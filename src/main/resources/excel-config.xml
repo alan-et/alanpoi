@@ -1,0 +1,8 @@
+<?xml version = "1.0" encoding = "GB2312"?>
+<exg name="serProduct" version="1.0" file-type="excel">
+    <excel id="EXCEL_ID" consume="">
+        <sheet index="0" row-start="2" column-start="0" vo="">
+<!--            <column offset="1">id</column>-->
+        </sheet>
+   </excel>
+</exg>
