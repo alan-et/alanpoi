@@ -1,6 +1,6 @@
 ## 前言
 
-针对Excel操作，alanpoi是为了实现一个操作更加简单，开发效率更加高的工具，开发者不需要关系太多的逻辑，只需要处理和自己业务相关的逻辑
+针对Excel操作，alanpoi是为了实现一个操作更加简单，开发效率更加高的工具，开发者不需要关系太多的逻辑，只需要处理和自己业务相关的部分
 
 ## 功能介绍
 
@@ -18,11 +18,11 @@
 1. 用户不需要额外引入poi等繁琐的jar
 2. 毫秒级解析大文件，支持一键解析多sheet页签，不需要自己按照一定的格式循环匹配解析所有数据
 3. 不管你的系统多么复杂，有多少个导入，alanpoi全部支持，而且准确返回你需要的对象，减轻开发者工作量
-4. 目前外界业务越来越复杂，对各个功能要求也越来越严格，当然导入也不例外，alanpoi支持错误一键会写到excel，对应到每一行
-5. alanpoi灵活可扩展，提供了ExcelConsumeInterface接口，可继承valid、error、end三个方法实现自己的业务 </br>
-     A. valid: 方法参数反馈excel所有数据，用户可进行自我校验</br>
+4. 目前外界业务越来越复杂，对各个功能要求也越来越严格，当然导入也不例外，alanpoi支持错误一键回写到excel，对应到每一行
+5. alanpoi灵活可扩展，提供了ExcelConsumeInterface接口，可继承它，实现valid、error、end三个方法编写自己的业务 </br>
+     A. valid: 方法参数返回excel所有数据，用户可进行自我校验</br>
      B. error: 导入错误会回调</br>
-     C. end: 方法参数返回校验成功的数据，valid校验失败的数据不会返回，用户可以自己操作持久化或者其他业务操作
+     C. end: 方法参数返回校验成功的数据，valid校验失败的数据不会返回，用户可以自己操作持久化或者其他业务
 
 ## 怎么使用alanpoi
 
@@ -32,14 +32,17 @@
 
 在项目resources目录中新建excel-config.xml文件,cosume中配置自己的消费类路径，继承提供了ExcelConsumeInterface接口，sheet中的vo是把当切sheet序列化的对象路径，column中当然就是配置vo中的属性了，导入包含多个sheet就配置多个
 
-<?xml version = "1.0" encoding = "GB2312"?>
-<exg name="excelId" version="1.0" file-type="excel">
-    <excel id="EXCEL_ID" consume="">
-        <sheet index="0" row-start="2" column-start="0" vo="">
-             <column offset="1">id</column>
-        </sheet>
-   </excel>
-</exg>
+
+```
+   <?xml version = "1.0" encoding = "GB2312"?>
+   <exg name="excelId" version="1.0" file-type="excel">
+     <excel id="EXCEL_ID" consume="">
+         <sheet index="0" row-start="2" column-start="0" vo="">
+              <column offset="1">id</column>
+         </sheet>
+    </excel>
+   </exg>
+```
 
 ### 一继承
 
