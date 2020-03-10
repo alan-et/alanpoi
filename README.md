@@ -29,6 +29,7 @@
 简单一句话:一配置一继承一调用
 
 ### 一配置
+
 在项目resources目录中新建excel-config.xml文件,cosume中配置自己的消费类路径，继承提供了ExcelConsumeInterface接口，sheet中的vo是把当切sheet序列化的对象路径，column中当然就是配置vo中的属性了，导入包含多个sheet就配置多个
 
 <?xml version = "1.0" encoding = "GB2312"?>
@@ -43,6 +44,7 @@
 ### 一继承
 
 consume类继承ExcelConsumeInterface接口，实现方法
+
     /**
      * when error will 调用
      *
