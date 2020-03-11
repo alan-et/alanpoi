@@ -1,4 +1,4 @@
-package com.qizhidao.alanpoi.common;
+package com.alanpoi.common;
 
 import io.netty.util.concurrent.DefaultThreadFactory;
 import org.springframework.stereotype.Component;

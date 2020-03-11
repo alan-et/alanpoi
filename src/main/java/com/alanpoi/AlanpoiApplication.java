@@ -1,4 +1,4 @@
-package com.qizhidao.alanpoi;
+package com.alanpoi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

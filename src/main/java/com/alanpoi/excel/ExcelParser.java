@@ -1,8 +1,8 @@
-package com.qizhidao.alanpoi.excel;
+package com.alanpoi.excel;
 
-import com.qizhidao.alanpoi.common.AbstractExcelService;
-import com.qizhidao.alanpoi.common.ExecutorTools;
-import com.qizhidao.alanpoi.excel.handle.ExcelWorkbookManage;
+import com.alanpoi.common.ExecutorTools;
+import com.alanpoi.common.AbstractExcelService;
+import com.alanpoi.excel.handle.ExcelWorkbookManage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -23,12 +23,12 @@ public class ExcelParser<T> extends AbstractFileParser<T> {
 
 
     @Autowired
-    public ExcelParser(ExcelHelper excelHelper,
+    public ExcelParser(ExcelInitConfig excelInitConfig,
                        ExcelWorkbookManage excelWorkbookManage,
                        AbstractExcelService excelService,
                        StringRedisTemplate redisTemplate,
                        ExecutorTools executorTools) {
-        this.excelHelper = excelHelper;
+        this.excelInitConfig = excelInitConfig;
         this.excelWorkbookManage = excelWorkbookManage;
         this.excelService=excelService;
         this.executorTools=executorTools;

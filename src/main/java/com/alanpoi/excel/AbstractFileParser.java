@@ -1,7 +1,7 @@
-package com.qizhidao.alanpoi.excel;
+package com.alanpoi.excel;
 
 import com.alibaba.fastjson.JSONObject;
-import com.qizhidao.alanpoi.excel.handle.ExcelHandle;
+import com.alanpoi.excel.handle.ExcelHandle;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -28,7 +28,7 @@ import java.util.UUID;
  */
 @Slf4j
 public abstract class AbstractFileParser<T> extends ExcelHandle {
-    protected ExcelHelper excelHelper;
+    protected ExcelInitConfig excelInitConfig;
 
     public AbstractFileParser() {
 
@@ -63,7 +63,7 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
     public List<T> importSingleData(String excelId, InputStream inputStream, String fileName) {
         Workbook wb = initWorkbook(inputStream, fileName);
         //取得 导入Excel文件的配置文件中的预设结果
-        Excel excel = excelHelper.getExcelSheet(excelId);
+        Excel excel = excelInitConfig.getExcelSheet(excelId);
         excel.setFileName(fileName);
         List<ExcelSheet> scList = excel.getExcelSheets();
         ExcelSheet sc = scList.get(0);
@@ -82,13 +82,34 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
         return list;
     }
 
-    public void download(String filepath, String fileId, HttpServletResponse response, HttpServletRequest request) {
+    public List<ExcelSheetData> getData(String excelId, InputStream inputStream, String fileName) {
+        List<ExcelSheetData> sheetDataList = new ArrayList<>();
+        Workbook wb = initWorkbook(inputStream, fileName);
+        Excel excel = excelInitConfig.getExcelSheet(excelId);
+
+        excel.setFileName(fileName);
+        List<ExcelSheet> scList = excel.getExcelSheets();
+        scList.forEach(sc -> {
+            //取得  预设文件中指定sheet页
+            Sheet sheet = wb.getSheetAt(sc.getIndex());
+            ExcelSheetData sheetData = new ExcelSheetData();
+            sheetData.setIndex(sc.getIndex());
+            sheetData.setRowStart(sc.getRowStart());
+            sheetData.setSheetName(sheet.getSheetName());
+            sheetData.setData(parse(sc, sheet));
+            sheetDataList.add(sheetData);
+        });
+        return sheetDataList;
+    }
+
+    public void download(String fileId, HttpServletResponse response, HttpServletRequest request) {
         String errorStr = redisTemplate.opsForValue().get("product:import:" + fileId);
         if (StringUtils.isEmpty(errorStr)) {
             return;
         }
         ErrorFile errorFile = JSONObject.parseObject(errorStr, ErrorFile.class);
         String fileName = errorFile.getFileName();
+        String filepath = errorFile.getFilePath();
         InputStream in = null;
         CloseableHttpClient httpClient = null;
         if (errorFile.getIpAddress().equals(ApplicationUtil.getInetAddress().getHostAddress())) {
@@ -184,7 +205,7 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
     public ExcelImportRes importData(String excelId, InputStream inputStream, String fileName, String excelParam) {
         List<ExcelSheetData> sheetDataList = new ArrayList<>();
         Workbook wb = initWorkbook(inputStream, fileName);
-        Excel excel = excelHelper.getExcelSheet(excelId);
+        Excel excel = excelInitConfig.getExcelSheet(excelId);
 
         if (StringUtils.isNotEmpty(excelParam)) {
             //初始化记录

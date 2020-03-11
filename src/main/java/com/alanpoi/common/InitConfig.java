@@ -1,10 +1,9 @@
-package com.qizhidao.alanpoi.common;
+package com.alanpoi.common;
 
-import com.qizhidao.alanpoi.excel.ApplicationUtil;
-import com.qizhidao.alanpoi.excel.ExcelHelper;
-import com.qizhidao.alanpoi.excel.ExcelParser;
-import com.qizhidao.alanpoi.excel.handle.ExcelWorkbookManage;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.alanpoi.excel.ApplicationUtil;
+import com.alanpoi.excel.ExcelInitConfig;
+import com.alanpoi.excel.ExcelParser;
+import com.alanpoi.excel.handle.ExcelWorkbookManage;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -25,8 +24,8 @@ public class InitConfig {
     }
 
     @Bean
-    public ExcelHelper getExcelHelper() {
-        return new ExcelHelper();
+    public ExcelInitConfig getExcelHelper() {
+        return new ExcelInitConfig();
     }
 
     @Bean
@@ -35,12 +34,12 @@ public class InitConfig {
     }
 
     @Bean
-    public ExcelParser getExcelParser(ExcelHelper excelHelper,
+    public ExcelParser getExcelParser(ExcelInitConfig excelInitConfig,
                                       ExcelWorkbookManage excelWorkbookManage,
                                       AbstractExcelService excelService,
                                       StringRedisTemplate redisTemplate,
                                       ExecutorTools executorTools) {
-        return new ExcelParser(excelHelper, excelWorkbookManage, excelService, redisTemplate, executorTools);
+        return new ExcelParser(excelInitConfig, excelWorkbookManage, excelService, redisTemplate, executorTools);
     }
 
 

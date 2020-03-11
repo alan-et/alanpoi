@@ -1,4 +1,4 @@
-package com.qizhidao.alanpoi;
+package com.alanpoi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

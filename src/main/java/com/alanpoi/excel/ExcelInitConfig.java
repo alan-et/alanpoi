@@ -1,4 +1,4 @@
-package com.qizhidao.alanpoi.excel;
+package com.alanpoi.excel;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -20,13 +20,13 @@ import java.util.List;
  * @since 2020-2-25
  */
 @Slf4j
-public class ExcelHelper implements Serializable {
+public class ExcelInitConfig implements Serializable {
     private String fileName = "excel-config.xml";  //Excel结构配置文件
 
     private HashMap map = new HashMap();
 
 
-    public ExcelHelper() {
+    public ExcelInitConfig() {
 
     }
 
