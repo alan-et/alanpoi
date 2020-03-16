@@ -1,9 +1,9 @@
 package com.alanpoi.common;
 
-import com.alanpoi.excel.ApplicationUtil;
-import com.alanpoi.excel.ExcelInitConfig;
-import com.alanpoi.excel.ExcelParser;
-import com.alanpoi.excel.handle.ExcelWorkbookManage;
+import com.alanpoi.excel.imports.ApplicationUtil;
+import com.alanpoi.excel.imports.ExcelInitConfig;
+import com.alanpoi.excel.imports.ExcelParser;
+import com.alanpoi.excel.imports.handle.ExcelWorkbookManage;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;

@@ -1,4 +1,4 @@
-package com.alanpoi.excel;
+package com.alanpoi.excel.imports;
 
 import lombok.Data;
 

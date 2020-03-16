@@ -1,10 +1,10 @@
-package com.alanpoi.excel.handle;
+package com.alanpoi.excel.imports.handle;
 
 import com.alanpoi.common.ExecutorTools;
-import com.alanpoi.excel.ApplicationUtil;
-import com.alanpoi.excel.ErrorFile;
-import com.alanpoi.excel.ExcelImportRes;
-import com.alanpoi.excel.ExcelSheetData;
+import com.alanpoi.excel.imports.ApplicationUtil;
+import com.alanpoi.excel.imports.ErrorFile;
+import com.alanpoi.excel.imports.ExcelImportRes;
+import com.alanpoi.excel.imports.ExcelSheetData;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
@@ -46,13 +46,13 @@ public class ExcelHandle {
 
     public StringRedisTemplate redisTemplate;
 
-    @Value("${server.port:5577}")
+    @Value("${server.port:8080}")
     public String port;
 
-    @Value("${excel.tmp_path:/tmp/ips-product/import/}")
+    @Value("${excel.tmp_path:/tmp/import/}")
     public String tmpPath;
 
-    @Value("${excel.download_path:/product/common/download/}")
+    @Value("${excel.download_path:/download/}")
     public String downloadPath;
 
     public ExcelImportRes process(String workbookId, List<ExcelSheetData> sheetDataList, Class<? extends ExcelConsumeInterface> c, String fileName, long frameId) {

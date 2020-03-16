@@ -1,8 +1,8 @@
 package com.alanpoi.excel.utils;
 
-import com.alanpoi.excel.AbstractFileParser;
-import com.alanpoi.excel.ApplicationUtil;
-import com.alanpoi.excel.ExcelSheetData;
+import com.alanpoi.excel.imports.AbstractFileParser;
+import com.alanpoi.excel.imports.ApplicationUtil;
+import com.alanpoi.excel.imports.ExcelSheetData;
 
 import java.io.InputStream;
 import java.util.List;
