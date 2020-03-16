@@ -16,6 +16,8 @@ import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -55,6 +57,7 @@ public class ExcelHandle {
 
     public ExcelImportRes process(String workbookId, List<ExcelSheetData> sheetDataList, Class<? extends ExcelConsumeInterface> c, String fileName, long frameId) {
         log.info("ExcelHandle.process ");
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         int total = sheetDataList.get(0).getData().size();
         ExcelImportRes excelImportRes = new ExcelImportRes();
         ExcelConsumeInterface consumeInterface = ApplicationUtil.getBean(c);
@@ -79,6 +82,7 @@ public class ExcelHandle {
                 });
             }
             log.info("import success:{},error:{}", sheetDataList.size(), total - sheetDataList.size());
+            RequestContextHolder.setRequestAttributes(requestAttributes, true);
             consumeInterface.end(sheetDataList);
             return null;
 
@@ -106,12 +110,12 @@ public class ExcelHandle {
                 excelImportRes.setStatus(ResponseEnum.IMPORT_FILE_DATA_EXP.status());
                 excelImportRes.setDownErrorUrl(downloadPath + workbookId);
                 //
-                updateLogToFrame(frameId, -1, null, excelImportRes.getDownErrorUrl());
+                updateLogToFrame(frameId, -1, null, excelImportRes.getDownErrorUrl(), fileName);
             } else {
                 ByteArrayOutputStream bytes = new ByteArrayOutputStream(3072);
                 excelWorkbookManage.getWorkbook(workbookId).write(bytes);
                 //
-                updateLogToFrame(frameId, 1, bytes.toByteArray(), null);
+                updateLogToFrame(frameId, 1, bytes.toByteArray(), null, fileName);
             }
             excelImportRes.setMessage(String.format(ResponseEnum.IMPORT_FILE_DATA_EXP.message(), sheetDataList.get(0).getData().size(), total - sheetDataList.get(0).getData().size()));
         } catch (Exception e) {
@@ -198,14 +202,14 @@ public class ExcelHandle {
      * @param status
      * @param bytes
      */
-    public void updateLogToFrame(long frameId, int status, byte[] bytes, String filePath) {
+    public void updateLogToFrame(long frameId, int status, byte[] bytes, String filePath, String fileName) {
         executorTools.getExecutor().execute(new Runnable() {
             @Override
             public void run() {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("id", frameId);
                 jsonObject.put("status", status);
-
+                jsonObject.put("fileName", status);
                 if (StringUtils.isNotEmpty(filePath)) {
                     jsonObject.put("fileUrl", filePath);
                 }

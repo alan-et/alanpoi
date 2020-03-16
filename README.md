@@ -9,7 +9,7 @@
 
 ### ExcelWorkbookManage  excel所有工作表管理
 
-### ExcelHelper  配置文件初始化
+### ExcelInitConfig  配置文件初始化
 
 ### AbstractFileParser  文件转换类
 
