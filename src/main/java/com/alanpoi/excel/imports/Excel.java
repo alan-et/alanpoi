@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * excel全局参数
@@ -14,9 +15,9 @@ import java.util.List;
 public class Excel implements Serializable {
 
     private long frameId;
-
     private Class consume;
     private String fileName;
+    private Map<Serializable,Object> customParam;
     private List<ExcelSheet> excelSheets;
 
     public Excel() {

@@ -1,10 +1,7 @@
 package com.alanpoi.excel.imports.handle;
 
 import com.alanpoi.common.ExecutorTools;
-import com.alanpoi.excel.imports.ApplicationUtil;
-import com.alanpoi.excel.imports.ErrorFile;
-import com.alanpoi.excel.imports.ExcelImportRes;
-import com.alanpoi.excel.imports.ExcelSheetData;
+import com.alanpoi.excel.imports.*;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
@@ -55,13 +52,16 @@ public class ExcelHandle {
     @Value("${excel.download_path:/download/}")
     public String downloadPath;
 
-    public ExcelImportRes process(String workbookId, List<ExcelSheetData> sheetDataList, Class<? extends ExcelConsumeInterface> c, String fileName, long frameId) {
+    public ExcelImportRes process(String workbookId, List<ExcelSheetData> sheetDataList, Excel excel) {
         log.info("ExcelHandle.process ");
+        Class<? extends ExcelConsumeInterface> c = excel.getConsume();
+        String fileName = excel.getFileName();
+        long frameId = excel.getFrameId();
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         int total = sheetDataList.get(0).getData().size();
         ExcelImportRes excelImportRes = new ExcelImportRes();
         ExcelConsumeInterface consumeInterface = ApplicationUtil.getBean(c);
-        consumeInterface.validData(workbookId, sheetDataList);
+        consumeInterface.validData(workbookId, sheetDataList, excel.getCustomParam());
         ExcelError excelError = excelWorkbookManage.getExcelError(workbookId);
         int rowStart = sheetDataList.get(0).getRowStart();
         CompletableFuture<String> completableFuture = CompletableFuture.supplyAsync(() -> {
@@ -83,7 +83,7 @@ public class ExcelHandle {
             }
             log.info("import success:{},error:{}", sheetDataList.size(), total - sheetDataList.size());
             RequestContextHolder.setRequestAttributes(requestAttributes, true);
-            consumeInterface.end(sheetDataList);
+            consumeInterface.end(sheetDataList, excel.getCustomParam());
             return null;
 
         }).supplyAsync(() -> {

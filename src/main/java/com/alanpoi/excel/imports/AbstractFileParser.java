@@ -17,10 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author zhuoxun.peng
@@ -185,7 +182,7 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
 
     private ExcelImportRes consumeHandle(String workbookId, Excel excel, List<ExcelSheetData> sheetDataList) {
         try {
-            ExcelImportRes res = process(workbookId, sheetDataList, excel.getConsume(), excel.getFileName(), excel.getFrameId());
+            ExcelImportRes res = process(workbookId, sheetDataList, excel);
             return res;
         } catch (Exception e) {
             log.error("consumeHandle exception:", e);
@@ -202,20 +199,29 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
      * @param fileName
      * @return
      */
-    public ExcelImportRes importData(String excelId, InputStream inputStream, String fileName, String excelParam) {
+    public ExcelImportRes importData(String excelId, InputStream inputStream, String fileName) {
+        return importData(excelId, inputStream, fileName, new HashMap<>(), null);
+    }
+
+    public ExcelImportRes importData(String excelId, InputStream inputStream, String fileName, String frameParam) {
+        return importData(excelId, inputStream, fileName, new HashMap<>(), frameParam);
+    }
+
+    public ExcelImportRes importData(String excelId, InputStream inputStream, String fileName, Map<Serializable, Object> excelParam, String frameParam) {
         List<ExcelSheetData> sheetDataList = new ArrayList<>();
         Workbook wb = initWorkbook(inputStream, fileName);
         Excel excel = excelInitConfig.getExcelSheet(excelId);
 
-        if (StringUtils.isNotEmpty(excelParam)) {
+        if (StringUtils.isNotEmpty(frameParam)) {
             //初始化记录
-            Long paramId = excelService.initImportLogEntity(excelParam);
+            Long paramId = excelService.initImportLogEntity(frameParam);
             if (paramId != null) {
                 excel.setFrameId(paramId);
             }
         }
 
         excel.setFileName(fileName);
+        excel.setCustomParam(excelParam);
         List<ExcelSheet> scList = excel.getExcelSheets();
         scList.forEach(sc -> {
             //取得  预设文件中指定sheet页

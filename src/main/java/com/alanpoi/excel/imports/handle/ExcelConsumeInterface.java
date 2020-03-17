@@ -2,10 +2,13 @@ package com.alanpoi.excel.imports.handle;
 
 import com.alanpoi.excel.imports.ExcelSheetData;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Excel消费接口
+ *
  * @author zhuoxun.peng
  * @since 2020-2-26
  */
@@ -23,11 +26,10 @@ public interface ExcelConsumeInterface {
      * @param workbookId
      * @param sheetDataList
      */
-    void validData(String workbookId, List<ExcelSheetData> sheetDataList);
+    void validData(String workbookId, List<ExcelSheetData> sheetDataList, Map<Serializable, Object> excelParam);
 
     /**
-     *
      * @param sheetDataList return success data
      */
-    void end(List<ExcelSheetData> sheetDataList);
+    void end(List<ExcelSheetData> sheetDataList, Map<Serializable, Object> excelParam);
 }
