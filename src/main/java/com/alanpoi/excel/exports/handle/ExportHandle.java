@@ -10,6 +10,7 @@ import com.alanpoi.excel.exports.ReflectorManager;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -28,10 +29,13 @@ public class ExportHandle {
 
     public Workbook exportData(Workbook workbook, Collection<?> data, Class<?> c) {
         CellStyle cellStyle = workbook.createCellStyle();
+        CellStyle headStyle = workbook.createCellStyle();
+
         //自动换行*重要*
         cellStyle.setWrapText(true);
         try {
             Sheet sheet = null;
+            ReflectorManager reflectorManager = ReflectorManager.fromCache(c);
             ExcelSheet excelSheet = c.getAnnotation(ExcelSheet.class);
             sheet = workbook.createSheet();
             int rowInd = 0;
@@ -40,6 +44,14 @@ public class ExportHandle {
             if (excelSheet != null) {
                 workbook.setSheetName(excelSheet.index(), excelSheet.name());
                 headRow.setHeightInPoints(excelSheet.rowHeight());
+                Font font = workbook.createFont();
+                font.setFontName(excelSheet.font());
+                font.setFontHeightInPoints((short) excelSheet.fontSize());//设置字体大小
+                headStyle.setFont(font);
+                headStyle.setAlignment(HorizontalAlignment.CENTER);
+                headStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+                headStyle.setFillForegroundColor(excelSheet.backColor().index);
+                headStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
             }
             Field[] fields = FieldUtil.getClassFields(c);
             int fieldLength = fields.length;
@@ -51,14 +63,14 @@ public class ExportHandle {
                 if (excelColumn != null) {
                     Cell cell;
                     if (StringUtils.isNotBlank(excelColumn.index())) {
-                        cell = headRow.getCell(Integer.valueOf(excelColumn.index()));
+                        cell = headRow.createCell(Integer.valueOf(excelColumn.index()));
                     } else {
-                        cell = headRow.getCell(i);
+                        cell = headRow.createCell(i);
                     }
                     cell.setCellValue(excelColumn.name());
+                    cell.setCellStyle(headStyle);
                     sheet.setColumnWidth(i, excelColumn.width() * 256);
                 }
-                ReflectorManager reflectorManager = ReflectorManager.fromCache(c);
                 ExcelParseParam excelParseParam = new ExcelParseParam();
                 if (dateFormat != null) {
                     excelParseParam.setFormat(dateFormat.value());
@@ -71,7 +83,7 @@ public class ExportHandle {
             }
             Iterator iterator = data.iterator();
             while (iterator.hasNext()) {
-                Object object = iterator.hasNext();
+                Object object = iterator.next();
                 handleRow(sheet.createRow(rowInd), object, excelParseParamList);
                 rowInd++;
             }

@@ -1,5 +1,6 @@
 package com.alanpoi.excel.utils;
 
+import com.alanpoi.common.ExcelType;
 import com.alanpoi.excel.exports.WorkbookManager;
 import com.alanpoi.excel.exports.handle.ExportHandle;
 import com.alanpoi.excel.imports.ApplicationUtil;
@@ -21,19 +22,16 @@ import java.util.UUID;
 public class ExcelExportUtil {
     protected static final Logger logger = LoggerFactory.getLogger(ExcelExportUtil.class);
 
-    public static Workbook getWorkbook(List singleSheetData) {
-
-        return null;
-
-    }
-
     public static Workbook getWorkbook(Collection<?> singleSheetData, Class<?> c) {
-        ExportHandle exportHandle = ApplicationUtil.getBean(ExportHandle.class);
-        WorkbookManager workbookManager = ApplicationUtil.getBean(WorkbookManager.class);
-        return exportHandle.exportData(workbookManager(), singleSheetData, c);
+        return getWorkbook(ExcelType.EXCEL_2007, singleSheetData, c);
     }
 
-    public static Workbook getWorkbook(Workbook workbook,Collection<?> singleSheetData, Class<?> c) {
+    public static Workbook getWorkbook(ExcelType excelType, Collection<?> singleSheetData, Class<?> c) {
+        ExportHandle exportHandle = ApplicationUtil.getBean(ExportHandle.class);
+        return exportHandle.exportData(WorkbookManager.newWorkbook(excelType), singleSheetData, c);
+    }
+
+    public static Workbook getWorkbook(Workbook workbook, Collection<?> singleSheetData, Class<?> c) {
         ExportHandle exportHandle = ApplicationUtil.getBean(ExportHandle.class);
         return exportHandle.exportData(workbook, singleSheetData, c);
     }
@@ -48,15 +46,16 @@ public class ExcelExportUtil {
     }
 
     public static void export(Collection<?> singleSheetData, Class<?> c, HttpServletRequest request, HttpServletResponse response, String fileName) {
-        Workbook workbook = getWorkbook(singleSheetData, c);
-        download(getWorkbook(singleSheetData, c), request, response, fileName);
+        WorkbookManager workbookManager = ApplicationUtil.getBean(WorkbookManager.class);
+        getWorkbook(workbookManager.getWorkbook(), singleSheetData, c);
+        download(workbookManager, request, response, fileName);
     }
 
     public static void export(Collection<?> singleSheetData, Class<?> c, HttpServletRequest request, HttpServletResponse response) {
         export(singleSheetData, c, request, response, UUID.randomUUID().toString() + ".xlsx");
     }
 
-    private static void download(Workbook workbook, HttpServletRequest request, HttpServletResponse response, String fileName) {
+    private static void download(WorkbookManager workbookManager, HttpServletRequest request, HttpServletResponse response, String fileName) {
         try {
             response.setContentType("application/force-download;charset=UTF-8");
             final String userAgent = request.getHeader("USER-AGENT");
@@ -73,11 +72,11 @@ public class ExcelExportUtil {
                 logger.error(e.getMessage(), e);
                 return;
             }
-            workbook.write(response.getOutputStream());
+            workbookManager.getWorkbook().write(response.getOutputStream());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
-
+            workbookManager.close(workbookManager.getWorkbookId());
         }
 
     }

@@ -62,6 +62,21 @@ public class WorkbookManager {
 
     public WorkbookManager getWorkbookManager(ExcelType excelType, String workbookId) {
         WorkbookManager workbookManager = new WorkbookManager();
+
+        workbookManager.workbook = getWorkbook(excelType);
+        workbookManager.workbookId = workbookId;
+        workbookManagerMap.put(workbookId, workbookManager);
+        return workbookManagerMap.get(workbookId);
+    }
+
+    public Workbook getWorkbook() {
+        if (workbook == null) {
+            workbook = new XSSFWorkbook();
+        }
+        return workbook;
+    }
+
+    public static Workbook newWorkbook(ExcelType excelType) {
         Workbook workbook = null;
         try {
             if (excelType == ExcelType.EXCEL_2003) {
@@ -73,13 +88,21 @@ public class WorkbookManager {
         } catch (Exception e) {
             log.error("", e);
         }
-        workbookManager.workbook = workbook;
-        workbookManager.workbookId = workbookId;
-        workbookManagerMap.put(workbookId, workbookManager);
-        return workbookManagerMap.get(workbookId);
+        return workbook;
     }
 
-    public Workbook getWorkbook() {
+    public Workbook getWorkbook(ExcelType excelType) {
+        try {
+            if (workbook == null) {
+                if (excelType == ExcelType.EXCEL_2003) {
+                    workbook = new HSSFWorkbook();
+                } else {
+                    workbook = new XSSFWorkbook();
+                }
+            }
+        } catch (Exception e) {
+            log.error("", e);
+        }
         return workbook;
     }
 

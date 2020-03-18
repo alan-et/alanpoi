@@ -1,5 +1,7 @@
 package com.alanpoi.excel.annotation;
 
+import org.apache.poi.ss.usermodel.IndexedColors;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -22,7 +24,5 @@ public @interface ExcelColumn {
 
     int width() default 30;
 
-    Color color() default Color.WHITE;
-
-    public enum Color {WHITE, RED, GREEN}
+    IndexedColors color() default IndexedColors.WHITE;
 }

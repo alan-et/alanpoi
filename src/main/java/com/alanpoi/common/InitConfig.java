@@ -1,5 +1,6 @@
 package com.alanpoi.common;
 
+import com.alanpoi.excel.exports.handle.ExportHandle;
 import com.alanpoi.excel.imports.ApplicationUtil;
 import com.alanpoi.excel.imports.ExcelInitConfig;
 import com.alanpoi.excel.imports.ExcelParser;
@@ -31,6 +32,11 @@ public class InitConfig {
     @Bean
     public ApplicationUtil getApplicationUtil() {
         return new ApplicationUtil();
+    }
+
+    @Bean
+    public ExportHandle getExportHandle() {
+        return new ExportHandle();
     }
 
     @Bean
