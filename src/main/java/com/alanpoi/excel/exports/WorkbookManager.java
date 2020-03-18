@@ -1,11 +1,18 @@
 package com.alanpoi.excel.exports;
 
+import com.alanpoi.common.ExcelType;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -16,24 +23,85 @@ import java.io.FileInputStream;
  */
 @Slf4j
 public class WorkbookManager {
-    private static Workbook workbook;
 
-    public Workbook getWorkbook(String url) {
+    private Map<String, WorkbookManager> workbookManagerMap = new ConcurrentHashMap();
+    private String workbookId;
+    private Workbook workbook;
+
+    @PreDestroy
+    public void destroy() {
+        for (String workbookId : workbookManagerMap.keySet()) {
+            Workbook workbook = workbookManagerMap.get(workbookId).getWorkbook();
+            if (workbook != null) {
+                try {
+                    workbook.close();
+                } catch (IOException e) {
+                    log.info("stop {},workbook close exception:{}", workbookId, e);
+                }
+            }
+        }
+        workbookManagerMap.clear();
+    }
+
+    public WorkbookManager getWorkbookManager(String url) {
+        if (workbookManagerMap.containsKey(url)) {
+            return workbookManagerMap.get(url);
+        }
+        WorkbookManager workbookManager = new WorkbookManager();
         Workbook workbook = null;
         try {
             workbook = WorkbookFactory.create(new FileInputStream(new File(url)));
         } catch (Exception e) {
             log.error("", e);
         }
-        this.setWorkbook(workbook);
+        workbookManager.setWorkbookId(url);
+        workbookManager.setWorkbook(workbook);
+        workbookManagerMap.put(url, workbookManager);
+        return workbookManagerMap.get(workbookManager.workbookId);
+    }
+
+    public WorkbookManager getWorkbookManager(ExcelType excelType, String workbookId) {
+        WorkbookManager workbookManager = new WorkbookManager();
+        Workbook workbook = null;
+        try {
+            if (excelType == ExcelType.EXCEL_2003) {
+                workbook = new HSSFWorkbook();
+            } else {
+                workbook = new XSSFWorkbook();
+            }
+
+        } catch (Exception e) {
+            log.error("", e);
+        }
+        workbookManager.workbook = workbook;
+        workbookManager.workbookId = workbookId;
+        workbookManagerMap.put(workbookId, workbookManager);
+        return workbookManagerMap.get(workbookId);
+    }
+
+    public Workbook getWorkbook() {
         return workbook;
     }
 
-    public static Workbook getWorkbook() {
-        return workbook;
+    public void setWorkbook(Workbook workbook) {
+        this.workbook = workbook;
     }
 
-    public static void setWorkbook(Workbook workbook) {
-        WorkbookManager.workbook = workbook;
+    public String getWorkbookId() {
+        return workbookId;
     }
+
+    public void setWorkbookId(String workbookId) {
+        this.workbookId = workbookId;
+    }
+
+    public void close(String workbookId) {
+        try {
+            Workbook wb = workbookManagerMap.get(workbookId).getWorkbook();
+            wb.close();
+        } catch (Exception e) {
+            log.error("Close workbook exception:" + e);
+        }
+    }
+
 }

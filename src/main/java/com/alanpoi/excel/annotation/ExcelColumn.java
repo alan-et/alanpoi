@@ -1,0 +1,28 @@
+package com.alanpoi.excel.annotation;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ * Excel Column annotation
+ *
+ * @author zhuoxun.peng
+ * @since 2020-3-17
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD})
+public @interface ExcelColumn {
+    String name() default "";
+
+    String index() default "";
+
+    int height() default 20;
+
+    int width() default 30;
+
+    Color color() default Color.WHITE;
+
+    public enum Color {WHITE, RED, GREEN}
+}
