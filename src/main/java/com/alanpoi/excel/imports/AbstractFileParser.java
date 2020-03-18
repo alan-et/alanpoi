@@ -1,5 +1,6 @@
 package com.alanpoi.excel.imports;
 
+import com.alanpoi.common.AbstractExcelService;
 import com.alibaba.fastjson.JSONObject;
 import com.alanpoi.excel.imports.handle.ExcelHandle;
 import lombok.extern.slf4j.Slf4j;
@@ -214,9 +215,13 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
 
         if (StringUtils.isNotEmpty(frameParam)) {
             //初始化记录
-            Long paramId = excelService.initImportLogEntity(frameParam);
-            if (paramId != null) {
-                excel.setFrameId(paramId);
+            AbstractExcelService excelService = ApplicationUtil.getBean(AbstractExcelService.class);
+            if (excelService != null) {
+                //初始化记录
+                Long paramId = excelService.initImportLogEntity(frameParam);
+                if (paramId != null) {
+                    excel.setFrameId(paramId);
+                }
             }
         }
 

@@ -39,8 +39,6 @@ public class ExcelHandle {
 
     public ExecutorTools executorTools;
 
-    public AbstractExcelService excelService;
-
     public StringRedisTemplate redisTemplate;
 
     @Value("${server.port:8080}")
@@ -213,12 +211,14 @@ public class ExcelHandle {
                 if (StringUtils.isNotEmpty(filePath)) {
                     jsonObject.put("fileUrl", filePath);
                 }
-                if (bytes != null) {
-                    excelService.uploadFileToFrame(jsonObject.toJSONString(), bytes);
-                } else {
-                    excelService.uploadFileToFrame(jsonObject.toJSONString());
+                AbstractExcelService excelService = ApplicationUtil.getBean(AbstractExcelService.class);
+                if (excelService != null) {
+                    if (bytes != null) {
+                        excelService.uploadFileToFrame(jsonObject.toJSONString(), bytes);
+                    } else {
+                        excelService.uploadFileToFrame(jsonObject.toJSONString());
+                    }
                 }
-
             }
         });
 

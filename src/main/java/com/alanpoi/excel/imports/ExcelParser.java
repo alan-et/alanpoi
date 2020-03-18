@@ -25,12 +25,10 @@ public class ExcelParser<T> extends AbstractFileParser<T> {
     @Autowired
     public ExcelParser(ExcelInitConfig excelInitConfig,
                        ExcelWorkbookManage excelWorkbookManage,
-                       AbstractExcelService excelService,
                        StringRedisTemplate redisTemplate,
                        ExecutorTools executorTools) {
         this.excelInitConfig = excelInitConfig;
         this.excelWorkbookManage = excelWorkbookManage;
-        this.excelService=excelService;
         this.executorTools=executorTools;
         this.redisTemplate=redisTemplate;
     }

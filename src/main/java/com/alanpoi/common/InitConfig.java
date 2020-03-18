@@ -42,10 +42,9 @@ public class InitConfig {
     @Bean
     public ExcelParser getExcelParser(ExcelInitConfig excelInitConfig,
                                       ExcelWorkbookManage excelWorkbookManage,
-                                      AbstractExcelService excelService,
                                       StringRedisTemplate redisTemplate,
                                       ExecutorTools executorTools) {
-        return new ExcelParser(excelInitConfig, excelWorkbookManage, excelService, redisTemplate, executorTools);
+        return new ExcelParser(excelInitConfig, excelWorkbookManage, redisTemplate, executorTools);
     }
 
 
