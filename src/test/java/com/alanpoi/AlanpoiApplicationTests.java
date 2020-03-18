@@ -20,8 +20,8 @@ class AlanpoiApplicationTests {
             List<ExportVO> list = new ArrayList<>();
             for (int i=0;i<500;i++){
                 ExportVO exportVO = new ExportVO();
-                exportVO.setName("123");
-                exportVO.setValue("32143放的");
+                exportVO.setName("name1234");
+                exportVO.setValue("value放的43");
                 exportVO.setDate(new Date(1232323123));
                 exportVO.setDateTime(new java.util.Date());
                 list.add(exportVO);

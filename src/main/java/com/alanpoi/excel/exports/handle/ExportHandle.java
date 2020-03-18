@@ -53,13 +53,13 @@ public class ExportHandle {
                 headStyle.setFillForegroundColor(excelSheet.backColor().index);
                 headStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
             }
-            Field[] fields = FieldUtil.getClassFields(c);
-            int fieldLength = fields.length;
+            List<Field> fields = reflectorManager.getFieldList();
+            int fieldLength = fields.size();
             List<ExcelParseParam> excelParseParamList = new ArrayList<>();
             for (int i = 0; i < fieldLength; i++) {
-                ExcelColumn excelColumn = fields[i].getAnnotation(ExcelColumn.class);
-                DateFormat dateFormat = fields[i].getAnnotation(DateFormat.class);
-                NumFormat numFormat = fields[i].getAnnotation(NumFormat.class);
+                ExcelColumn excelColumn = fields.get(i).getAnnotation(ExcelColumn.class);
+                DateFormat dateFormat = fields.get(i).getAnnotation(DateFormat.class);
+                NumFormat numFormat = fields.get(i).getAnnotation(NumFormat.class);
                 if (excelColumn != null) {
                     Cell cell;
                     if (StringUtils.isNotBlank(excelColumn.index())) {
@@ -78,7 +78,7 @@ public class ExportHandle {
                 if (numFormat != null) {
                     excelParseParam.setNumFormat(numFormat.value());
                 }
-                excelParseParam.setMethod(reflectorManager.getGetMethod(fields[i].getName()));
+                excelParseParam.setMethod(reflectorManager.getGetMethod(fields.get(i).getName()));
                 excelParseParamList.add(excelParseParam);
             }
             Iterator iterator = data.iterator();

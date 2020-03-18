@@ -1,5 +1,6 @@
 package com.alanpoi.common;
 
+import com.alanpoi.excel.exports.WorkbookManager;
 import com.alanpoi.excel.exports.handle.ExportHandle;
 import com.alanpoi.excel.imports.ApplicationUtil;
 import com.alanpoi.excel.imports.ExcelInitConfig;
@@ -22,6 +23,11 @@ public class InitConfig {
     @Bean
     public ExcelWorkbookManage getExcelWorkbookManage() {
         return new ExcelWorkbookManage();
+    }
+
+    @Bean
+    public WorkbookManager getWorkbookManage() {
+        return new WorkbookManager();
     }
 
     @Bean

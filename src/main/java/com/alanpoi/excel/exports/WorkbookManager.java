@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -60,13 +61,13 @@ public class WorkbookManager {
         return workbookManagerMap.get(workbookManager.workbookId);
     }
 
-    public WorkbookManager getWorkbookManager(ExcelType excelType, String workbookId) {
+    public WorkbookManager getWorkbookManager(ExcelType excelType) {
         WorkbookManager workbookManager = new WorkbookManager();
 
-        workbookManager.workbook = getWorkbook(excelType);
-        workbookManager.workbookId = workbookId;
-        workbookManagerMap.put(workbookId, workbookManager);
-        return workbookManagerMap.get(workbookId);
+        workbookManager.workbook = newWorkbook(excelType);
+        workbookManager.workbookId = UUID.randomUUID().toString();
+        workbookManagerMap.put(workbookManager.workbookId, workbookManager);
+        return workbookManagerMap.get(workbookManager.workbookId);
     }
 
     public Workbook getWorkbook() {
@@ -91,21 +92,6 @@ public class WorkbookManager {
         return workbook;
     }
 
-    public Workbook getWorkbook(ExcelType excelType) {
-        try {
-            if (workbook == null) {
-                if (excelType == ExcelType.EXCEL_2003) {
-                    workbook = new HSSFWorkbook();
-                } else {
-                    workbook = new XSSFWorkbook();
-                }
-            }
-        } catch (Exception e) {
-            log.error("", e);
-        }
-        return workbook;
-    }
-
     public void setWorkbook(Workbook workbook) {
         this.workbook = workbook;
     }
@@ -124,6 +110,8 @@ public class WorkbookManager {
             wb.close();
         } catch (Exception e) {
             log.error("Close workbook exception:" + e);
+        } finally {
+            workbookManagerMap.remove(workbookId);
         }
     }
 

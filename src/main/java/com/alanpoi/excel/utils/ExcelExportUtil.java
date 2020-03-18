@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collection;
@@ -31,7 +30,7 @@ public class ExcelExportUtil {
         return exportHandle.exportData(WorkbookManager.newWorkbook(excelType), singleSheetData, c);
     }
 
-    public static Workbook getWorkbook(Workbook workbook, Collection<?> singleSheetData, Class<?> c) {
+    private static Workbook getWorkbook(Workbook workbook, Collection<?> singleSheetData, Class<?> c) {
         ExportHandle exportHandle = ApplicationUtil.getBean(ExportHandle.class);
         return exportHandle.exportData(workbook, singleSheetData, c);
     }
@@ -45,10 +44,15 @@ public class ExcelExportUtil {
         return null;
     }
 
-    public static void export(Collection<?> singleSheetData, Class<?> c, HttpServletRequest request, HttpServletResponse response, String fileName) {
+    public static void export(ExcelType excelType, Collection<?> singleSheetData, Class<?> c, HttpServletRequest request, HttpServletResponse response, String fileName) {
         WorkbookManager workbookManager = ApplicationUtil.getBean(WorkbookManager.class);
+        workbookManager = workbookManager.getWorkbookManager(excelType);
         getWorkbook(workbookManager.getWorkbook(), singleSheetData, c);
         download(workbookManager, request, response, fileName);
+    }
+
+    public static void export(Collection<?> singleSheetData, Class<?> c, HttpServletRequest request, HttpServletResponse response, String fileName) {
+        export(ExcelType.EXCEL_2007, singleSheetData, c, request, response, fileName);
     }
 
     public static void export(Collection<?> singleSheetData, Class<?> c, HttpServletRequest request, HttpServletResponse response) {
