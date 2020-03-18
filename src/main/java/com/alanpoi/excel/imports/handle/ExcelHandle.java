@@ -5,7 +5,6 @@ import com.alanpoi.excel.imports.*;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
-import com.alanpoi.common.AbstractExcelService;
 import com.alanpoi.common.ResponseEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -107,13 +106,9 @@ public class ExcelHandle {
                 consumeInterface.error(excelError);
                 excelImportRes.setStatus(ResponseEnum.IMPORT_FILE_DATA_EXP.status());
                 excelImportRes.setDownErrorUrl(downloadPath + workbookId);
-                //
-                updateLogToFrame(frameId, -1, null, excelImportRes.getDownErrorUrl(), fileName);
             } else {
                 ByteArrayOutputStream bytes = new ByteArrayOutputStream(3072);
                 excelWorkbookManage.getWorkbook(workbookId).write(bytes);
-                //
-                updateLogToFrame(frameId, 1, bytes.toByteArray(), null, fileName);
             }
             excelImportRes.setMessage(String.format(ResponseEnum.IMPORT_FILE_DATA_EXP.message(), sheetDataList.get(0).getData().size(), total - sheetDataList.get(0).getData().size()));
         } catch (Exception e) {
@@ -191,36 +186,5 @@ public class ExcelHandle {
 
     public void addErrorInfo(String workbookId, int sheetIndex, List<RowError> rowErrors) {
         excelWorkbookManage.addErrorInfo(workbookId, sheetIndex, rowErrors);
-    }
-
-    /**
-     * 更新日志到框架导入导出
-     *
-     * @param frameId
-     * @param status
-     * @param bytes
-     */
-    public void updateLogToFrame(long frameId, int status, byte[] bytes, String filePath, String fileName) {
-        executorTools.getExecutor().execute(new Runnable() {
-            @Override
-            public void run() {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("id", frameId);
-                jsonObject.put("status", status);
-                jsonObject.put("fileName", status);
-                if (StringUtils.isNotEmpty(filePath)) {
-                    jsonObject.put("fileUrl", filePath);
-                }
-                AbstractExcelService excelService = ApplicationUtil.getBean(AbstractExcelService.class);
-                if (excelService != null) {
-                    if (bytes != null) {
-                        excelService.uploadFileToFrame(jsonObject.toJSONString(), bytes);
-                    } else {
-                        excelService.uploadFileToFrame(jsonObject.toJSONString());
-                    }
-                }
-            }
-        });
-
     }
 }

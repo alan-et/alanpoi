@@ -1,6 +1,5 @@
 package com.alanpoi.excel.imports;
 
-import com.alanpoi.common.AbstractExcelService;
 import com.alibaba.fastjson.JSONObject;
 import com.alanpoi.excel.imports.handle.ExcelHandle;
 import lombok.extern.slf4j.Slf4j;
@@ -201,29 +200,13 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
      * @return
      */
     public ExcelImportRes importData(String excelId, InputStream inputStream, String fileName) {
-        return importData(excelId, inputStream, fileName, new HashMap<>(), null);
+        return importData(excelId, inputStream, fileName, new HashMap<>());
     }
 
-    public ExcelImportRes importData(String excelId, InputStream inputStream, String fileName, String frameParam) {
-        return importData(excelId, inputStream, fileName, new HashMap<>(), frameParam);
-    }
-
-    public ExcelImportRes importData(String excelId, InputStream inputStream, String fileName, Map<Serializable, Object> excelParam, String frameParam) {
+    public ExcelImportRes importData(String excelId, InputStream inputStream, String fileName, Map<Serializable, Object> excelParam) {
         List<ExcelSheetData> sheetDataList = new ArrayList<>();
         Workbook wb = initWorkbook(inputStream, fileName);
         Excel excel = excelInitConfig.getExcelSheet(excelId);
-
-        if (StringUtils.isNotEmpty(frameParam)) {
-            //初始化记录
-            AbstractExcelService excelService = ApplicationUtil.getBean(AbstractExcelService.class);
-            if (excelService != null) {
-                //初始化记录
-                Long paramId = excelService.initImportLogEntity(frameParam);
-                if (paramId != null) {
-                    excel.setFrameId(paramId);
-                }
-            }
-        }
 
         excel.setFileName(fileName);
         excel.setCustomParam(excelParam);
