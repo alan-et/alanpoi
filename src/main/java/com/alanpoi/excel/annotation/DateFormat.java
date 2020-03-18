@@ -14,5 +14,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
 public @interface DateFormat {
-    String value() default "YYYY/mm/dd";
+    String value() default "YYYY/MM/dd";
 }
