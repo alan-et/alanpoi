@@ -28,11 +28,9 @@ public class ExportHandle {
     protected static final Logger logger = LoggerFactory.getLogger(ExportHandle.class);
 
     public Workbook exportData(Workbook workbook, Collection<?> data, Class<?> c) {
-        CellStyle cellStyle = workbook.createCellStyle();
         CellStyle headStyle = workbook.createCellStyle();
 
-        //自动换行*重要*
-        cellStyle.setWrapText(true);
+        headStyle.setWrapText(true);
         try {
             Sheet sheet = null;
             ReflectorManager reflectorManager = ReflectorManager.fromCache(c);
@@ -60,18 +58,23 @@ public class ExportHandle {
                 ExcelColumn excelColumn = fields.get(i).getAnnotation(ExcelColumn.class);
                 DateFormat dateFormat = fields.get(i).getAnnotation(DateFormat.class);
                 NumFormat numFormat = fields.get(i).getAnnotation(NumFormat.class);
+                ExcelParseParam excelParseParam = new ExcelParseParam();
                 if (excelColumn != null) {
                     Cell cell;
                     if (StringUtils.isNotBlank(excelColumn.index())) {
                         cell = headRow.createCell(Integer.valueOf(excelColumn.index()));
+                        excelParseParam.setIndex(Integer.valueOf(excelColumn.index()));
                     } else {
                         cell = headRow.createCell(i);
                     }
                     cell.setCellValue(excelColumn.name());
                     cell.setCellStyle(headStyle);
                     sheet.setColumnWidth(i, excelColumn.width() * 256);
+                    excelParseParam.setHeight(excelColumn.height());
+                    excelParseParam.setColor(excelColumn.color().index);
+                    excelParseParam.setCellStyle(workbook.createCellStyle());
                 }
-                ExcelParseParam excelParseParam = new ExcelParseParam();
+
                 if (dateFormat != null) {
                     excelParseParam.setFormat(dateFormat.value());
                 }
@@ -104,8 +107,10 @@ public class ExportHandle {
         if (CollectionUtils.isEmpty(excelParseParams)) {
             return;
         }
+        row.setHeightInPoints(excelParseParams.get(0).getHeight());
         for (int j = 0; j < excelParseParams.size(); j++) {
-            handleCell(row.createCell(j), object, excelParseParams.get(j));
+            Integer index = excelParseParams.get(j).getIndex();
+            handleCell(row.createCell(index != null ? index : j), object, excelParseParams.get(j));
         }
     }
 
@@ -122,6 +127,7 @@ public class ExportHandle {
                     value = this.numFormatValue(value, excelParseParam);
                 }
                 cell.setCellValue(value == null ? "" : value.toString());
+                cell.setCellStyle(excelParseParam.getCellStyle());
             } catch (IllegalAccessException e) {
                 logger.error("", e);
             } catch (InvocationTargetException e) {

@@ -1,5 +1,6 @@
 package com.alanpoi.excel.annotation;
 
+import com.alanpoi.common.AlanColor;
 import org.apache.poi.ss.usermodel.IndexedColors;
 
 import java.lang.annotation.ElementType;
@@ -26,5 +27,5 @@ public @interface ExcelSheet {
 
     int fontSize() default 20;
 
-    IndexedColors backColor() default IndexedColors.AQUA;
+    AlanColor backColor() default AlanColor.AQUA;
 }
