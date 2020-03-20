@@ -117,9 +117,10 @@ public class ExportVO {
 }
 ```
 #### 使用
-
-一行代码直接导出: ExcelExportUtil.export(Colletion<?>,类.class,request,response,fileName);<br>
-获取workbook,自行处理方式: ExcelExportUtil.getWorkbook(Collection<?> singleSheetData, Class<?> c)<br>
+1. 直接导出到浏览器<br>
+ExcelExportUtil.export(Colletion<?>,Class,HttpServletRequest,HttpServletResponse,fileName);<br>
+2. 程序获取工作表<br>
+ExcelExportUtil.getWorkbook(Collection<?> singleSheetData, Class<?> c)<br>
 
 
 
