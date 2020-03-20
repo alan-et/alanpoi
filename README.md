@@ -117,9 +117,9 @@ public class ExportVO {
 }
 ```
 #### 使用
-1. 直接导出到浏览器<br>
+方式一. 直接导出到浏览器<br>
 ExcelExportUtil.export(Colletion<?>,Class,HttpServletRequest,HttpServletResponse,fileName);<br>
-2. 程序获取工作表<br>
+方式二. 调用getWorkbook获取工作表,自行处理workbook<br>
 ExcelExportUtil.getWorkbook(Collection<?> singleSheetData, Class<?> c)<br>
 
 
