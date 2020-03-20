@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.alanpoi</groupId>
     <artifactId>alan-poi</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0-RELEASE</version>
     <name>alan-poi</name>
     <description>Demo project for Spring Boot</description>
 
@@ -171,4 +171,14 @@
             </resource>
         </resources>
     </build>
+    <distributionManagement>
+        <repository>
+            <id>rdc-releases</id>
+            <url>https://repo.rdc.aliyun.com/repository/105148-release-ahmQmj/</url>
+        </repository>
+        <snapshotRepository>
+            <id>rdc-snapshots</id>
+            <url>https://repo.rdc.aliyun.com/repository/105148-snapshot-u5XrNN/</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
