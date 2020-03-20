@@ -94,7 +94,7 @@ NumFormat注解: 用于导入类的属性上，可以按照指定格式输出到
 
 样例：
 ```
-@ExcelSheet(name = "测试", backColor = IndexedColors.GREEN, font = "宋体", fontSize = 25)
+@ExcelSheet(name = "测试", backColor = AlanColors.GREEN, font = "宋体", fontSize = 25)
 @Data
 public class ExportVO {
     @ExcelColumn(name = "名称", width = 32)
