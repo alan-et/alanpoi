@@ -94,7 +94,7 @@ NumFormat注解: 用于导入类的属性上，可以按照指定格式输出到
 
 样例：
 ```
-@ExcelSheet(name = "测试", backColor = IndexedColors.GREEN, font = "宋体", fontSize = 25)
+@ExcelSheet(name = "测试", backColor = AlanColors.GREEN, font = "宋体", fontSize = 25)
 @Data
 public class ExportVO {
     @ExcelColumn(name = "名称", width = 32)
@@ -117,9 +117,10 @@ public class ExportVO {
 }
 ```
 #### 使用
-
-一行代码直接导出: ExcelExportUtil.export(Colletion<?>,类.class,request,response,fileName);<br>
-获取workbook,自行处理方式: ExcelExportUtil.getWorkbook(Collection<?> singleSheetData, Class<?> c)<br>
+方式一. 直接导出到浏览器<br>
+ExcelExportUtil.export(Colletion<?>,Class,HttpServletRequest,HttpServletResponse,fileName);<br><br>
+方式二. 调用getWorkbook获取工作表,自行处理workbook<br>
+ExcelExportUtil.getWorkbook(Collection<?> singleSheetData, Class<?> c)<br>
 
 
 
