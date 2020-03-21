@@ -4,11 +4,17 @@ import com.alanpoi.common.ExecutorTools;
 import com.alanpoi.excel.imports.handle.ExcelWorkbookManage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Excel解析
@@ -28,8 +34,8 @@ public class ExcelParser<T> extends AbstractFileParser<T> {
                        ExecutorTools executorTools) {
         this.excelInitConfig = excelInitConfig;
         this.excelWorkbookManage = excelWorkbookManage;
-        this.executorTools=executorTools;
-        this.redisTemplate=redisTemplate;
+        this.executorTools = executorTools;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
@@ -54,7 +60,14 @@ public class ExcelParser<T> extends AbstractFileParser<T> {
             if (cell != null) {
                 switch (cell.getCellType()) {
                     case NUMERIC:
-                        value = String.valueOf(cell.getNumericCellValue());
+                        if (DateUtil.isCellDateFormatted(cell)) {
+                            Date d = cell.getDateCellValue();
+                            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            value = dateFormat.format(d);
+                        } else {
+                            DecimalFormat df = new DecimalFormat("############.##");
+                            value = df.format(cell.getNumericCellValue());
+                        }
                         break;
                     case STRING:
                         value = cell.getStringCellValue();
@@ -64,6 +77,7 @@ public class ExcelParser<T> extends AbstractFileParser<T> {
                         break;
                     default:
                 }
+
                 if (null != value) {
                     //给对象指定属性名附值
                     wrapper.setPropertyValue(fieldName, value);

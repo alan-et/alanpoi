@@ -11,6 +11,8 @@ import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -78,6 +80,10 @@ public class WorkbookManager {
     }
 
     public static Workbook newWorkbook(ExcelType excelType) {
+        return newWorkbook(excelType, null);
+    }
+
+    public static Workbook newWorkbook(ExcelType excelType, Collection<?> collection) {
         Workbook workbook = null;
         try {
             if (excelType == ExcelType.EXCEL_2003) {
@@ -88,6 +94,13 @@ public class WorkbookManager {
 
         } catch (Exception e) {
             log.error("", e);
+        }
+        if (collection == null) {
+            workbook.createSheet();
+            return workbook;
+        }
+        for (Iterator it = collection.iterator(); it.hasNext(); workbook.createSheet()) {
+            it.next();
         }
         return workbook;
     }

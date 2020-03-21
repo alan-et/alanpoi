@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collection;
@@ -30,19 +31,27 @@ public class ExcelExportUtil {
         return exportHandle.exportData(WorkbookManager.newWorkbook(excelType), singleSheetData, c);
     }
 
+    /**
+     * Multi sheet export
+     *
+     * @param excelType
+     * @param dataMap
+     * @return
+     */
+    public static Workbook getWorkbookByMultiSheet(ExcelType excelType, Map<Class<?>, Collection<?>> dataMap) {
+        ExportHandle exportHandle = ApplicationUtil.getBean(ExportHandle.class);
+        return exportHandle.exportMultipleSheet(WorkbookManager.newWorkbook(excelType, dataMap.keySet()), dataMap);
+    }
+
+    public static Workbook getWorkbookByMultiSheet(Map<Class<?>, Collection<?>> dataMap) {
+        return getWorkbookByMultiSheet(ExcelType.EXCEL_2007, dataMap);
+    }
+
     private static Workbook getWorkbook(Workbook workbook, Collection<?> singleSheetData, Class<?> c) {
         ExportHandle exportHandle = ApplicationUtil.getBean(ExportHandle.class);
         return exportHandle.exportData(workbook, singleSheetData, c);
     }
 
-    /**
-     * @param multipleSheetData sheet name and sheet Data
-     * @param headParam
-     * @return
-     */
-    public static Workbook getWorkbook(Map<String, List<JSONObject>> multipleSheetData, Map<String, JSONObject> headParam) {
-        return null;
-    }
 
     public static void export(ExcelType excelType, Collection<?> singleSheetData, Class<?> c, HttpServletRequest request, HttpServletResponse response, String fileName) {
         WorkbookManager workbookManager = ApplicationUtil.getBean(WorkbookManager.class);

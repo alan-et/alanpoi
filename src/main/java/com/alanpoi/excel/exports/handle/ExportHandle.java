@@ -10,12 +10,11 @@ import com.alanpoi.excel.exports.ReflectorManager;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
-import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Time;
@@ -28,72 +27,93 @@ public class ExportHandle {
     protected static final Logger logger = LoggerFactory.getLogger(ExportHandle.class);
 
     public Workbook exportData(Workbook workbook, Collection<?> data, Class<?> c) {
-        CellStyle headStyle = workbook.createCellStyle();
-
-        headStyle.setWrapText(true);
         try {
-            Sheet sheet = null;
-            ReflectorManager reflectorManager = ReflectorManager.fromCache(c);
-            ExcelSheet excelSheet = c.getAnnotation(ExcelSheet.class);
-            sheet = workbook.createSheet();
-            int rowInd = 0;
-            Row headRow = sheet.createRow(rowInd);
-            rowInd++;
-            if (excelSheet != null) {
-                workbook.setSheetName(excelSheet.index(), excelSheet.name());
-                headRow.setHeightInPoints(excelSheet.rowHeight());
-                Font font = workbook.createFont();
-                font.setFontName(excelSheet.font());
-                font.setFontHeightInPoints((short) excelSheet.fontSize());//设置字体大小
-                headStyle.setFont(font);
-                headStyle.setAlignment(HorizontalAlignment.CENTER);
-                headStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-                headStyle.setFillForegroundColor(excelSheet.backColor().index);
-                headStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-            }
-            List<Field> fields = reflectorManager.getFieldList();
-            int fieldLength = fields.size();
-            List<ExcelParseParam> excelParseParamList = new ArrayList<>();
-            for (int i = 0; i < fieldLength; i++) {
-                ExcelColumn excelColumn = fields.get(i).getAnnotation(ExcelColumn.class);
-                DateFormat dateFormat = fields.get(i).getAnnotation(DateFormat.class);
-                NumFormat numFormat = fields.get(i).getAnnotation(NumFormat.class);
-                ExcelParseParam excelParseParam = new ExcelParseParam();
-                if (excelColumn != null) {
-                    Cell cell;
-                    if (StringUtils.isNotBlank(excelColumn.index())) {
-                        cell = headRow.createCell(Integer.valueOf(excelColumn.index()));
-                        excelParseParam.setIndex(Integer.valueOf(excelColumn.index()));
-                    } else {
-                        cell = headRow.createCell(i);
-                    }
-                    cell.setCellValue(excelColumn.name());
-                    cell.setCellStyle(headStyle);
-                    sheet.setColumnWidth(i, excelColumn.width() * 256);
-                    excelParseParam.setHeight(excelColumn.height());
-                    excelParseParam.setColor(excelColumn.color().index);
-                    excelParseParam.setCellStyle(workbook.createCellStyle());
-                }
-
-                if (dateFormat != null) {
-                    excelParseParam.setFormat(dateFormat.value());
-                }
-                if (numFormat != null) {
-                    excelParseParam.setNumFormat(numFormat.value());
-                }
-                excelParseParam.setMethod(reflectorManager.getGetMethod(fields.get(i).getName()));
-                excelParseParamList.add(excelParseParam);
-            }
-            Iterator iterator = data.iterator();
-            while (iterator.hasNext()) {
-                Object object = iterator.next();
-                handleRow(sheet.createRow(rowInd), object, excelParseParamList);
-                rowInd++;
-            }
+            loadSheet(workbook, data, c, 0);
         } catch (Exception e) {
             logger.error("", e);
         }
         return workbook;
+    }
+
+    public Workbook exportMultipleSheet(Workbook workbook, Map<Class<?>, Collection<?>> dataMap) {
+        int sheetAt = 0;
+        for (Class<?> c : dataMap.keySet()) {
+            Collection<?> collection = dataMap.get(c);
+            loadSheet(workbook, collection, c, sheetAt++);
+        }
+        return workbook;
+    }
+
+    private void loadSheet(Workbook workbook, Collection<?> data, Class<?> c, int sheetAt) {
+        CellStyle headStyle = workbook.createCellStyle();
+        headStyle.setWrapText(true);
+        ReflectorManager reflectorManager = ReflectorManager.fromCache(c);
+        ExcelSheet excelSheet = c.getAnnotation(ExcelSheet.class);
+        int rowInd = 0;
+        Sheet sheet = null;
+        Row headRow = null;
+        if (excelSheet != null) {
+            if (excelSheet.index() < sheetAt) {
+                sheet = workbook.getSheetAt(sheetAt);
+                workbook.setSheetName(sheetAt, excelSheet.name());
+            } else {
+                sheet = workbook.getSheetAt(excelSheet.index());
+                workbook.setSheetName(excelSheet.index(), excelSheet.name());
+            }
+            headRow = sheet.createRow(rowInd);
+            headRow.setHeightInPoints(excelSheet.rowHeight());
+            Font font = workbook.createFont();
+            font.setFontName(excelSheet.font());
+            font.setFontHeightInPoints((short) excelSheet.fontSize());//设置字体大小
+            headStyle.setFont(font);
+            headStyle.setAlignment(HorizontalAlignment.CENTER);
+            headStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+            headStyle.setFillForegroundColor(excelSheet.backColor().index);
+            headStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        } else {
+            sheet = workbook.getSheetAt(sheetAt);
+            logger.warn("请在导出类上加上注解，以便导出文件更加完整");
+        }
+        List<Field> fields = reflectorManager.getFieldList();
+        int fieldLength = fields.size();
+        List<ExcelParseParam> excelParseParamList = new ArrayList<>();
+        for (int i = 0; i < fieldLength; i++) {
+            ExcelColumn excelColumn = fields.get(i).getAnnotation(ExcelColumn.class);
+            DateFormat dateFormat = fields.get(i).getAnnotation(DateFormat.class);
+            NumFormat numFormat = fields.get(i).getAnnotation(NumFormat.class);
+            ExcelParseParam excelParseParam = new ExcelParseParam();
+            if (excelColumn != null) {
+                Cell cell;
+                if (StringUtils.isNotBlank(excelColumn.index())) {
+                    cell = headRow.createCell(Integer.valueOf(excelColumn.index()));
+                    excelParseParam.setIndex(Integer.valueOf(excelColumn.index()));
+                } else {
+                    cell = headRow.createCell(i);
+                }
+                cell.setCellValue(excelColumn.name());
+                cell.setCellStyle(headStyle);
+                sheet.setColumnWidth(i, excelColumn.width() * 256);
+                excelParseParam.setHeight(excelColumn.height());
+                excelParseParam.setColor(excelColumn.color().index);
+                excelParseParam.setCellStyle(workbook.createCellStyle());
+            }
+
+            if (dateFormat != null) {
+                excelParseParam.setFormat(dateFormat.value());
+            }
+            if (numFormat != null) {
+                excelParseParam.setNumFormat(numFormat.value());
+            }
+            excelParseParam.setMethod(reflectorManager.getGetMethod(fields.get(i).getName()));
+            excelParseParamList.add(excelParseParam);
+        }
+        rowInd++;
+        Iterator iterator = data.iterator();
+        while (iterator.hasNext()) {
+            Object object = iterator.next();
+            handleRow(sheet.createRow(rowInd), object, excelParseParamList);
+            rowInd++;
+        }
     }
 
     /**
