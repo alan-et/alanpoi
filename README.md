@@ -34,7 +34,7 @@
 
 #### 一配置
 
-在项目resources目录中新建excel-config.xml文件,cosume中配置自己的消费类路径，继承ExcelConsumeInterface接口，sheet中的vo是把当前sheet序列化的对象路径，column中当然就是配置vo中的属性了，导入包含多个sheet就配置多个,**其中column节点可以不写用VO中注解代替**
+在项目resources目录中新建excel-config.xml文件,cosume中配置自己的消费类路径，继承ExcelConsumeInterface接口，sheet中的vo是把当前sheet序列化的对象路径，column中当然就是配置vo中的属性了，导入包含多个sheet就配置多个,**其中column节点可以不写,在VO中用注解代替即可**
 
 
 ```
