@@ -1,6 +1,5 @@
 package com.alanpoi.excel.exports.handle;
 
-import com.alanpoi.common.utils.FieldUtil;
 import com.alanpoi.excel.annotation.DateFormat;
 import com.alanpoi.excel.annotation.ExcelColumn;
 import com.alanpoi.excel.annotation.ExcelSheet;
@@ -14,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
-import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Time;
@@ -83,6 +81,7 @@ public class ExportHandle {
             NumFormat numFormat = fields.get(i).getAnnotation(NumFormat.class);
             ExcelParseParam excelParseParam = new ExcelParseParam();
             if (excelColumn != null) {
+                if (!excelColumn.isExist()) continue;
                 Cell cell;
                 if (StringUtils.isNotBlank(excelColumn.index())) {
                     cell = headRow.createCell(Integer.valueOf(excelColumn.index()));
@@ -96,6 +95,10 @@ public class ExportHandle {
                 excelParseParam.setHeight(excelColumn.height());
                 excelParseParam.setColor(excelColumn.color().index);
                 excelParseParam.setCellStyle(workbook.createCellStyle());
+            } else {
+                Cell cell = headRow.createCell(i);
+                cell.setCellValue(excelColumn.name());
+                cell.setCellStyle(headStyle);
             }
 
             if (dateFormat != null) {

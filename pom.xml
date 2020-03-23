@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.alanpoi</groupId>
     <artifactId>alan-poi</artifactId>
-    <version>1.0.3</version>
+    <version>1.1.0</version>
     <name>alan-poi</name>
     <description>Demo project for Spring Boot</description>
 
@@ -199,17 +199,17 @@
             <id>release</id>
             <build>
                 <plugins>
-<!--                    <plugin>-->
-<!--                        <groupId>org.sonatype.plugins</groupId>-->
-<!--                        <artifactId>nexus-staging-maven-plugin</artifactId>-->
-<!--                        <version>1.6.7</version>-->
-<!--                        <extensions>true</extensions>-->
-<!--                        <configuration>-->
-<!--                            <serverId>sonatype</serverId>-->
-<!--                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>-->
-<!--                            <autoReleaseAfterClose>true</autoReleaseAfterClose>-->
-<!--                        </configuration>-->
-<!--                    </plugin>-->
+                    <!--                    <plugin>-->
+                    <!--                        <groupId>org.sonatype.plugins</groupId>-->
+                    <!--                        <artifactId>nexus-staging-maven-plugin</artifactId>-->
+                    <!--                        <version>1.6.7</version>-->
+                    <!--                        <extensions>true</extensions>-->
+                    <!--                        <configuration>-->
+                    <!--                            <serverId>sonatype</serverId>-->
+                    <!--                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>-->
+                    <!--                            <autoReleaseAfterClose>true</autoReleaseAfterClose>-->
+                    <!--                        </configuration>-->
+                    <!--                    </plugin>-->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-release-plugin</artifactId>

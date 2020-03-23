@@ -10,10 +10,10 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@ExcelSheet(name = "测试", backColor = AlanColor.GREEN, font = "宋体",fontSize = 25)
+@ExcelSheet(name = "测试请问额", backColor = AlanColor.BLUE, font = "黑体",fontSize = 25)
 @Data
 public class ExportVO {
-    @ExcelColumn(name = "名称", width = 32, index = "0")
+    @ExcelColumn(name = "名称", width = 60, index = "0")
     private String name;
 
     @ExcelColumn(name = "值", index = "3")

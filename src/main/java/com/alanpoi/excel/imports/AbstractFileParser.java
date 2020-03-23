@@ -50,39 +50,10 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
         return null;
     }
 
-    /**
-     * 转化excel只适合只有一个页签
-     *
-     * @param excelId
-     * @param fileName
-     * @return
-     */
-    public List<T> importSingleData(String excelId, InputStream inputStream, String fileName) {
-        Workbook wb = initWorkbook(inputStream, fileName);
-        //取得 导入Excel文件的配置文件中的预设结果
-        Excel excel = excelInitConfig.getExcelSheet(excelId);
-        excel.setFileName(fileName);
-        List<ExcelSheet> scList = excel.getExcelSheets();
-        ExcelSheet sc = scList.get(0);
-        //取得  预设文件中指定sheet页
-        Sheet sheet = wb.getSheetAt(sc.getIndex());
-        //取得  预设文件中指定sheet页
-        List list = parse(sc, sheet);
-        ExcelSheetData excelSheetData = new ExcelSheetData();
-        excelSheetData.setData(list);
-        excelSheetData.setIndex(0);
-        excelSheetData.setRowStart(sc.getRowStart());
-        excelSheetData.setSheetName(sheet.getSheetName());
-        String workbookId = UUID.randomUUID().toString();
-        excelWorkbookManage.addWorkbook(workbookId, wb);
-        consumeHandle(workbookId, excel, Arrays.asList(excelSheetData));
-        return list;
-    }
-
     public List<ExcelSheetData> getData(String excelId, InputStream inputStream, String fileName) {
         List<ExcelSheetData> sheetDataList = new ArrayList<>();
         Workbook wb = initWorkbook(inputStream, fileName);
-        Excel excel = excelInitConfig.getExcelSheet(excelId);
+        Excel excel = excelInitConfig.getExcelConfig(excelId);
 
         excel.setFileName(fileName);
         List<ExcelSheet> scList = excel.getExcelSheets();
@@ -157,7 +128,6 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
 
         OutputStream out = null;
         try {
-//            in = new FileInputStream(f);
             int len = 0;
             byte[] buffer = new byte[1024];
             out = response.getOutputStream();
@@ -206,7 +176,7 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
     public ExcelImportRes importData(String excelId, InputStream inputStream, String fileName, Map<Serializable, Object> excelParam) {
         List<ExcelSheetData> sheetDataList = new ArrayList<>();
         Workbook wb = initWorkbook(inputStream, fileName);
-        Excel excel = excelInitConfig.getExcelSheet(excelId);
+        Excel excel = excelInitConfig.getExcelConfig(excelId);
 
         excel.setFileName(fileName);
         excel.setCustomParam(excelParam);
@@ -236,7 +206,34 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
         }
 
         try {
-            //rows 是从1开始 与java数组不同
+            Row headRow = sheet.getRow(sc.getHeadStart());
+            List<String> excelColList = Arrays.asList(sc.getExcelColumn());
+            if (sc.getExcelColumn().length > 0) {
+                try {
+                    excelColList.removeAll(Collections.singleton(null));
+                } catch (UnsupportedOperationException e) {
+                    log.warn("" + e);
+                }
+            } else {
+                excelColList = new ArrayList<>();
+            }
+
+            if (excelColList.size() == sc.getColumn().length) {
+                for (short i = (short) sc.getColStart(); i < excelColList.size() + sc.getColStart(); i++) {
+                    int index = sc.getColumnEntities().indexOf(sc.getColumn()[i].trim());
+                    if (index != -1) sc.getColumnEntities().get(index).setName(excelColList.get(i));
+                }
+            }
+            for (short i = (short) sc.getColStart(); i < sc.getColumn().length + sc.getColStart(); i++) {
+                int index = sc.getColumnEntities().indexOf(headRow.getCell(i).getStringCellValue().trim());
+                if (index != -1) {
+                    sc.getColumnEntities().get(index).setIndex(i);
+                } else {
+                    index = sc.getColumnEntities().indexOf(sc.getColumn()[i].trim());
+                    if (index != -1) sc.getColumnEntities().get(index).setIndex(i);
+                }
+            }
+
             for (int j = sc.getRowStart(); j < rows; j++) {
                 if (null == sheet.getRow(j).getCell((short) 0)) {
                     break;
@@ -250,21 +247,14 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
                 if (null == index || "".equals(index)) {
                     break;
                 }
-                /*
-                 * 根据传入的参数（结构、一个row）, 构建对象
-                 * 在使用可以添加参数来修改
-                 */
+
                 T view = getData(sc, sheet.getRow(j));
                 list.add(view);
             }
         } catch (Exception e) {
             log.error("", e);
         } finally {
-//            try {
-//                if (wb != null) wb.close();
-//            } catch (IOException e) {
-//                log.error("", e);
-//            }
+
         }
         return list;
     }

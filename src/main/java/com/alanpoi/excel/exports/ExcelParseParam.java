@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
 public class ExcelParseParam {
 
     private Integer index;
-
+    
     private int height;
 
     private int color;

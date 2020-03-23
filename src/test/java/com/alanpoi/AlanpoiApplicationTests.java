@@ -36,11 +36,11 @@ class AlanpoiApplicationTests {
                 export2VO.setDateTime(new java.util.Date());
                 list2.add(export2VO);
             }
-            Workbook workbook = ExcelExportUtil.getWorkbook(list, ExportVO.class);
-//            Map<Class<?>, Collection<?>> map = new HashMap<>();
-//            map.put(ExportVO.class, list);
-//            map.put(Export2VO.class, list2);
-//            Workbook workbook = ExcelExportUtil.getWorkbookByMultiSheet(map);
+//            Workbook workbook = ExcelExportUtil.getWorkbook(list, ExportVO.class);
+            Map<Class<?>, Collection<?>> map = new HashMap<>();
+            map.put(ExportVO.class, list);
+            map.put(Export2VO.class, list2);
+            Workbook workbook = ExcelExportUtil.getWorkbookByMultiSheet(map);
             OutputStream outputStream = new FileOutputStream("/tmp/test.xlsx");
             workbook.write(outputStream);
             workbook.close();

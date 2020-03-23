@@ -53,7 +53,6 @@ public class ExcelHandle {
         log.info("ExcelHandle.process ");
         Class<? extends ExcelConsumeInterface> c = excel.getConsume();
         String fileName = excel.getFileName();
-        long frameId = excel.getFrameId();
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         int total = sheetDataList.get(0).getData().size();
         ExcelImportRes excelImportRes = new ExcelImportRes();

@@ -19,6 +19,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Excel Export Util
+ *
+ * @author pengzhuoxun
+ * @since 2020-3-18
+ */
 public class ExcelExportUtil {
     protected static final Logger logger = LoggerFactory.getLogger(ExcelExportUtil.class);
 

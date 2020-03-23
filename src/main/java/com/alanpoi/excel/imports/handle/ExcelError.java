@@ -1,7 +1,5 @@
 package com.alanpoi.excel.imports.handle;
 
-import lombok.Data;
-
 import java.util.List;
 
 /**
@@ -9,10 +7,17 @@ import java.util.List;
  * @author zhuouxn.peng
  * @since 2020-2-26
  */
-@Data
 public class ExcelError {
 
     private List<SheetError> sheetErrors;
+
+    public List<SheetError> getSheetErrors() {
+        return sheetErrors;
+    }
+
+    public void setSheetErrors(List<SheetError> sheetErrors) {
+        this.sheetErrors = sheetErrors;
+    }
 
     public static class SheetError {
         private int index;

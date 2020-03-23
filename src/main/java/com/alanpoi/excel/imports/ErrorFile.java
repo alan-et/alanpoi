@@ -1,14 +1,11 @@
 package com.alanpoi.excel.imports;
 
-import lombok.Data;
-
 import java.io.Serializable;
 
 /**
  * 记录错误文件信息
  * @author zhuoxun.peng
  */
-@Data
 public class ErrorFile implements Serializable {
 
 
@@ -28,6 +25,38 @@ public class ErrorFile implements Serializable {
         this.workbookId = workbookId;
         this.ipAddress = ipAddress;
         this.filePath = filePath;
+        this.fileName = fileName;
+    }
+
+    public String getWorkbookId() {
+        return workbookId;
+    }
+
+    public void setWorkbookId(String workbookId) {
+        this.workbookId = workbookId;
+    }
+
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
         this.fileName = fileName;
     }
 }

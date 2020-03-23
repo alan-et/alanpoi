@@ -19,13 +19,16 @@ public class FieldUtil {
             fields = clazz.getDeclaredFields();
 
             for (int i = 0; i < fields.length; ++i) {
-                list.add(fields[i]);
+                Field field = fields[i];
+                if (!"serialVersionUID".equalsIgnoreCase(field.getName())) {
+                    list.add(field);
+                }
             }
 
             clazz = clazz.getSuperclass();
         } while (clazz != Object.class && clazz != null);
 
-        return (Field[]) list.toArray(fields);
+        return (Field[]) list.toArray(new Field[list.size()]);
     }
 
 }

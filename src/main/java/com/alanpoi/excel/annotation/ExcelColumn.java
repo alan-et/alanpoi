@@ -20,6 +20,8 @@ public @interface ExcelColumn {
 
     String index() default "";
 
+    boolean isExist() default true;
+
     int height() default 20;
 
     int width() default 30;
