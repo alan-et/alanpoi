@@ -34,14 +34,14 @@
 
 #### 一配置
 
-在项目resources目录中新建excel-config.xml文件,cosume中配置自己的消费类路径，继承ExcelConsumeInterface接口，sheet中的vo是把当前sheet序列化的对象路径，column中当然就是配置vo中的属性了，导入包含多个sheet就配置多个
+在项目resources目录中新建excel-config.xml文件,cosume中配置自己的消费类路径，继承ExcelConsumeInterface接口，sheet中的vo是把当前sheet序列化的对象路径，column中当然就是配置vo中的属性了，导入包含多个sheet就配置多个,**其中column节点可以不写用VO中注解代替**
 
 
 ```
    <?xml version = "1.0" encoding = "GB2312"?>
    <exg name="excelId" version="1.0" file-type="excel">
      <excel id="EXCEL_ID" consume="">
-         <sheet index="0" row-start="2" column-start="0" vo="">
+         <sheet index="0" head-start="1" row-start="2" column-start="0" vo="">
               <column offset="1">id</column>
          </sheet>
     </excel>
@@ -52,6 +52,7 @@
 
 consume类继承ExcelConsumeInterface接口，实现方法
 
+   
     /**
      * when error will 调用
      *
@@ -65,17 +66,20 @@ consume类继承ExcelConsumeInterface接口，实现方法
      * @param workbookId
      * @param sheetDataList
      */
-    void validData(String workbookId, List<ExcelSheetData> sheetDataList);
+    void validData(String workbookId, List<ExcelSheetData> sheetDataList, Map<Serializable, Object> excelParam);
 
     /**
-     *
      * @param sheetDataList return success data
      */
-    void end(List<ExcelSheetData> sheetDataList);
+    void end(List<ExcelSheetData> sheetDataList, Map<Serializable, Object> excelParam);
+
 
 #### 一调用
-
-用户调用ExcelParser类的importData即可，参数excelId就是excel-conifg.xml中配置的id
+<br>
+方式一: 自定义导入，和上面两步搭配使用<br>
+ ExcelImportUtil.customImportData(String excelId, InputStream inputStream, String fileName)<br><br>
+方式二: 基础导入，直接返回所有sheet数据<br>
+ ExcelImportUtil.getExcelData(String excelId, InputStream inputStream, String fileName)<br>
 
 
 ## Export
