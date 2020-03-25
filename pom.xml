@@ -10,9 +10,16 @@
     </parent>
     <groupId>com.alanpoi</groupId>
     <artifactId>alan-poi</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
     <name>alan-poi</name>
-    <description>Demo project for Spring Boot</description>
+    <packaging>pom</packaging>
+    <description>Alan Poi</description>
+
+    <modules>
+        <module>alanpoi-activity</module>
+        <module>alanpoi-analysis</module>
+        <module>alanpoi-common</module>
+    </modules>
 
     <properties>
         <java.version>1.8</java.version>
@@ -27,7 +34,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.62</version>
+            <version>1.2.67</version>
         </dependency>
 
         <dependency>
@@ -58,7 +65,6 @@
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
             <version>5.0.0.Alpha2</version>
-            <!-- <version>4.1.24.Final</version> -->
         </dependency>
 
         <dependency>
