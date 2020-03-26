@@ -8,9 +8,9 @@
         <version>1.1.1</version>
     </parent>
     <groupId>com.alanpoi</groupId>
-    <artifactId>et-activity</artifactId>
-    <name>et-activity</name>
-    <description>Alan Poi Et-activity</description>
+    <artifactId>et-activity-client</artifactId>
+    <name>et-activity-client</name>
+    <description>Alan POI Et-activity Client</description>
 
     <dependencies>
     </dependencies>
