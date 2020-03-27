@@ -1,4 +1,4 @@
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.alanpoi.common.InitConfig,\
-com.alanpoi.common.ExecutorTools
+com.alanpoi.analysis.common.InitConfig,\
+com.alanpoi.analysis.common.ExecutorTools
