@@ -46,7 +46,12 @@ public class ApplicationUtil implements ApplicationContextAware {
     }
 
     public static <T> T getBean(Class<T> clazz) {
-        return getApplicationContext().getBean(clazz);
+        try {
+            return getApplicationContext().getBean(clazz);
+        } catch (Exception e) {
+            log.warn("bean not is exist:" + clazz);
+            return null;
+        }
     }
 
     public static <T> T getBean(String name, Class<T> clazz) {

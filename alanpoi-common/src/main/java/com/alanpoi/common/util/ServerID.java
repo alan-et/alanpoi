@@ -4,6 +4,7 @@ import com.alanpoi.common.constants.TimeConstants;
 import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
@@ -15,6 +16,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+@Component
 public class ServerID {
     private static Logger logger = LoggerFactory.getLogger(ServerID.class);
     public static final String KEY_SERVER_INFO = "serverInfo";
@@ -29,12 +31,12 @@ public class ServerID {
 
     private volatile static ServerID current = null;
 
-    private String space;
+    private String space = "alanPoi-g-serverid";
     private JedisPool jedisPool;
 
     private volatile ServerInfo info;
 
-    public ServerID(String space, JedisPool jedisPool) {
+    public ServerID(JedisPool jedisPool) {
         if (current != null) throw new RuntimeException("ServerID can only create one");
         synchronized (ServerID.class) {
             if (current == null) {
@@ -131,7 +133,8 @@ public class ServerID {
         try (Jedis jedis = jedisPool.getResource()) {
             int retryTimes = 1000;
             for (int i = 0; i < retryTimes; i++) {
-                short id = (short) (random.nextInt(0x7FFF) + 1); //16位以内 1-32767
+                //short 1-32767
+                short id = (short) (random.nextInt(0xFF) + 1); //16位以内
                 info.setId(id);
                 Long res = jedis.hsetnx(key, String.valueOf(id), JSON.toJSONString(info));
                 if (res != null && res == 1) return info;

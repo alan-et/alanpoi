@@ -1,7 +1,10 @@
 package com.alanpoi.analysis.excel.imports;
 
 import com.alanpoi.analysis.common.ExecutorTools;
+import com.alanpoi.analysis.common.PoiEventManager;
 import com.alanpoi.analysis.excel.imports.handle.ExcelWorkbookManage;
+import com.alanpoi.common.event.Event;
+import com.alanpoi.common.event.EventListener;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -12,11 +15,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.PostConstruct;
+import java.io.InputStream;
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Excel解析
@@ -26,7 +33,7 @@ import java.util.List;
  * @since 2020-2-25
  */
 @Slf4j
-public class ExcelParser<T> extends AbstractFileParser<T> {
+public class ExcelParser<T> extends AbstractFileParser<T> implements EventListener {
 
 
     @Autowired
@@ -38,6 +45,11 @@ public class ExcelParser<T> extends AbstractFileParser<T> {
         this.excelWorkbookManage = excelWorkbookManage;
         this.executorTools = executorTools;
         this.redisTemplate = redisTemplate;
+    }
+
+    @PostConstruct
+    public void init() {
+        PoiEventManager.getDispatcher().on(PoiEventManager.POI_IMPORT_EVENT_NAME, this);
     }
 
     @Override
@@ -121,5 +133,24 @@ public class ExcelParser<T> extends AbstractFileParser<T> {
             }
         }
         return value;
+    }
+
+    @Override
+    public void onEvent(Event e) {
+        if (e == null) return;
+        try {
+            if (e.getName() == PoiEventManager.POI_IMPORT_EVENT_NAME) {
+                if (e.getData() == null) return;
+                Map<String, Object> param = (Map<String, Object>) e.getData();
+                Map<Serializable, Object> excelParam = null;
+                String excelId = (String) param.get("excelId");
+                InputStream inputStream = (InputStream) param.get("inputStream");
+                String fileName = (String) param.get("fileName");
+                if (param.get("excelParam") != null) excelParam = (Map<Serializable, Object>) param.get("excelParam");
+                importData(excelId, inputStream, fileName, excelParam);
+            }
+        } catch (Exception error) {
+            log.error("POI Event error:", error);
+        }
     }
 }
