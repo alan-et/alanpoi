@@ -4,17 +4,19 @@ import com.alanpoi.common.util.ApplicationUtil;
 import com.alanpoi.common.util.ID;
 import com.alanpoi.common.util.ServerID;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import redis.clients.jedis.JedisPool;
+import org.springframework.data.redis.core.RedisTemplate;
 
 @Configuration
 public class LoadConfig {
 
     @Bean(destroyMethod = "destroy")
-    @ConditionalOnBean(name = "jedisPool")
-    public ServerID initID(JedisPool jedisPool) {
-        ServerID serverID = new ServerID(jedisPool);
+    @ConditionalOnBean(name = "redisTemplate")
+    @ConditionalOnProperty(name = {"alanpoi.serverid.enable"}, havingValue = "true")
+    public ServerID initServerID(RedisTemplate redisTemplate) {
+        ServerID serverID = new ServerID(redisTemplate);
         return serverID;
     }
 

@@ -4,6 +4,8 @@ import com.alanpoi.common.constants.TimeConstants;
 import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -16,7 +18,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-@Component
 public class ServerID {
     private static Logger logger = LoggerFactory.getLogger(ServerID.class);
     public static final String KEY_SERVER_INFO = "serverInfo";
@@ -32,32 +33,33 @@ public class ServerID {
     private volatile static ServerID current = null;
 
     private String space = "alanPoi-g-serverid";
-    private JedisPool jedisPool;
 
     private volatile ServerInfo info;
 
-    public ServerID(JedisPool jedisPool) {
+    private RedisTemplate redisTemplate;
+
+    public ServerID(RedisTemplate redisTemplate) {
         if (current != null) throw new RuntimeException("ServerID can only create one");
         synchronized (ServerID.class) {
             if (current == null) {
-                current = init(space, jedisPool);
+                current = init(space, redisTemplate);
             }
         }
     }
 
 
-    private ServerID init(String space, JedisPool jedisPool) {
+    private ServerID init(String space, RedisTemplate redisTemplate) {
 
         this.space = space;
-        this.jedisPool = jedisPool;
+        this.redisTemplate = redisTemplate;
 
         String localIP = NetworkUtil.getLocalIP();
-        List<ServerInfo> serverInfoList = getServerInfo(space, jedisPool);
+        List<ServerInfo> serverInfoList = getServerInfo(space);
 
-        cleanExpire(serverInfoList, space, jedisPool);
+        cleanExpire(serverInfoList, space);
         Optional<ServerInfo> current = findLocal(localIP, serverInfoList);
 
-        this.info = current.orElseGet(() -> register(localIP, space, jedisPool));
+        this.info = current.orElseGet(() -> register(localIP, space));
 
         startCheckThread();
         return this;
@@ -67,7 +69,7 @@ public class ServerID {
         return list.stream().filter(info -> info.getIp().equals(localIP)).findAny();
     }
 
-    private void cleanExpire(List<ServerInfo> list, String space, JedisPool jedisPool) {
+    private void cleanExpire(List<ServerInfo> list, String space) {
         long now = System.currentTimeMillis();
         List<ServerInfo> expireList = list.stream()
                 .filter(info -> now - info.getHbtime() > SERVER_INFO_EXPIRE_TIME)
@@ -78,9 +80,8 @@ public class ServerID {
                     .map(info -> String.valueOf(info.getId()))
                     .toArray(String[]::new);
             String key = genKey(space);
-            try (Jedis jedis = jedisPool.getResource()) {
-                jedis.hdel(key, expireIds);
-            }
+            redisTemplate.opsForHash().delete(key, expireIds);
+
             list.removeAll(expireList);
         }
     }
@@ -95,9 +96,7 @@ public class ServerID {
         try {
             String key = genKey(space);
             current.info.setHbtime(System.currentTimeMillis());
-            try (Jedis jedis = jedisPool.getResource()) {
-                jedis.hset(key, String.valueOf(current.info.getId()), JSON.toJSONString(current.info));
-            }
+            redisTemplate.opsForHash().put(key, String.valueOf(current.info.getId()), JSON.toJSONString(current.info));
         } catch (Exception e) {
             logger.warn("heartbeat error, ip:[{}] ", current.info.ip, e);
         }
@@ -106,9 +105,8 @@ public class ServerID {
     public void destroy() {
         try {
             String key = genKey(space);
-            try (Jedis jedis = jedisPool.getResource()) {
-                jedis.hdel(key, String.valueOf(current.info.getId()));
-            }
+            redisTemplate.opsForHash().delete(key, String.valueOf(current.info.getId()));
+
         } catch (Exception e) {
             logger.warn("destroy error, ip:[{}] ", current.info.ip, e);
         }
@@ -119,7 +117,8 @@ public class ServerID {
         return info.getId();
     }
 
-    private ServerInfo register(String localIP, String space, JedisPool jedisPool) {
+    private ServerInfo register(String localIP, String space) {
+        logger.info("service ip:{}", localIP);
         Random random = new Random();
         long now = System.currentTimeMillis();
 
@@ -130,25 +129,22 @@ public class ServerID {
         info.setStarttime(now);
         String key = genKey(space);
 
-        try (Jedis jedis = jedisPool.getResource()) {
-            int retryTimes = 1000;
-            for (int i = 0; i < retryTimes; i++) {
-                //short 1-32767
-                short id = (short) (random.nextInt(0xFF) + 1); //16位以内
-                info.setId(id);
-                Long res = jedis.hsetnx(key, String.valueOf(id), JSON.toJSONString(info));
-                if (res != null && res == 1) return info;
-            }
+        int retryTimes = 1000;
+        for (int i = 0; i < retryTimes; i++) {
+            //short 1-32767
+            short id = (short) (random.nextInt(0x3F) + 1);
+            info.setId(id);
+            boolean bool = redisTemplate.opsForHash().putIfAbsent(key, String.valueOf(id), JSON.toJSONString(info));
+            if (bool) return info;
         }
         throw new RuntimeException("register serverId error " + localIP);
     }
 
-    private List<ServerInfo> getServerInfo(String space, JedisPool jedisPool) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            String key = genKey(space);
-            List<String> list = jedis.hvals(key);
-            return list.stream().map(s -> JSON.parseObject(s, ServerInfo.class)).collect(Collectors.toList());
-        }
+    private List<ServerInfo> getServerInfo(String space) {
+        String key = genKey(space);
+        List<Object> list = redisTemplate.opsForHash().values(key);
+        return list.stream().map(s -> JSON.parseObject((String) s, ServerInfo.class)).collect(Collectors.toList());
+
     }
 
     private String genKey(String space) {
