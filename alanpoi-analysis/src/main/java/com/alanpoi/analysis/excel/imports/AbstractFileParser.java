@@ -74,7 +74,7 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
     }
 
     public void download(String fileId, HttpServletResponse response, HttpServletRequest request) {
-        String errorStr = redisTemplate.opsForValue().get("product:import:" + fileId);
+        String errorStr = redisTemplate.opsForValue().get("$$poi-excel:import:" + fileId);
         if (StringUtils.isEmpty(errorStr)) {
             return;
         }

@@ -129,7 +129,7 @@ public class ExcelHandle {
             @Override
             public void run() {
                 ErrorFile errorFile = new ErrorFile(workbookId, ApplicationUtil.getInetAddress().getHostAddress(), tmpPath, fileName);
-                redisTemplate.opsForValue().set("product:import:" + workbookId, JSON.toJSONString(errorFile), 15, TimeUnit.DAYS);
+                redisTemplate.opsForValue().set("$$poi-excel:import:" + workbookId, JSON.toJSONString(errorFile), 15, TimeUnit.DAYS);
             }
         });
         File file = new File(tmpPath);

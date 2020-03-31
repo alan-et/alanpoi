@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
@@ -32,7 +33,7 @@ public class ServerID {
 
     private volatile static ServerID current = null;
 
-    private String space = "alanPoi-g-serverid";
+    private String space = "alanpoi-g-serverid";
 
     private volatile ServerInfo info;
 
@@ -137,13 +138,25 @@ public class ServerID {
             boolean bool = redisTemplate.opsForHash().putIfAbsent(key, String.valueOf(id), JSON.toJSONString(info));
             if (bool) return info;
         }
+        List<String> list = redisTemplate.opsForHash().values(key);
+        if (!CollectionUtils.isEmpty(list) && list.size() >= 64) {
+            throw new RuntimeException("register serverId error,Maximum number of server nodes exceeded,max node num: " + 0x3f + 1);
+        } else {
+            int k = 0;
+            do {
+                if (!list.contains(k)) {
+                    info.setId((short) k);
+                    return info;
+                }
+            } while (k <= 0x3f);
+        }
         throw new RuntimeException("register serverId error " + localIP);
     }
 
     private List<ServerInfo> getServerInfo(String space) {
         String key = genKey(space);
-        List<Object> list = redisTemplate.opsForHash().values(key);
-        return list.stream().map(s -> JSON.parseObject((String) s, ServerInfo.class)).collect(Collectors.toList());
+        List<String> list = redisTemplate.opsForHash().values(key);
+        return list.stream().map(s -> JSON.parseObject(s, ServerInfo.class)).collect(Collectors.toList());
 
     }
 
