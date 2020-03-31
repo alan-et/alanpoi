@@ -60,7 +60,34 @@ public class PoiEventManager {
 
 ## 全局高并发分布式ID
 
-### 算法（|43bit(timestamp)|15bit(version)|6bit(serverId)|）
+### 基本描叙
+
+
+ * 64位分布式ID(Long)（支持高并发(每毫秒32767，超过并发数，排队1毫秒,说无延时也不为过)）
+ * 支持时间  此方法可以支持139年(应该是目前除开UUID(UUID是128为字节，32位的字符，生成的ID无法排序)，支持时间最长的分布式算法)
+ * 支持节点  为了更好的支持高并发，适量的降低了服务器节点数，此方法最多支持128(0-127)台服务器节点部署，我相信应该满足99%的需求，我接触的华为公司一般都只有4-12台服务器节点
+ * 容错率高 高并发的场景往往不能保持原子性，一般很容易出现问题，因此此算法引入了AtomicInteger（原子类，CAS算法）来解决此问题
+ 
+
+### 算法（|42bit(timestamp)|15bit(version)|7bit(serverId)|）
+
+### 和主流ID算法比较
+
+1. 雪花算法生成ID: 采用的是41位事件戳生成ID,可以支持69年（怎么算的就不描叙了，二进制的基础知识）,而且多节点部署，如果服务器时间不一致就可能会出现生成重复ID，而且多线程使用SnowFlake不恰当也会导致大量重复
+2. UUID: 此算法是32位字符，换算成二进制是采用的128位算法，其中主要的两部分就是时间、节点、随机数；包含的信息足够多，因此就转换成了16进制的字符展示；算法绝对唯一，但是排序怎么办；
+
+### 使用
+
+1. 单节点可以可以直接使用 ID.getId.next()，多节点也可以使用，不能保证真正的分布式唯一<br>
+2. 多节点通过配置alanpoi.serverid.enable=true,或者通过配置类Bean开启如下：
+```
+    @Bean(destroyMethod = "destroy")
+    public ServerID initServerID(RedisTemplate redisTemplate) {
+        ServerID serverID = new ServerID(redisTemplate);
+        return serverID;
+    }
+```
+3. 基础用法，ID.getId().next()、ID.getId.current()
 
 
 
