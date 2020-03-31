@@ -40,10 +40,14 @@
 ```
    <?xml version = "1.0" encoding = "GB2312"?>
    <exg name="excelId" version="1.0" file-type="excel">
-     <excel id="EXCEL_ID" consume="">
-         <sheet index="0" row-start="2" column-start="0" vo="">
-              <column name="" offset="1">id</column>
-         </sheet>
+     <excel id="ACCOUNT" consume="com.xxx.FinAccountImportHandler">
+        <sheet index="0" row-start="1" column-start="0"
+               vo="com.xxx.vo.FinAccountImportVO">
+            <column name="公司/供应商编号" offset="1">companyCode</column>
+            <column name="公司/供应商名称" offset="2">companyName</column>
+            <column name="银行账号" offset="3">bankAccount</column>
+            <column name="开户银行" offset="4">bankName</column>
+        </sheet>
     </excel>
    </exg>
 ```
