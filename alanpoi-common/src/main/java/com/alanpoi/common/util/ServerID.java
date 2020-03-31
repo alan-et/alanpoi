@@ -133,13 +133,13 @@ public class ServerID {
         int retryTimes = 1000;
         for (int i = 0; i < retryTimes; i++) {
             //short 1-32767
-            short id = (short) (random.nextInt(0x3F) + 1);
+            short id = (short) (random.nextInt(0x7F) + 1);
             info.setId(id);
             boolean bool = redisTemplate.opsForHash().putIfAbsent(key, String.valueOf(id), JSON.toJSONString(info));
             if (bool) return info;
         }
         List<String> list = redisTemplate.opsForHash().values(key);
-        if (!CollectionUtils.isEmpty(list) && list.size() >= 64) {
+        if (!CollectionUtils.isEmpty(list) && list.size() >= 0x7F + 1) {
             throw new RuntimeException("register serverId error,Maximum number of server nodes exceeded,max node num: " + 0x3f + 1);
         } else {
             int k = 0;
@@ -148,7 +148,7 @@ public class ServerID {
                     info.setId((short) k);
                     return info;
                 }
-            } while (k <= 0x3f);
+            } while (k <= 0x7F);
         }
         throw new RuntimeException("register serverId error " + localIP);
     }
