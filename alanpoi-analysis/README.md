@@ -34,7 +34,7 @@
 
 #### 一配置
 
-在项目resources目录中新建excel-config.xml文件,cosume中配置自己的消费类路径，继承ExcelConsumeInterface接口，sheet中的vo是把当前sheet序列化的对象路径，column中当然就是配置vo中的属性了，导入包含多个sheet就配置多个
+在项目resources目录中新建excel-config.xml文件,cosume中配置自己的消费类路径，继承ExcelConsumeInterface接口，sheet中的vo是把当前sheet序列化的对象路径，column中当然就是配置vo中的属性了， 其中name可选字段，填了就是按照这个匹配excel列名，不填就是按照offset顺序；导入包含多个sheet就配置多个
 
 
 ```
@@ -42,7 +42,7 @@
    <exg name="excelId" version="1.0" file-type="excel">
      <excel id="EXCEL_ID" consume="">
          <sheet index="0" row-start="2" column-start="0" vo="">
-              <column offset="1">id</column>
+              <column name="" offset="1">id</column>
          </sheet>
     </excel>
    </exg>
@@ -65,13 +65,12 @@ consume类继承ExcelConsumeInterface接口，实现方法
      * @param workbookId
      * @param sheetDataList
      */
-    void validData(String workbookId, List<ExcelSheetData> sheetDataList);
+    void validData(String workbookId, List<ExcelSheetData> sheetDataList, Map<Serializable, Object> excelParam);
 
     /**
-     *
      * @param sheetDataList return success data
      */
-    void end(List<ExcelSheetData> sheetDataList);
+    void end(List<ExcelSheetData> sheetDataList, Map<Serializable, Object> excelParam);
 
 #### 一调用
 
