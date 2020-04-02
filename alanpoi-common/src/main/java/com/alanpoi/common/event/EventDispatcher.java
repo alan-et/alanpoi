@@ -1,5 +1,8 @@
 package com.alanpoi.common.event;
 
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,9 +68,11 @@ public class EventDispatcher {
     }
 
     public void trigger(final Event event) {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         executor.execute(new Runnable() {
             @Override
             public void run() {
+                RequestContextHolder.setRequestAttributes(requestAttributes, true);
                 doDispatch(event);
             }
         });

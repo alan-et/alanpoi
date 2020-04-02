@@ -139,7 +139,7 @@ public class ExcelParser<T> extends AbstractFileParser<T> implements EventListen
     public void onEvent(Event e) {
         if (e == null) return;
         try {
-            if (e.getName() == PoiEventManager.POI_IMPORT_EVENT_NAME) {
+            if (PoiEventManager.POI_IMPORT_EVENT_NAME.equals(e.getName())) {
                 if (e.getData() == null) return;
                 Map<String, Object> param = (Map<String, Object>) e.getData();
                 Map<Serializable, Object> excelParam = null;
