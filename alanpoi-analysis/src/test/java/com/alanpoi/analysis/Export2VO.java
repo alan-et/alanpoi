@@ -19,8 +19,7 @@ public class Export2VO {
     @ExcelColumn(name = "值", index = "3")
     private String value;
 
-    @ExcelColumn(name = "金额", index = "2")
-    @NumFormat(value = "0000.00##")
+
     private BigDecimal amount;
 
     @ExcelColumn(name = "时间格式化", index = "1")

@@ -97,7 +97,7 @@ public class ExportHandle {
                 excelParseParam.setCellStyle(workbook.createCellStyle());
             } else {
                 Cell cell = headRow.createCell(i);
-                cell.setCellValue(excelColumn.name());
+                cell.setCellValue(fields.get(i).getName());
                 cell.setCellStyle(headStyle);
             }
 
