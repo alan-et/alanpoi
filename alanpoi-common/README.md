@@ -74,12 +74,12 @@ public class PoiEventManager {
 ### 和主流ID算法比较
 
 1. 雪花算法生成ID: 采用的是41位事件戳生成ID,可以支持69年（怎么算的就不描叙了，二进制的基础知识）,单节点每毫秒可以生成4096个ID(12位计数器)，多节点部署时，如果服务器时间不一致就可能会出现生成重复ID，而且多线程使用SnowFlake不恰当也会导致大量重复
-2. UUID: 此算法是32位字符，换算成二进制是采用的128位算法，其中主要的两部分就是时间、节点、随机数；包含的信息足够多，因此就转换成了16进制的字符展示；算法绝对唯一，但是排序怎么办；
+2. UUID: 此算法是32位字符，换算成二进制是采用的128位算法，其中主要的三部分就是时间、节点、随机数；包含的信息足够多，因此就转换成了16进制的字符展示；算法绝对唯一，但是排序怎么办；
 
 ### 使用
 
 1. 单节点可以可以直接使用 ID.getId.next()，多节点也可以使用，不能保证真正的分布式唯一<br>
-2. 多节点通过配置alanpoi.serverid.enable=true,或者通过配置类Bean开启如下：
+2. 多节点通过配置alanpoi.serverid.enable=true,或者通过以下配置类Bean开启：
 ```
     @Bean(destroyMethod = "destroy")
     public ServerID initServerID(RedisTemplate redisTemplate) {
