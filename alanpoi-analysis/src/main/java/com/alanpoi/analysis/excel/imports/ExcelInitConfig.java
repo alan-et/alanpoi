@@ -74,6 +74,7 @@ public class ExcelInitConfig implements Serializable {
                 } catch (ClassNotFoundException e) {
                     log.error("", e);
                 }
+                excel.setSupportPart(supportPart);
                 map.put(excelId, excel);
             }
         }
