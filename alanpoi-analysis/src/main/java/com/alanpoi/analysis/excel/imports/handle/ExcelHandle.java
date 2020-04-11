@@ -83,7 +83,13 @@ public class ExcelHandle {
             }
             RequestContextHolder.setRequestAttributes(requestAttributes, true);
             try {
+
                 if ("true".equals(excel.getSupportPart())) consumeInterface.end(sheetDataList, excel.getCustomParam());
+                else {
+                    if (excelError == null ||
+                            CollectionUtils.isEmpty(excelError.getSheetErrors()))
+                        consumeInterface.end(sheetDataList, excel.getCustomParam());
+                }
             } catch (Exception e) {
                 log.error("", e);
             }
