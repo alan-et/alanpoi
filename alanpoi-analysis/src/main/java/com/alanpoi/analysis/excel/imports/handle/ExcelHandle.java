@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -64,6 +65,7 @@ public class ExcelHandle {
         CompletableFuture<String> completableFuture = CompletableFuture.supplyAsync(() -> {
             if (excelError != null && !CollectionUtils.isEmpty(excelError.getSheetErrors())) {
                 sheetDataList.forEach(e -> {
+                    int sTotal = e.getData().size();
                     List<Object> errorDataList = new ArrayList<>();
                     e.getData().forEach(vo -> {
                         JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(vo));
@@ -75,13 +77,13 @@ public class ExcelHandle {
                             });
                         });
                     });
+                    log.info("ExcelSheet({}) import success:{},error:{}", e.getSheetName(), sTotal - errorDataList.size(), errorDataList.size());
                     e.getData().removeAll(errorDataList);
                 });
             }
-            log.info("import success:{},error:{}", sheetDataList.size(), total - sheetDataList.size());
             RequestContextHolder.setRequestAttributes(requestAttributes, true);
             try {
-                consumeInterface.end(sheetDataList, excel.getCustomParam());
+                if ("true".equals(excel.getSupportPart())) consumeInterface.end(sheetDataList, excel.getCustomParam());
             } catch (Exception e) {
                 log.error("", e);
             }

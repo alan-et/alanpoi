@@ -56,6 +56,8 @@ public class ExcelInitConfig implements Serializable {
         List list = root.getChildren();
         for (int i = 0; i < list.size(); i++) {
             Element element = (Element) list.get(i);
+            String supportPart = element.getAttributeValue("supportPart");
+            if (StringUtils.isEmpty(supportPart)) supportPart = "true";
             String excelId = element.getAttributeValue("id");
             log.debug("excelId=" + excelId);
             if (excelId == null) {

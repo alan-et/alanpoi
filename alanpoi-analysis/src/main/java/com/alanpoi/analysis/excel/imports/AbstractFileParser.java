@@ -103,7 +103,7 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
                 CloseableHttpResponse closeableHttpResponse = null;
                 closeableHttpResponse = httpClient.execute(httpGet);
                 HttpEntity responseEntity = closeableHttpResponse.getEntity();
-                log.info("请求地址:{},响应状态：{}", null, closeableHttpResponse.getStatusLine());
+                log.info("request address:{},response status：{}", null, closeableHttpResponse.getStatusLine());
                 in = responseEntity.getContent();
             } catch (Exception e) {
                 log.warn("request remote server error:{}", e);
@@ -241,7 +241,8 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
             }
 
             for (int j = sc.getRowStart(); j < rows; j++) {
-                if (null == sheet.getRow(j).getCell((short) 0)) {
+                if (null == sheet.getRow(j) || null == sheet.getRow(j).getCell((short) 0)) {
+                    log.warn("excel row({}) is null,break import", j);
                     break;
                 }
                 String index = null;

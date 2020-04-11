@@ -13,6 +13,7 @@ public class Excel implements Serializable {
 
     private Class consume;
     private String fileName;
+    private String supportPart;
     private Map<Serializable, Object> customParam;
     private List<ExcelSheet> excelSheets;
 
@@ -34,6 +35,14 @@ public class Excel implements Serializable {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public String getSupportPart() {
+        return supportPart;
+    }
+
+    public void setSupportPart(String supportPart) {
+        this.supportPart = supportPart;
     }
 
     public Map<Serializable, Object> getCustomParam() {
