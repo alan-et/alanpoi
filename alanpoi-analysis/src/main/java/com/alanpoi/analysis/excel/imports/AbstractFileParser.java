@@ -241,20 +241,10 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
             }
 
             for (int j = sc.getRowStart(); j < rows; j++) {
-                if (null == sheet.getRow(j) || null == sheet.getRow(j).getCell((short) 0)) {
-                    log.warn("excel row({}) is null,break import", j);
-                    break;
+                if (null == sheet.getRow(j)) {
+                    log.warn("excel row({}) is null,skip current row", j);
+                    continue;
                 }
-                String index = null;
-                if (CellType.NUMERIC == sheet.getRow(j).getCell((short) 0).getCellType()) {
-                    index = String.valueOf(sheet.getRow(j).getCell((short) 0).getNumericCellValue());
-                } else if (CellType.STRING == sheet.getRow(j).getCell((short) 0).getCellType()) {
-                    index = sheet.getRow(j).getCell((short) 0).getStringCellValue();
-                }
-                if (null == index || "".equals(index)) {
-                    break;
-                }
-
                 T view = getData(sc, sheet.getRow(j));
                 list.add(view);
             }
@@ -265,6 +255,16 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
 
         }
         return list;
+    }
+
+    public boolean isRowEmpty(Row row) {
+        for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
+            Cell cell = row.getCell(c);
+            if (cell != null && cell.getCellType() != CellType.BLANK) {
+                return false;
+            }
+        }
+        return true;
     }
 
     //解析返回对象
