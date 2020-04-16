@@ -230,13 +230,15 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
                     if (index != -1) sc.getColumnEntities().get(index).setName(excelColList.get(i));
                 }
             }
-            for (short i = (short) sc.getColStart(); i < sc.getColumn().length + sc.getColStart(); i++) {
+            for (short i = (short) sc.getColStart(); i < headRow.getPhysicalNumberOfCells(); i++) {
                 int index = sc.getColumnEntities().indexOf(headRow.getCell(i).getStringCellValue().trim());
                 if (index != -1) {
                     sc.getColumnEntities().get(index).setIndex(i);
                 } else {
-                    index = sc.getColumnEntities().indexOf(sc.getColumn()[i].trim());
-                    if (index != -1) sc.getColumnEntities().get(index).setIndex(i);
+                    if (excelColList.size() == 0) {
+                        index = sc.getColumnEntities().indexOf(sc.getColumn()[i].trim());
+                        if (index != -1) sc.getColumnEntities().get(index).setIndex(i);
+                    }
                 }
             }
 
