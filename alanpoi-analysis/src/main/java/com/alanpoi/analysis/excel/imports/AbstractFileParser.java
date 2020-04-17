@@ -243,7 +243,7 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
             }
 
             for (int j = sc.getRowStart(); j < rows; j++) {
-                if (null == sheet.getRow(j)) {
+                if (null == sheet.getRow(j) || isRowEmpty(sheet.getRow(j))) {
                     log.warn("excel row({}) is null,skip current row", j);
                     continue;
                 }
