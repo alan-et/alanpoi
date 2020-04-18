@@ -236,6 +236,7 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
                     sc.getColumnEntities().get(index).setIndex(i);
                 } else {
                     if (excelColList.size() == 0) {
+                        if (i >= sc.getColumn().length) break;
                         index = sc.getColumnEntities().indexOf(sc.getColumn()[i].trim());
                         if (index != -1) sc.getColumnEntities().get(index).setIndex(i);
                     }
