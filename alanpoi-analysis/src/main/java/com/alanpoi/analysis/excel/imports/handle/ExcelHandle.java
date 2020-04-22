@@ -4,6 +4,7 @@ import com.alanpoi.analysis.common.ExecutorTools;
 import com.alanpoi.common.enums.ResponseEnum;
 import com.alanpoi.common.util.ApplicationUtil;
 import com.alanpoi.analysis.excel.imports.*;
+import com.alanpoi.common.util.NetworkUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
@@ -136,7 +137,7 @@ public class ExcelHandle {
         executorTools.getExecutor().execute(new Runnable() {
             @Override
             public void run() {
-                ErrorFile errorFile = new ErrorFile(workbookId, ApplicationUtil.getInetAddress().getHostAddress(), tmpPath, fileName);
+                ErrorFile errorFile = new ErrorFile(workbookId, NetworkUtil.getLocalIP(), port, tmpPath, fileName);
                 redisTemplate.opsForValue().set("$$poi-excel:import:" + workbookId, JSON.toJSONString(errorFile), 15, TimeUnit.DAYS);
             }
         });

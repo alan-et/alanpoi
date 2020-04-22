@@ -3,6 +3,7 @@ package com.alanpoi.analysis.excel.imports;
 import com.alanpoi.common.enums.ResponseEnum;
 import com.alanpoi.common.exception.AlanPoiException;
 import com.alanpoi.common.util.ApplicationUtil;
+import com.alanpoi.common.util.NetworkUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alanpoi.analysis.excel.imports.handle.ExcelHandle;
 import lombok.extern.slf4j.Slf4j;
@@ -83,7 +84,7 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
         String filepath = errorFile.getFilePath();
         InputStream in = null;
         CloseableHttpClient httpClient = null;
-        if (errorFile.getIpAddress().equals(ApplicationUtil.getInetAddress().getHostAddress())) {
+        if (errorFile.getIpAddress().equals(NetworkUtil.getLocalIP())) {
             File f = new File(filepath + fileName);
             try {
                 in = new FileInputStream(f);
@@ -99,7 +100,7 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
             try {
                 //文件不在档期服务器，获取指定服务器文件
                 httpClient = HttpClientBuilder.create().build();
-                HttpGet httpGet = new HttpGet("http://" + errorFile.getIpAddress() + ":" + port + request.getRequestURI());
+                HttpGet httpGet = new HttpGet("http://" + errorFile.getIpAddress() + ":" + errorFile.getPort() + request.getRequestURI());
                 CloseableHttpResponse closeableHttpResponse = null;
                 closeableHttpResponse = httpClient.execute(httpGet);
                 HttpEntity responseEntity = closeableHttpResponse.getEntity();

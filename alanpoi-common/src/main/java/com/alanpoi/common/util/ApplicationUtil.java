@@ -58,6 +58,7 @@ public class ApplicationUtil implements ApplicationContextAware {
         return getApplicationContext().getBean(name, clazz);
     }
 
+    @Deprecated
     public static InetAddress getInetAddress() {
         return inetAddress;
     }
