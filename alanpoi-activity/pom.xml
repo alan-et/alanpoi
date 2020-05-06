@@ -13,5 +13,9 @@
     <description>Alan POI Et-activity Client</description>
 
     <dependencies>
+        <dependency>
+            <groupId>com.alanpoi</groupId>
+            <artifactId>alanpoi-common</artifactId>
+        </dependency>
     </dependencies>
 </project>
