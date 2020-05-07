@@ -13,7 +13,8 @@ class EtActivityApplicationTests {
 
     @Test
     void contextLoads() {
-        etFlowApi.startFlow("12334");
+        String result = etFlowApi.start("12334");
+        System.out.println(result);
     }
 
 }
