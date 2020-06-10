@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 
 /**
@@ -70,7 +71,9 @@ public class ExcelHandle {
                     List<Object> errorDataList = new ArrayList<>();
                     e.getData().forEach(vo -> {
                         JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(vo));
-                        excelError.getSheetErrors().forEach(er -> {
+                        //filter mismatch sheet error
+                        List<ExcelError.SheetError> sheetErrors = excelError.getSheetErrors().stream().filter(fe -> fe.getIndex() == e.getIndex()).collect(Collectors.toList());
+                        sheetErrors.forEach(er -> {
                             er.getRowErrors().forEach(re -> {
                                 if (re.getRowIndex() == jsonObject.getInteger("rowIndex")) {
                                     errorDataList.add(vo);

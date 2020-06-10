@@ -12,6 +12,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 @Configuration
 public class LoadConfig {
 
+    @Bean
+    public ApplicationUtil getApplicationUtil() {
+        return new ApplicationUtil();
+    }
+
     @Bean(destroyMethod = "destroy")
     @ConditionalOnBean(name = "redisTemplate")
     @ConditionalOnProperty(name = {"alanpoi.serverid.enable"}, havingValue = "true")
@@ -23,10 +28,5 @@ public class LoadConfig {
     @Bean
     public ID initID() {
         return new ID();
-    }
-
-    @Bean
-    public ApplicationUtil getApplicationUtil() {
-        return new ApplicationUtil();
     }
 }

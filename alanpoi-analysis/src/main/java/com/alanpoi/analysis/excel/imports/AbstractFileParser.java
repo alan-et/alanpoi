@@ -101,6 +101,11 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
                 //文件不在档期服务器，获取指定服务器文件
                 httpClient = HttpClientBuilder.create().build();
                 HttpGet httpGet = new HttpGet("http://" + errorFile.getIpAddress() + ":" + errorFile.getPort() + request.getRequestURI());
+                Enumeration headerNames = request.getHeaderNames();
+                while (headerNames.hasMoreElements()) {
+                    String headerName = (String) headerNames.nextElement();
+                    httpGet.addHeader(headerName, request.getHeader(headerName));
+                }
                 CloseableHttpResponse closeableHttpResponse = null;
                 closeableHttpResponse = httpClient.execute(httpGet);
                 HttpEntity responseEntity = closeableHttpResponse.getEntity();
