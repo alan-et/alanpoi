@@ -28,6 +28,10 @@ public class HttpUtils {
         return httpGet(urlStr, contentType, new HashMap<>());
     }
 
+    public static String httpGet(String urlStr, Map<String, String> headerMap) {
+        return httpGet(urlStr, "application/json; charset=utf-8", headerMap);
+    }
+
     public static <T> T httpGet(String urlStr, Map<String, String> headerMap, Class<? extends T> c) {
         String result = httpGet(urlStr, "application/json; charset=utf-8", headerMap);
         if (result == null) return null;
@@ -90,7 +94,7 @@ public class HttpUtils {
     }
 
     public static String httpPostWithBody(String urlStr, String body) {
-       return httpPostWithBody(urlStr, body, new HashMap<>());
+        return httpPostWithBody(urlStr, body, new HashMap<>());
     }
 
     public static String httpPostWithBody(String urlStr, String body, Map<String, String> headerMap) {

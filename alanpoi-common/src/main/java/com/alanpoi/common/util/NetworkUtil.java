@@ -51,7 +51,7 @@ public class NetworkUtil {
                             LOG.info("IP:" + _localIP);
                         } else {// 外网IP
                             String netip = ip.getHostAddress();
-                            if(netIP == null && !netip.endsWith(".1")){
+                            if (netIP == null && !netip.endsWith(".1")) {
                                 netIP = netip;
                                 byte[] ipAddress = ip.getAddress();
                                 if (ipAddress.length == 4) {
@@ -92,7 +92,7 @@ public class NetworkUtil {
         //x-forwarded-for是一个 Squid 开发的字段，只有在通过了HTTP代理或者负载均衡服务器时才会添加该项。当客户端请求被转发，
         //格式为X-Forwarded-For:client1,proxy1,proxy2，一般情况下，第一个ip为客户端真实ip，
         //IP将会追加在其后并以逗号隔开，后面的为经过的代理服务器ip。现在大部分的代理都会加上这个请求头。
-        String ipString = request.getHeader("x-forwarded-for");
+        String ipString = request.getHeader("X-Forwarded-For");
         //用apache http做代理时一般会加上Proxy-Client-IP请求头
         if (StringUtils.isBlank(ipString) || "unknown".equalsIgnoreCase(ipString)) {
             ipString = request.getHeader("Proxy-Client-IP");
@@ -104,21 +104,22 @@ public class NetworkUtil {
         //HTTP_CLIENT_IP ：有些代理服务器会加上此请求头。
         if (ipString == null || ipString.length() == 0 || "unknown".equalsIgnoreCase(ipString)) {
             ipString = request.getHeader("HTTP_CLIENT_IP");
-            System.out.println("HTTP_CLIENT_IP ipString: " + ipString);
+            LOG.info("HTTP_CLIENT_IP ipString: " + ipString);
         }
         if (ipString == null || ipString.length() == 0 || "unknown".equalsIgnoreCase(ipString)) {
             ipString = request.getHeader("HTTP_X_FORWARDED_FOR");
-            System.out.println("HTTP_X_FORWARDED_FOR ipString: " + ipString);
+            LOG.info("HTTP_X_FORWARDED_FOR ipString: " + ipString);
         }
         //nginx代理一般会加上此请求头。
         if (ipString == null || ipString.length() == 0 || "unknown".equalsIgnoreCase(ipString)) {
             ipString = request.getHeader("X-Real-IP");
-            System.out.println("X-Real-IP ipString: " + ipString);
+            LOG.info("X-Real-IP ipString: " + ipString);
         }
         //当不是上述（代理）方式访问时，request.getRemoteAddr()直接获取客户真实ip
         if (StringUtils.isBlank(ipString) || "unknown".equalsIgnoreCase(ipString)) {
             ipString = request.getRemoteAddr(); //客户端未经过代理，直接访问服务器端(nginx,squid,haproxy)；
         }
+        LOG.info("request client ip :{}", ipString);
         // 多个路由时，取第一个非unknown的ip
         final String[] arr = ipString.split(",");
         for (final String str : arr) {
@@ -132,12 +133,13 @@ public class NetworkUtil {
 
     /**
      * 获取外网ip
+     *
      * @throws Exception
      */
     public static String getOuterNetIp(final HttpServletRequest request) throws Exception {
         String ipAddr = getIpAddr(request);//获取ip地址
         boolean internalIp = internalIp(ipAddr);//判断ip是否内网ip
-        if(!internalIp){//外网地址直接返回
+        if (!internalIp) {//外网地址直接返回
             return ipAddr;
         }
         String result = "";
@@ -169,6 +171,7 @@ public class NetworkUtil {
         }
         return result;
     }
+
     /**
      * 判断是否内网ip
      */
