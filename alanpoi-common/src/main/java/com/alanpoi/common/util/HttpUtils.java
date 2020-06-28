@@ -9,10 +9,15 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
  * http util
+ *
  * @author pengzhuoxun
  * @since 1.1.2
  */
@@ -20,12 +25,28 @@ public class HttpUtils {
     static Logger logger = LoggerFactory.getLogger(HttpUtils.class);
 
     public static String httpGet(String urlStr, String contentType) {
+        return httpGet(urlStr, contentType, new HashMap<>());
+    }
+
+    public static <T> T httpGet(String urlStr, Map<String, String> headerMap, Class<? extends T> c) {
+        String result = httpGet(urlStr, "application/json; charset=utf-8", headerMap);
+        if (result == null) return null;
+        return JSON.parseObject(result, c);
+    }
+
+    public static String httpGet(String urlStr, String contentType, Map<String, String> headerMap) {
         BufferedReader in = null;
         try {
             URL url = new URL(urlStr);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Content-Type", contentType);
+            Set<String> keySet = headerMap.keySet();
+            Iterator<String> it = keySet.iterator();
+            while (it.hasNext()) {
+                String key = it.next();
+                conn.setRequestProperty(key, headerMap.get(key));
+            }
             in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
 
             StringBuffer buf = new StringBuffer();
@@ -68,8 +89,11 @@ public class HttpUtils {
         return httpPostWithBody(urlStr, "");
     }
 
-
     public static String httpPostWithBody(String urlStr, String body) {
+       return httpPostWithBody(urlStr, body, new HashMap<>());
+    }
+
+    public static String httpPostWithBody(String urlStr, String body, Map<String, String> headerMap) {
         BufferedReader in = null;
         OutputStream os = null;
         try {
@@ -78,6 +102,12 @@ public class HttpUtils {
             conn.setDoOutput(true);
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+            Set<String> keySet = headerMap.keySet();
+            Iterator<String> it = keySet.iterator();
+            while (it.hasNext()) {
+                String key = it.next();
+                conn.setRequestProperty(key, headerMap.get(key));
+            }
             byte[] bytes = body.getBytes("utf-8");
             os = conn.getOutputStream();
             os.write(bytes);
@@ -104,7 +134,12 @@ public class HttpUtils {
     }
 
     public static <T> T httpPostWithBody(String urlStr, String body, Class<? extends T> resultClass) {
-        String result = httpPostWithBody(urlStr, body);
+        return httpPostWithBody(urlStr, body, new HashMap<>(), resultClass);
+    }
+
+    public static <T> T httpPostWithBody(String urlStr, String body, Map<String, String> headerMap, Class<? extends T> resultClass) {
+        String result = httpPostWithBody(urlStr, body, headerMap);
+        logger.info("response:{}", result);
         if (result == null) return null;
         return JSON.parseObject(result, resultClass);
     }
