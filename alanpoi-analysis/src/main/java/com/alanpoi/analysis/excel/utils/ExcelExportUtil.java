@@ -1,6 +1,7 @@
 package com.alanpoi.analysis.excel.utils;
 
 import com.alanpoi.analysis.common.ExcelType;
+import com.alanpoi.analysis.excel.exports.WorkbookEntity;
 import com.alanpoi.analysis.excel.exports.WorkbookManager;
 import com.alanpoi.analysis.excel.exports.handle.ExportHandle;
 import com.alanpoi.common.util.ApplicationUtil;
@@ -55,12 +56,17 @@ public class ExcelExportUtil {
         return exportHandle.exportData(workbook, singleSheetData, c);
     }
 
+    private static Workbook getWorkbookMulti(Workbook workbook, Map<Class<?>, Collection<?>> dataMap) {
+        ExportHandle exportHandle = ApplicationUtil.getBean(ExportHandle.class);
+        return exportHandle.exportMultipleSheet(workbook, dataMap);
+    }
+
 
     public static void export(ExcelType excelType, Collection<?> singleSheetData, Class<?> c, HttpServletRequest request, HttpServletResponse response, String fileName) {
         WorkbookManager workbookManager = ApplicationUtil.getBean(WorkbookManager.class);
-        workbookManager = workbookManager.getWorkbookManager(excelType);
-        getWorkbook(workbookManager.getWorkbook(), singleSheetData, c);
-        download(workbookManager, request, response, fileName);
+        WorkbookEntity workbookEntity = workbookManager.getWorkbookManager(excelType);
+        getWorkbook(workbookEntity.getWorkbook(), singleSheetData, c);
+        download(workbookEntity, request, response, fileName);
     }
 
     public static void export(Collection<?> singleSheetData, Class<?> c, HttpServletRequest request, HttpServletResponse response, String fileName) {
@@ -71,7 +77,18 @@ public class ExcelExportUtil {
         export(singleSheetData, c, request, response, UUID.randomUUID().toString() + ".xlsx");
     }
 
-    private static void download(WorkbookManager workbookManager, HttpServletRequest request, HttpServletResponse response, String fileName) {
+    public static void exportByMultiSheet(Map<Class<?>, Collection<?>> dataMap, HttpServletRequest request, HttpServletResponse response) {
+        exportByMultiSheet(dataMap, UUID.randomUUID().toString() + ".xlsx", request, response);
+    }
+
+    public static void exportByMultiSheet(Map<Class<?>, Collection<?>> dataMap, String fileName, HttpServletRequest request, HttpServletResponse response) {
+        WorkbookManager workbookManager = ApplicationUtil.getBean(WorkbookManager.class);
+        WorkbookEntity workbookEntity = workbookManager.getWorkbookManager(ExcelType.EXCEL_2007, dataMap.keySet());
+        getWorkbookMulti(workbookEntity.getWorkbook(), dataMap);
+        download(workbookEntity, request, response, fileName);
+    }
+
+    private static void download(WorkbookEntity workbookEntity, HttpServletRequest request, HttpServletResponse response, String fileName) {
         try {
             response.setContentType("application/force-download;charset=UTF-8");
             final String userAgent = request.getHeader("USER-AGENT");
@@ -88,11 +105,11 @@ public class ExcelExportUtil {
                 logger.error(e.getMessage(), e);
                 return;
             }
-            workbookManager.getWorkbook().write(response.getOutputStream());
+            workbookEntity.getWorkbook().write(response.getOutputStream());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
-            workbookManager.close(workbookManager.getWorkbookId());
+            workbookEntity.close();
         }
 
     }
