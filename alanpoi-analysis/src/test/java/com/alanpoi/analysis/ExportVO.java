@@ -10,17 +10,18 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@ExcelSheet(name = "测试请问额", backColor = AlanColor.BLUE, font = "黑体",fontSize = 25)
+@ExcelSheet(name = "测试请问额", backColor = AlanColor.BLUE, font = "黑体", fontSize = 25)
 @Data
 public class ExportVO {
     @ExcelColumn(name = "名称", width = 60, index = "0")
     private String name;
 
-    @ExcelColumn(name = "值", index = "3")
-    private String value;
+    @ExcelColumn(name = "值", index = "4")
+    @NumFormat(value = "#0.0")
+    private BigDecimal value;
 
     @ExcelColumn(name = "金额", color = AlanColor.RED, index = "2")
-    @NumFormat(value = "0000.00##")
+    @NumFormat(value = "0.00%")
     private BigDecimal amount;
 
     @ExcelColumn(name = "时间格式化", index = "1")
@@ -28,6 +29,6 @@ public class ExportVO {
     private Date dateTime;
 
     @DateFormat
-    @ExcelColumn(name = "日期格式化", index = "4")
+    @ExcelColumn(name = "日期格式化", index = "3")
     private java.sql.Date date;
 }

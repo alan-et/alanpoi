@@ -22,7 +22,7 @@ class AlanpoiApplicationTests {
             for (int i = 0; i < 500; i++) {
                 ExportVO exportVO = new ExportVO();
                 exportVO.setName("name" + i);
-                exportVO.setValue("value" + i);
+                exportVO.setValue(new BigDecimal(123.11 + i * 0.09));
                 exportVO.setAmount(new BigDecimal(6666.666 + i * 10));
                 exportVO.setDate(new Date(132324343 + i * 100));
                 exportVO.setDateTime(new java.util.Date());

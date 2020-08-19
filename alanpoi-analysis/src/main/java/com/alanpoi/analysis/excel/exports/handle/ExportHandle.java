@@ -117,6 +117,7 @@ public class ExportHandle {
             handleRow(sheet.createRow(rowInd), object, excelParseParamList);
             rowInd++;
         }
+        logger.info("excel sheet({}) handle completed !", sheet.getSheetName());
     }
 
     /**
@@ -143,13 +144,28 @@ public class ExportHandle {
         } else {
             try {
                 Object value = excelParseParam.getMethod().invoke(object);
+                boolean isFormat = false;
                 if (StringUtils.isNotEmpty(excelParseParam.getFormat())) {
                     value = this.dateFormatValue(value, excelParseParam);
-                }
-                if (StringUtils.isNotEmpty(excelParseParam.getNumFormat())) {
+                    isFormat = true;
+                } else if (StringUtils.isNotEmpty(excelParseParam.getNumFormat())) {
                     value = this.numFormatValue(value, excelParseParam);
+                    isFormat = true;
                 }
-                cell.setCellValue(value == null ? "" : value.toString());
+                if (!isFormat) {
+                    if (value == null) cell.setCellValue("");
+                    else if (NumberUtils.isCreatable(value.toString()))
+                        if (value.toString().indexOf(".") != -1)
+                            cell.setCellValue(Double.valueOf(value.toString()));
+                        else
+                            cell.setCellValue(Long.valueOf(value.toString()));
+                    else
+                        cell.setCellValue(value.toString());
+
+                } else {
+                    cell.setCellValue(value == null ? "" : value.toString());
+                }
+
                 cell.setCellStyle(excelParseParam.getCellStyle());
             } catch (IllegalAccessException e) {
                 logger.error("", e);
