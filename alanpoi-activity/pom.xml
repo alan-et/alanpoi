@@ -17,5 +17,9 @@
             <groupId>com.alanpoi</groupId>
             <artifactId>alanpoi-common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+        </dependency>
     </dependencies>
 </project>

@@ -1,17 +1,19 @@
 package com.alanpoi.etactivity.client;
 
 import com.alanpoi.common.util.ApplicationUtil;
+import com.alanpoi.etactivity.protocol.ByteBufCache;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import javax.annotation.PostConstruct;
+import java.io.*;
 import java.net.Socket;
 import java.rmi.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * et-activity socket client
@@ -24,6 +26,13 @@ public class EtSocketClient {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     private final static String DEFAULT_HOST = "127.0.0.1";
     private final static int DEFAULT_PORT = 6088;
+
+    @PostConstruct
+    public void init() throws IOException{
+//        socket=createClient();
+//        socket.setKeepAlive(true);
+        ByteBufCache.init();
+    }
 
     public Socket createClient() throws IOException {
         Environment environment = ApplicationUtil.getBean(Environment.class);
@@ -47,7 +56,7 @@ public class EtSocketClient {
         return socket;
     }
 
-    public String send(byte[] data) {
+    public Object send(byte[] data) throws IOException,ClassNotFoundException{
         Socket socket = null;
         OutputStream outputStream = null;
         InputStream inputStream = null;
@@ -56,19 +65,20 @@ public class EtSocketClient {
             socket = createClient();
             if (socket == null) return null;
             outputStream = socket.getOutputStream();
-            socket.getOutputStream().write(data);
+            outputStream.write(data);
             //后续只能接受数据
             socket.shutdownOutput();
 
             inputStream = socket.getInputStream();
             byte[] bytes = new byte[1024];
             int len;
-            StringBuilder sb = new StringBuilder();
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
             while ((len = inputStream.read(bytes)) != -1) {
-                sb.append(new String(bytes, 0, len, "UTF-8"));
+                output.write(bytes,0,len);
             }
-
-            return sb.toString();
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(output.toByteArray());
+            ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+            return objectInputStream.readObject();
         } catch (UnknownHostException e) {
             logger.error("", e);
         } catch (IOException e1) {

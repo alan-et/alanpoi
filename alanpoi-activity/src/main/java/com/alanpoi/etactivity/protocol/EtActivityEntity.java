@@ -1,12 +1,30 @@
 package com.alanpoi.etactivity.protocol;
 
-public class EtActivityEntity<T> {
+
+import com.alanpoi.common.util.ApplicationUtil;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
+public class EtActivityEntity<T> implements Serializable {
+
 
     private String className;
     private String methodName;
     private Class<?>[] parameterTypes;
     private T[] param;
     private Object result;
+
+    public T getCls() {
+        try {
+            return (T) ApplicationUtil.getBean(Class.forName(className));
+        } catch (Exception e) {
+
+        }
+        return null;
+    }
 
     public String getClassName() {
         return className;
@@ -46,5 +64,12 @@ public class EtActivityEntity<T> {
 
     public void setResult(Object result) {
         this.result = result;
+    }
+
+    public byte[] toByteArray() throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+        objectOutputStream.writeObject(this);
+        return byteArrayOutputStream.toByteArray();
     }
 }

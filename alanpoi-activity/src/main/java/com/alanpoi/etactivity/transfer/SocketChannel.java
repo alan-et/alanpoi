@@ -1,5 +1,6 @@
 package com.alanpoi.etactivity.transfer;
 
+import com.alanpoi.etactivity.protocol.ByteBufCache;
 import com.alanpoi.etactivity.protocol.EtActivityEntity;
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
@@ -81,7 +82,7 @@ public class SocketChannel {
                 ETActivityDecode<EtActivityEntity> etActivityDecode = new ETActivityDecode<EtActivityEntity>();
                 etActivityDecode.decode(is, etActivityEntity);
                 logger.info("call {}.{}", etActivityEntity.getClassName(), etActivityEntity.getMethodName());
-                Object result = etActivityEntity.getClass().getMethod(etActivityEntity.getMethodName(),etActivityEntity.getParameterTypes()).invoke(etActivityEntity.getClass(), etActivityEntity.getParam());
+                Object result = etActivityEntity.getClass().getMethod(etActivityEntity.getMethodName(), etActivityEntity.getParameterTypes()).invoke(etActivityEntity.getClass(), etActivityEntity.getParam());
                 String resStr = JSON.toJSONString(result);
                 os.write(resStr.getBytes("UTF-8"));
             } catch (Exception e) {
