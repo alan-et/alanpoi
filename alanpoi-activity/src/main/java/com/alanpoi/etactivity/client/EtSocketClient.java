@@ -1,7 +1,10 @@
 package com.alanpoi.etactivity.client;
 
+import com.alanpoi.common.exception.AlanPoiException;
+import com.alanpoi.common.util.AObject;
 import com.alanpoi.common.util.ApplicationUtil;
 import com.alanpoi.etactivity.protocol.ByteBufCache;
+import io.netty.buffer.ByteBuf;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +31,7 @@ public class EtSocketClient {
     private final static int DEFAULT_PORT = 6088;
 
     @PostConstruct
-    public void init() throws IOException{
+    public void init() throws IOException {
 //        socket=createClient();
 //        socket.setKeepAlive(true);
         ByteBufCache.init();
@@ -56,7 +59,8 @@ public class EtSocketClient {
         return socket;
     }
 
-    public Object send(byte[] data) throws IOException,ClassNotFoundException{
+    public Object send(byte[] data) throws ClassNotFoundException {
+        AObject aObject = new AObject();
         Socket socket = null;
         OutputStream outputStream = null;
         InputStream inputStream = null;
@@ -74,11 +78,9 @@ public class EtSocketClient {
             int len;
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             while ((len = inputStream.read(bytes)) != -1) {
-                output.write(bytes,0,len);
+                output.write(bytes, 0, len);
             }
-            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(output.toByteArray());
-            ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
-            return objectInputStream.readObject();
+            return decode(bytes);
         } catch (UnknownHostException e) {
             logger.error("", e);
         } catch (IOException e1) {
@@ -92,6 +94,32 @@ public class EtSocketClient {
                 logger.error("", e);
             }
         }
-        return null;
+        return aObject.toString();
+    }
+
+    private Object decode(byte[] bytes) throws UnsupportedEncodingException, IOException, ClassNotFoundException {
+        ByteBuf buf = ByteBufCache.getByteBuf();
+        buf.writeBytes(bytes);
+
+        short code = buf.readShort();
+        int version = buf.readInt();
+        int length = buf.readInt();
+        int erLength = buf.readInt();
+        byte[] body = new byte[length];
+        if (length > 0) {
+            buf.readBytes(body);
+        }
+        if (erLength > 0) {
+            byte[] erMsg = new byte[erLength];
+            buf.readBytes(erMsg);
+            exception(code, new String(erMsg, "UTF-8"));
+        }
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(body);
+        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+        return objectInputStream.readObject();
+    }
+
+    private void exception(short code, String msg) {
+        throw new AlanPoiException(code, msg);
     }
 }

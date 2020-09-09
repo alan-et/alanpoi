@@ -31,13 +31,13 @@ public class ActivityInvocationHandler implements InvocationHandler {
         if (etSocketClient == null) {
             throw new BeanCreationException(null, "etSocketClient", "EtSocketClient is null");
         }
-        EtActivityReq req=new EtActivityReq();
+        EtActivityReq req = new EtActivityReq();
         EtActivityEntity etActivityEntity = new EtActivityEntity();
         etActivityEntity.setClassName(method.getDeclaringClass().getName());
         etActivityEntity.setMethodName(method.getName());
         etActivityEntity.setParameterTypes(method.getParameterTypes());
         etActivityEntity.setParam(args);
-        byte[] body=etActivityEntity.toByteArray();
+        byte[] body = etActivityEntity.toByteArray();
         req.setVersion(1);
         req.setCmd((byte) (0x01));
         req.setBody(body);

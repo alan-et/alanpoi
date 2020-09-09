@@ -1,6 +1,8 @@
 package com.alanpoi.etactivity;
 
 import com.alanpoi.etactivity.api.EtFlowApi;
+import com.alanpoi.etactivity.api.req.CreateInstanceReq;
+import com.alanpoi.etactivity.api.rsp.InstanceInfoRsp;
 import com.alanpoi.etactivity.transfer.ExecutorTools;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,7 +24,13 @@ class EtActivityApplicationTests {
         long begin = System.currentTimeMillis();
         SimpleDateFormat format = new SimpleDateFormat("YYYY-MM-dd hh:mm:ss.SSS");
         System.out.println(format.format(new Date()));
-        String result = etFlowApi.start("12334");
+        CreateInstanceReq req = new CreateInstanceReq();
+        req.setProcessId(1L);
+        req.setApplicant(123456L);
+        req.setStatus(1001);
+        req.setTaskName("XXX流程");
+        req.setCreatedBy(123456L);
+        InstanceInfoRsp result = etFlowApi.start(req);
 //        boolean bool=etFlowApi.addHandler(new ArrayList<>());
 //        String result2 = etFlowApi.endFlow("12334");
 //        for (int i=0;i<50;i++){
