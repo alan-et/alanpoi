@@ -1,9 +1,10 @@
 package com.alanpoi.etactivity.api.rsp;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class TaskInfo {
+public class TaskInfo implements Serializable {
 
     /**
      * 实例ID

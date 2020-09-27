@@ -1,6 +1,8 @@
 package com.alanpoi.etactivity.api.rsp;
 
-public class InstanceInfoRsp {
+import java.io.Serializable;
+
+public class InstanceInfoRsp implements Serializable {
 
     /**
      * 流程ID
@@ -92,4 +94,5 @@ public class InstanceInfoRsp {
     public void setLastUpdatedBy(Long lastUpdatedBy) {
         this.lastUpdatedBy = lastUpdatedBy;
     }
+
 }

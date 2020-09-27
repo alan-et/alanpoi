@@ -2,6 +2,7 @@ package com.alanpoi.etactivity;
 
 import com.alanpoi.etactivity.api.EtFlowApi;
 import com.alanpoi.etactivity.api.req.CreateInstanceReq;
+import com.alanpoi.etactivity.api.req.FlowProcessReq;
 import com.alanpoi.etactivity.api.rsp.InstanceInfoRsp;
 import com.alanpoi.etactivity.transfer.ExecutorTools;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,7 @@ class EtActivityApplicationTests {
         SimpleDateFormat format = new SimpleDateFormat("YYYY-MM-dd hh:mm:ss.SSS");
         System.out.println(format.format(new Date()));
         CreateInstanceReq req = new CreateInstanceReq();
-        req.setProcessId(1L);
+        req.setProcessId(27638201013239997L);
         req.setApplicant(123456L);
         req.setStatus(1001);
         req.setTaskName("XXX流程");
@@ -42,6 +43,16 @@ class EtActivityApplicationTests {
 //            });
 //        }
         System.out.println(String.format("结果:%s-%s,----耗时:%s", result, 1, System.currentTimeMillis() - begin));
+    }
+
+    @Test
+    public void process(){
+        FlowProcessReq req=new FlowProcessReq();
+        req.setHandler(123456L);
+        req.setTaskId(30333642257465940L);
+        req.setIsAgree((byte) 1);
+        req.setNextNodeId(2L);
+        etFlowApi.process(req);
     }
 
 }
