@@ -124,7 +124,7 @@ public class ExportHandle {
                 String link = excelColumn.link();
                 if (StringUtils.isNotBlank(link)) {
                     excelParseParam.setSourceLink(link);
-                    if (link.indexOf(Placeholder.TYPE0.begin) != -1)
+                    if (link.indexOf("${") != -1)
                         excelParseParam.setLinkMethod(reflectorManager.getGetMethod(StringUtils.findReplace(link, Placeholder.TYPE0)));
                 }
                 excelParseParam.setHeight(excelColumn.height());
