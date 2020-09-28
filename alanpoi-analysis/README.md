@@ -1,7 +1,16 @@
 # 前言
 
-针对Excel操作，alanpoi是为了实现一个操作更加简单，开发效率更加高的工具，开发者不需要关心太多的逻辑，只需要处理和自己业务相关的部分;<br>
+针对Excel操作，alanpoi是为了实现一个操作更加简单，开发效率更加高的工具，开发者不需要关心太多的逻辑，只需要处理和自己业务相关的部分;
 化繁为简，由简变精的原则
+
+项目中使用:
+```
+  <dependency>
+      <groupId>com.alanpoi</groupId>
+      <artifactId>alanpoi-analysis</artifactId>
+      <version>1.3.0</version>
+  </dependency>
+```
 
 
 # 功能介绍
@@ -147,6 +156,7 @@ ExcelExportUtil.getWorkbook(Collection<?> singleSheetData, Class<?> c)<br>
     colList.add("value");
     //调用获取workbook对象；也可以直接调用exportSpecifyCol方法导出到浏览器
     Workbook workbook = ExcelExportUtil.getWorkbookSpecifyCol(list, ExportVO.class, colList);
+```
 
 实例二：多sheet页签导出
 
@@ -174,7 +184,7 @@ ExcelExportUtil.getWorkbook(Collection<?> singleSheetData, Class<?> c)<br>
     map.put(Export2VO.class, list2);
     //调用获取workbook对象；也可以直接调用exportByMultiSheet方法导出到浏览器
     Workbook workbook = ExcelExportUtil.getWorkbookByMultiSheet(map);
-
+```
 
 
 
