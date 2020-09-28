@@ -99,7 +99,7 @@ NumFormat注解: 用于导入类的属性上，可以按照指定格式输出到
 @ExcelSheet(name = "测试", backColor = AlanColors.GREEN, font = "宋体", fontSize = 25)
 @Data
 public class ExportVO {
-    @ExcelColumn(name = "名称", width = 32)
+    @ExcelColumn(name = "名称", width = 32, link = "${url}")
     private String name;
 
     @ExcelColumn(name = "值")
@@ -116,6 +116,9 @@ public class ExportVO {
     @DateFormat
     @ExcelColumn(name = "日期格式化")
     private java.sql.Date date;
+    
+    @ExcelColumn(isExist = false)
+    private String url;
 }
 ```
 #### 使用
@@ -124,7 +127,53 @@ ExcelExportUtil.export(Colletion<?>,Class,HttpServletRequest,HttpServletResponse
 方式二. 调用getWorkbook获取工作表,自行处理workbook<br>
 ExcelExportUtil.getWorkbook(Collection<?> singleSheetData, Class<?> c)<br>
 
+#### 高级使用
 
+示例一：导出指定列（动态导出列）
+```
+    List<ExportVO> list = new ArrayList<>();
+    for (int i = 0; i < 500; i++) {
+        ExportVO exportVO = new ExportVO();
+        exportVO.setName("name" + i);
+        exportVO.setValue(new BigDecimal(123.11 + i * 0.09));
+        exportVO.setAmount(new BigDecimal(6666.666 + i * 10));
+        exportVO.setDate(new Date(132324343 + i * 100));
+        exportVO.setDateTime(new java.util.Date());
+        list.add(exportVO);
+    }
+    List<String> colList = new ArrayList<>();
+    //按照顺序仅导出add的列
+    colList.add("name");
+    colList.add("value");
+    //调用获取workbook对象；也可以直接调用exportSpecifyCol方法导出到浏览器
+    Workbook workbook = ExcelExportUtil.getWorkbookSpecifyCol(list, ExportVO.class, colList);
+
+实例二：多sheet页签导出
+
+```
+    List<ExportVO> list = new ArrayList<>();
+    List<Export2VO> list2 = new ArrayList<>();
+    for (int i = 0; i < 500; i++) {
+        ExportVO exportVO = new ExportVO();
+        exportVO.setName("name" + i);
+        exportVO.setValue(new BigDecimal(123.11 + i * 0.09));
+        exportVO.setAmount(new BigDecimal(6666.666 + i * 10));
+        exportVO.setDate(new Date(132324343 + i * 100));
+        exportVO.setDateTime(new java.util.Date());
+        list.add(exportVO);
+        Export2VO export2VO = new Export2VO();
+        export2VO.setName("name" + i);
+        export2VO.setValue("value" + i);
+        export2VO.setAmount(new BigDecimal(6666.666 + i * 10));
+        export2VO.setDate(new Date(132324343 + i * 100));
+        export2VO.setDateTime(new java.util.Date());
+        list2.add(export2VO);
+    }
+    Map<Class<?>, Collection<?>> map = new HashMap<>();
+    map.put(ExportVO.class, list);
+    map.put(Export2VO.class, list2);
+    //调用获取workbook对象；也可以直接调用exportByMultiSheet方法导出到浏览器
+    Workbook workbook = ExcelExportUtil.getWorkbookByMultiSheet(map);
 
 
 
