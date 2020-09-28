@@ -96,7 +96,7 @@ consume类继承ExcelConsumeInterface接口，实现方法
 
 ### 模式
 
-#### 使用注解模式导入
+#### 使用注解模式导出
 
 ExcelSheet注解：用于导入类上，可制定sheet名，列头的颜色、字体、高度、宽度<br>
 ExcelColum注解: 用于导入类的属性上，可指定列头的名称，单元格的样式<br>
@@ -158,7 +158,7 @@ ExcelExportUtil.getWorkbook(Collection<?> singleSheetData, Class<?> c)<br>
     Workbook workbook = ExcelExportUtil.getWorkbookSpecifyCol(list, ExportVO.class, colList);
 ```
 
-实例二：多sheet页签导出
+示例二：多sheet页签导出
 
 ```
     List<ExportVO> list = new ArrayList<>();
