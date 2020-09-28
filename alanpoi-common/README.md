@@ -1,5 +1,14 @@
 # anpoi common 
 
+项目中使用:
+```
+  <dependency>
+      <groupId>com.alanpoi</groupId>
+      <artifactId>alanpoi-common</artifactId>
+      <version>1.3.0</version>
+  </dependency>
+```
+
 ## Event事件
 (参照JQuery事件原理)
 
