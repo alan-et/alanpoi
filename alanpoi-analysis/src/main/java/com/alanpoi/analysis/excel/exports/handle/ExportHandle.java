@@ -124,7 +124,8 @@ public class ExportHandle {
                 String link = excelColumn.link();
                 if (StringUtils.isNotBlank(link)) {
                     excelParseParam.setSourceLink(link);
-                    excelParseParam.setLinkMethod(reflectorManager.getGetMethod(StringUtils.findReplace(link, Placeholder.TYPE0)));
+                    if (link.indexOf(Placeholder.TYPE0.begin) != -1)
+                        excelParseParam.setLinkMethod(reflectorManager.getGetMethod(StringUtils.findReplace(link, Placeholder.TYPE0)));
                 }
                 excelParseParam.setHeight(excelColumn.height());
                 excelParseParam.setColor(excelColumn.color().index);
@@ -185,8 +186,10 @@ public class ExportHandle {
                 if (StringUtils.isNotBlank(excelParseParam.getSourceLink())) {
                     //set hyperlink and style
                     Hyperlink hyperlink = workbook.getCreationHelper().createHyperlink(HyperlinkType.URL);
-                    Object link = excelParseParam.getLinkMethod().invoke(object);
-                    hyperlink.setAddress(StringUtils.replace(excelParseParam.getSourceLink(), (String) link, Placeholder.TYPE0));
+                    String link = excelParseParam.getSourceLink();
+                    if (null != excelParseParam.getLinkMethod())
+                        link = (String) excelParseParam.getLinkMethod().invoke(object);
+                    hyperlink.setAddress(StringUtils.replace(excelParseParam.getSourceLink(), link, Placeholder.TYPE0));
                     cell.setHyperlink(hyperlink);
                     Font font = workbook.createFont();
                     font.setUnderline((byte) 1);
