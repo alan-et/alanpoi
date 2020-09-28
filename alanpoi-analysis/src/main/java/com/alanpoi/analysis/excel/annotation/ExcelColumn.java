@@ -26,5 +26,7 @@ public @interface ExcelColumn {
 
     int width() default 30;
 
+    String link() default "";
+
     AlanColor color() default AlanColor.NONE;
 }

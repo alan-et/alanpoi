@@ -3,8 +3,10 @@ package com.alanpoi.analysis.excel.exports;
 import com.alanpoi.analysis.common.AlanColor;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.Hyperlink;
 
 import java.lang.reflect.Method;
+import java.util.Set;
 
 /**
  * excel解析参数
@@ -15,7 +17,7 @@ import java.lang.reflect.Method;
 public class ExcelParseParam {
 
     private Integer index;
-    
+
     private int height;
 
     private int color;
@@ -29,6 +31,12 @@ public class ExcelParseParam {
     private Method method;
 
     private CellStyle cellStyle;
+
+    private String sourceLink;
+
+    private Method linkMethod;
+
+    private Set<String> specifyCol;
 
     public Integer getIndex() {
         return index;
@@ -96,5 +104,29 @@ public class ExcelParseParam {
 
     public void setNumFormat(String numFormat) {
         this.numFormat = numFormat;
+    }
+
+    public Method getLinkMethod() {
+        return linkMethod;
+    }
+
+    public void setLinkMethod(Method linkMethod) {
+        this.linkMethod = linkMethod;
+    }
+
+    public String getSourceLink() {
+        return sourceLink;
+    }
+
+    public void setSourceLink(String sourceLink) {
+        this.sourceLink = sourceLink;
+    }
+
+    public Set<String> getSpecifyCol() {
+        return specifyCol;
+    }
+
+    public void setSpecifyCol(Set<String> specifyCol) {
+        this.specifyCol = specifyCol;
     }
 }

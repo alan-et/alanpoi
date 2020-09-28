@@ -13,7 +13,7 @@ import java.util.Date;
 @ExcelSheet(name = "测试2", backColor = AlanColor.YELLOW, font = "宋体", index = 1, fontSize = 25)
 @Data
 public class Export2VO {
-    @ExcelColumn(name = "名称", width = 32, index = "0")
+    @ExcelColumn(name = "名称", width = 32, index = "0",link = "http://alanpoi.com/${value}")
     private String name;
 
     @ExcelColumn(name = "值", index = "3")

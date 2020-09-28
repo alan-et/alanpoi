@@ -13,9 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Collection;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Excel Export Util
@@ -26,6 +24,13 @@ import java.util.UUID;
 public class ExcelExportUtil {
     protected static final Logger logger = LoggerFactory.getLogger(ExcelExportUtil.class);
 
+    /**
+     * get excel workbook object
+     *
+     * @param singleSheetData
+     * @param c
+     * @return
+     */
     public static Workbook getWorkbook(Collection<?> singleSheetData, Class<?> c) {
         return getWorkbook(ExcelType.EXCEL_2007, singleSheetData, c);
     }
@@ -36,7 +41,20 @@ public class ExcelExportUtil {
     }
 
     /**
-     * Multi sheet export
+     * Gets the workbook object of the specified column
+     *
+     * @param singleSheetData
+     * @param c
+     * @param specifyCol
+     * @return
+     */
+    public static Workbook getWorkbookSpecifyCol(Collection<?> singleSheetData, Class<?> c, List<String> specifyCol) {
+        ExportHandle exportHandle = ApplicationUtil.getBean(ExportHandle.class);
+        return exportHandle.exportData(WorkbookManager.newWorkbook(ExcelType.EXCEL_2007), singleSheetData, c, specifyCol);
+    }
+
+    /**
+     * Get Multi sheet workbook object
      *
      * @param excelType
      * @param dataMap
@@ -56,6 +74,11 @@ public class ExcelExportUtil {
         return exportHandle.exportData(workbook, singleSheetData, c);
     }
 
+    private static Workbook getWorkbookSpecifyCol(Workbook workbook, Collection<?> singleSheetData, Class<?> c, List<String> specifyCol) {
+        ExportHandle exportHandle = ApplicationUtil.getBean(ExportHandle.class);
+        return exportHandle.exportData(workbook, singleSheetData, c, specifyCol);
+    }
+
     private static Workbook getWorkbookMulti(Workbook workbook, Map<Class<?>, Collection<?>> dataMap) {
         ExportHandle exportHandle = ApplicationUtil.getBean(ExportHandle.class);
         return exportHandle.exportMultipleSheet(workbook, dataMap);
@@ -69,6 +92,39 @@ public class ExcelExportUtil {
         download(workbookEntity, request, response, fileName);
     }
 
+    /**
+     * Export Excel to the browser, allowing you to specify the columns to be exported
+     *
+     * @param excelType
+     * @param singleSheetData
+     * @param c
+     * @param request
+     * @param response
+     * @param fileName
+     * @param specifyCol
+     */
+    public static void exportSpecifyCol(ExcelType excelType,
+                                        Collection<?> singleSheetData,
+                                        Class<?> c,
+                                        HttpServletRequest request,
+                                        HttpServletResponse response,
+                                        String fileName,
+                                        List<String> specifyCol) {
+        WorkbookManager workbookManager = ApplicationUtil.getBean(WorkbookManager.class);
+        WorkbookEntity workbookEntity = workbookManager.getWorkbookManager(excelType);
+        getWorkbookSpecifyCol(workbookEntity.getWorkbook(), singleSheetData, c, specifyCol);
+        download(workbookEntity, request, response, fileName);
+    }
+
+    /**
+     * Export Excel to the browser
+     *
+     * @param singleSheetData
+     * @param c
+     * @param request
+     * @param response
+     * @param fileName
+     */
     public static void export(Collection<?> singleSheetData, Class<?> c, HttpServletRequest request, HttpServletResponse response, String fileName) {
         export(ExcelType.EXCEL_2007, singleSheetData, c, request, response, fileName);
     }
@@ -81,6 +137,14 @@ public class ExcelExportUtil {
         exportByMultiSheet(dataMap, UUID.randomUUID().toString() + ".xlsx", request, response);
     }
 
+    /**
+     * Export multiple sheet tab Excel to the browser, allowing you to specify the columns to be exported
+     *
+     * @param dataMap
+     * @param fileName
+     * @param request
+     * @param response
+     */
     public static void exportByMultiSheet(Map<Class<?>, Collection<?>> dataMap, String fileName, HttpServletRequest request, HttpServletResponse response) {
         WorkbookManager workbookManager = ApplicationUtil.getBean(WorkbookManager.class);
         WorkbookEntity workbookEntity = workbookManager.getWorkbookManager(ExcelType.EXCEL_2007, dataMap.keySet());

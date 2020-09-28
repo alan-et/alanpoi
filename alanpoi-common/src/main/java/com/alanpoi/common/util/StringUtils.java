@@ -35,6 +35,28 @@ public class StringUtils {
         return source;
     }
 
+    public static String findReplace(String source, Placeholder placeholder) {
+        Pattern regex = Pattern.compile(placeholder.regex);
+        Matcher matcher = regex.matcher(source);
+        boolean flag = matcher.find();
+        if (!flag) {
+            return null;
+        }
+        String key = matcher.group(0);
+        return formatParam(key);
+    }
+
+    public static String replace(String source, String replaceVal, Placeholder placeholder) {
+        Pattern regex = Pattern.compile(placeholder.regex);
+        Matcher matcher = regex.matcher(source);
+        boolean flag = matcher.find();
+        if (!flag) {
+            return null;
+        }
+        String key = matcher.group(0);
+        return source.replace(key, replaceVal);
+    }
+
     public static String formatParam(String paramCode) {
         return paramCode.replaceAll("\\$\\{", "").replaceAll("\\}", "");
     }

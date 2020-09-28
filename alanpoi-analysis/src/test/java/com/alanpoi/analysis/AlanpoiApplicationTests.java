@@ -1,5 +1,6 @@
 package com.alanpoi.analysis;
 
+import com.alanpoi.analysis.excel.imports.Excel;
 import com.alanpoi.analysis.excel.utils.ExcelExportUtil;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.jupiter.api.Test;
@@ -42,6 +43,35 @@ class AlanpoiApplicationTests {
             map.put(Export2VO.class, list2);
             Workbook workbook = ExcelExportUtil.getWorkbookByMultiSheet(map);
             OutputStream outputStream = new FileOutputStream("/tmp/test.xlsx");
+            workbook.write(outputStream);
+            workbook.close();
+            outputStream.flush();
+            outputStream.close();
+        } catch (Exception e) {
+
+        } finally {
+
+        }
+    }
+
+    @Test
+    public void testSpecifyCol() {
+        try {
+            List<ExportVO> list = new ArrayList<>();
+            for (int i = 0; i < 500; i++) {
+                ExportVO exportVO = new ExportVO();
+                exportVO.setName("name" + i);
+                exportVO.setValue(new BigDecimal(123.11 + i * 0.09));
+                exportVO.setAmount(new BigDecimal(6666.666 + i * 10));
+                exportVO.setDate(new Date(132324343 + i * 100));
+                exportVO.setDateTime(new java.util.Date());
+                list.add(exportVO);
+            }
+            List<String> colList = new ArrayList<>();
+            colList.add("name");
+            colList.add("value");
+            Workbook workbook = ExcelExportUtil.getWorkbookSpecifyCol(list, ExportVO.class, colList);
+            OutputStream outputStream = new FileOutputStream("/tmp/test1.xlsx");
             workbook.write(outputStream);
             workbook.close();
             outputStream.flush();
