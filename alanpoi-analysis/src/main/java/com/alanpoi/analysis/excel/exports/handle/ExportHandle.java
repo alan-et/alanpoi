@@ -43,11 +43,15 @@ public class ExportHandle {
     }
 
     public Workbook exportMultipleSheet(Workbook workbook, Map<Class<?>, Collection<?>> dataMap) {
+        return exportMultipleSheet(workbook, dataMap, new HashMap<>());
+    }
+
+    public Workbook exportMultipleSheet(Workbook workbook, Map<Class<?>, Collection<?>> dataMap, Map<Integer, List<String>> specifyCol) {
         try {
             int sheetAt = 0;
             for (Class<?> c : dataMap.keySet()) {
                 Collection<?> collection = dataMap.get(c);
-                loadSheet(workbook, collection, c, sheetAt, null);
+                loadSheet(workbook, collection, c, sheetAt, specifyCol.get(sheetAt));
                 sheetAt++;
             }
         } catch (Exception e) {

@@ -79,9 +79,9 @@ public class ExcelExportUtil {
         return exportHandle.exportData(workbook, singleSheetData, c, specifyCol);
     }
 
-    private static Workbook getWorkbookMulti(Workbook workbook, Map<Class<?>, Collection<?>> dataMap) {
+    private static Workbook getWorkbookMulti(Workbook workbook, Map<Class<?>, Collection<?>> dataMap, Map<Integer, List<String>> specifyCol) {
         ExportHandle exportHandle = ApplicationUtil.getBean(ExportHandle.class);
-        return exportHandle.exportMultipleSheet(workbook, dataMap);
+        return exportHandle.exportMultipleSheet(workbook, dataMap, specifyCol);
     }
 
 
@@ -138,7 +138,7 @@ public class ExcelExportUtil {
     }
 
     /**
-     * Export multiple sheet tab Excel to the browser, allowing you to specify the columns to be exported
+     * Export multiple sheet tab Excel to the browser
      *
      * @param dataMap
      * @param fileName
@@ -148,7 +148,22 @@ public class ExcelExportUtil {
     public static void exportByMultiSheet(Map<Class<?>, Collection<?>> dataMap, String fileName, HttpServletRequest request, HttpServletResponse response) {
         WorkbookManager workbookManager = ApplicationUtil.getBean(WorkbookManager.class);
         WorkbookEntity workbookEntity = workbookManager.getWorkbookManager(ExcelType.EXCEL_2007, dataMap.keySet());
-        getWorkbookMulti(workbookEntity.getWorkbook(), dataMap);
+        getWorkbookMulti(workbookEntity.getWorkbook(), dataMap, new HashMap<>());
+        download(workbookEntity, request, response, fileName);
+    }
+
+    /**
+     * Export multiple sheet tab Excel to the browser, allowing you to specify the columns to be exported
+     *
+     * @param dataMap
+     * @param fileName
+     * @param request
+     * @param response
+     */
+    public static void exportByMultiSheet(Map<Class<?>, Collection<?>> dataMap, String fileName, Map<Integer, List<String>> specifyCol, HttpServletRequest request, HttpServletResponse response) {
+        WorkbookManager workbookManager = ApplicationUtil.getBean(WorkbookManager.class);
+        WorkbookEntity workbookEntity = workbookManager.getWorkbookManager(ExcelType.EXCEL_2007, dataMap.keySet());
+        getWorkbookMulti(workbookEntity.getWorkbook(), dataMap, specifyCol);
         download(workbookEntity, request, response, fileName);
     }
 
