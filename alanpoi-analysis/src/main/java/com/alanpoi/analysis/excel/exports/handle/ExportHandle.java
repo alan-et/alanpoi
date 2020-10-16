@@ -8,9 +8,9 @@ import com.alanpoi.analysis.excel.annotation.NumFormat;
 import com.alanpoi.analysis.excel.exports.ExcelParseParam;
 import com.alanpoi.analysis.excel.exports.ReflectorManager;
 import com.alanpoi.common.exception.AlanPoiException;
+import com.alanpoi.common.util.NumberUtils;
 import com.alanpoi.common.util.Placeholder;
 import com.alanpoi.common.util.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.ss.usermodel.*;
 import org.slf4j.Logger;
@@ -210,7 +210,7 @@ public class ExportHandle {
                 }
                 if (!isFormat) {
                     if (value == null) cell.setCellValue("");
-                    else if (NumberUtils.isCreatable(value.toString())) {
+                    else if (NumberUtils.isNumber(value.toString())) {
                         if (value.toString().indexOf(".") != -1)
                             cell.setCellValue(Double.valueOf(value.toString()));
                         else
