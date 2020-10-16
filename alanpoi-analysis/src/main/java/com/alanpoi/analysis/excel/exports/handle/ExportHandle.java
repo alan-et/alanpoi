@@ -258,7 +258,7 @@ public class ExportHandle {
             return null;
         } else if (!NumberUtils.isNumber(value.toString())) {
             logger.error("Data format error:" + value);
-            return null;
+            return value;
         } else {
             Double d = Double.parseDouble(value.toString());
             DecimalFormat df = new DecimalFormat(parseParam.getNumFormat());
