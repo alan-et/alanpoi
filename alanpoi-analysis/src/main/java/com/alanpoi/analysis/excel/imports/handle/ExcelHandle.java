@@ -22,9 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -59,14 +57,16 @@ public class ExcelHandle {
         String fileName = excel.getFileName();
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         int total = sheetDataList.get(0).getData().size();
-        ExcelImportRes excelImportRes = new ExcelImportRes();
+        final ExcelImportRes excelImportRes = new ExcelImportRes();
         ExcelConsumeInterface consumeInterface = ApplicationUtil.getBean(c);
         consumeInterface.validData(workbookId, sheetDataList, excel.getCustomParam());
         ExcelError excelError = excelWorkbookManage.getExcelError(workbookId);
         int rowStart = sheetDataList.get(0).getRowStart();
         CompletableFuture<String> completableFuture = CompletableFuture.supplyAsync(() -> {
             if (excelError != null && !CollectionUtils.isEmpty(excelError.getSheetErrors())) {
+                Map<Integer, ExcelImportRes.SheetInfo> sheetInfoMap = new HashMap<>();
                 sheetDataList.forEach(e -> {
+                    ExcelImportRes.SheetInfo sheetInfo = new ExcelImportRes.SheetInfo();
                     int sTotal = e.getData().size();
                     List<Object> errorDataList = new ArrayList<>();
                     e.getData().forEach(vo -> {
@@ -81,9 +81,18 @@ public class ExcelHandle {
                             });
                         });
                     });
-                    log.info("ExcelSheet({}) import success:{},error:{}", e.getSheetName(), sTotal - errorDataList.size(), errorDataList.size());
+                    //Record the import details of each sheet
+                    int sucNum = sTotal - errorDataList.size();
+                    int failNum = errorDataList.size();
+                    sheetInfo.setIndex(e.getIndex());
+                    sheetInfo.setSucNum(sucNum);
+                    sheetInfo.setFailNum(failNum);
+                    sheetInfo.setSheetName(e.getSheetName());
+                    sheetInfoMap.put(e.getIndex(), sheetInfo);
+                    log.info("ExcelSheet({}) import success:{},error:{}", e.getSheetName(), sucNum, failNum);
                     e.getData().removeAll(errorDataList);
                 });
+                excelImportRes.setErrorMap(sheetInfoMap);
             }
             RequestContextHolder.setRequestAttributes(requestAttributes, true);
             try {
