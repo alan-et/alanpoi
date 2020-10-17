@@ -64,7 +64,7 @@ public class ExcelHandle {
         int rowStart = sheetDataList.get(0).getRowStart();
         CompletableFuture<String> completableFuture = CompletableFuture.supplyAsync(() -> {
             if (excelError != null && !CollectionUtils.isEmpty(excelError.getSheetErrors())) {
-                Map<Integer, ExcelImportRes.SheetInfo> sheetInfoMap = new HashMap<>();
+                Map<String, ExcelImportRes.SheetInfo> sheetInfoMap = new HashMap<>();
                 sheetDataList.forEach(e -> {
                     ExcelImportRes.SheetInfo sheetInfo = new ExcelImportRes.SheetInfo();
                     int sTotal = e.getData().size();
@@ -88,7 +88,7 @@ public class ExcelHandle {
                     sheetInfo.setSucNum(sucNum);
                     sheetInfo.setFailNum(failNum);
                     sheetInfo.setSheetName(e.getSheetName());
-                    sheetInfoMap.put(e.getIndex(), sheetInfo);
+                    sheetInfoMap.put(e.getSheetName(), sheetInfo);
                     log.info("ExcelSheet({}) import success:{},error:{}", e.getSheetName(), sucNum, failNum);
                     e.getData().removeAll(errorDataList);
                 });

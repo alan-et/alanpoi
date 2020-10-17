@@ -20,7 +20,7 @@ public class ExcelImportRes implements Serializable {
     /**
      * @since 1.3.1
      */
-    private Map<Integer, SheetInfo> errorMap;
+    private Map<String, SheetInfo> errorMap;
 
     private String downErrorUrl;
 
