@@ -51,7 +51,11 @@ public class ExportHandle {
             int sheetAt = 0;
             for (Class<?> c : dataMap.keySet()) {
                 Collection<?> collection = dataMap.get(c);
-                loadSheet(workbook, collection, c, sheetAt, specifyCol.get(sheetAt));
+                ExcelSheet excelSheet = c.getAnnotation(ExcelSheet.class);
+                if (excelSheet != null)
+                    loadSheet(workbook, collection, c, sheetAt, specifyCol.get(excelSheet.index()));
+                else
+                    loadSheet(workbook, collection, c, sheetAt, specifyCol.get(sheetAt));
                 sheetAt++;
             }
         } catch (Exception e) {
