@@ -24,6 +24,13 @@ public class ExcelImportRes implements Serializable {
 
     private String downErrorUrl;
 
+    /**
+     * If the import fails, the error file is recorded
+     *
+     * @since 1.3.2
+     */
+    private ErrorFile errorFile;
+
     public static class SheetInfo {
         private int index;
         private String sheetName;

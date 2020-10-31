@@ -62,7 +62,7 @@ public class ExcelHandle {
         consumeInterface.validData(workbookId, sheetDataList, excel.getCustomParam());
         ExcelError excelError = excelWorkbookManage.getExcelError(workbookId);
         int rowStart = sheetDataList.get(0).getRowStart();
-        CompletableFuture<String> completableFuture = CompletableFuture.supplyAsync(() -> {
+        CompletableFuture<ErrorFile> completableFuture = CompletableFuture.supplyAsync(() -> {
             if (excelError != null && !CollectionUtils.isEmpty(excelError.getSheetErrors())) {
                 Map<String, ExcelImportRes.SheetInfo> sheetInfoMap = new HashMap<>();
                 sheetDataList.forEach(e -> {
@@ -120,17 +120,17 @@ public class ExcelHandle {
                 } else {
                     newFileName = new Date().getTime() + ".xlsx";
                 }
-                writeError(workbookId, excelError, excelWorkbookManage.getWorkbook(workbookId), newFileName, rowStart);
-                return newFileName;
+                return writeError(workbookId, excelError, excelWorkbookManage.getWorkbook(workbookId), newFileName, rowStart);
             }
             return null;
         });
-        completableFuture.join();
+        ErrorFile errorFile = completableFuture.join();
         try {
-            if (StringUtils.isNotEmpty(completableFuture.get())) {
+            if (errorFile != null) {
                 consumeInterface.error(excelError);
                 excelImportRes.setStatus(ResponseEnum.IMPORT_FILE_DATA_EXP.status());
                 excelImportRes.setDownErrorUrl(downloadPath + workbookId);
+                excelImportRes.setErrorFile(errorFile);
             } else {
                 ByteArrayOutputStream bytes = new ByteArrayOutputStream(3072);
                 excelWorkbookManage.getWorkbook(workbookId).write(bytes);
@@ -145,11 +145,11 @@ public class ExcelHandle {
 
     }
 
-    private void writeError(String workbookId, ExcelError excelError, Workbook workbook, String fileName, int rowStart) {
+    private ErrorFile writeError(String workbookId, ExcelError excelError, Workbook workbook, String fileName, int rowStart) {
+        ErrorFile errorFile = new ErrorFile(workbookId, NetworkUtil.getLocalIP(), port, tmpPath, fileName);
         executorTools.getExecutor().execute(new Runnable() {
             @Override
             public void run() {
-                ErrorFile errorFile = new ErrorFile(workbookId, NetworkUtil.getLocalIP(), port, tmpPath, fileName);
                 redisTemplate.opsForValue().set("$$poi-excel:import:" + workbookId, JSON.toJSONString(errorFile), 15, TimeUnit.DAYS);
             }
         });
@@ -197,7 +197,7 @@ public class ExcelHandle {
         } catch (Exception e1) {
             log.error("", e1);
         }
-
+        return errorFile;
     }
 
     public void addErrorInfo(String workbookId, List<RowError> rowErrors) {
