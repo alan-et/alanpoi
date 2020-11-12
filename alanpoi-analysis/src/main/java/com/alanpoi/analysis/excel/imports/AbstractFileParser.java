@@ -163,11 +163,17 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
         try {
             ExcelImportRes res = process(workbookId, sheetDataList, excel);
             return res;
-        } catch (Exception e) {
-            log.error("consumeHandle exception:", e);
+        } catch (AlanPoiException e1) {
+            log.error("consumeHandle exception:", e1);
+            ExcelImportRes res = new ExcelImportRes();
+            res.setStatus(e1.getCode());
+            res.setMessage(e1.getMessage());
+            return res;
+        } catch (Exception e2) {
+            log.error("consumeHandle exception:", e2);
             ExcelImportRes res = new ExcelImportRes();
             res.setStatus(ResponseEnum.IMPORT_BUSINESS_ERROR_EXP.status());
-            res.setMessage(ResponseEnum.IMPORT_BUSINESS_ERROR_EXP.message());
+            res.setMessage(e2.getMessage());
             return res;
         }
     }
