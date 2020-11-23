@@ -171,10 +171,7 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
             return res;
         } catch (Exception e2) {
             log.error("consumeHandle exception:", e2);
-            ExcelImportRes res = new ExcelImportRes();
-            res.setStatus(ResponseEnum.IMPORT_BUSINESS_ERROR_EXP.status());
-            res.setMessage(e2.getMessage());
-            return res;
+            throw new RuntimeException(e2.getMessage());
         }
     }
 
