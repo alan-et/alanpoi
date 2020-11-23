@@ -62,7 +62,7 @@ public class ExcelHandle {
         consumeInterface.validData(workbookId, sheetDataList, excel.getCustomParam());
         ExcelError excelError = excelWorkbookManage.getExcelError(workbookId);
         int rowStart = sheetDataList.get(0).getRowStart();
-        CompletableFuture<ErrorFile> completableFuture = CompletableFuture.supplyAsync(() -> {
+        CompletableFuture completableFuture = CompletableFuture.supplyAsync(() -> {
             if (excelError != null && !CollectionUtils.isEmpty(excelError.getSheetErrors())) {
                 Map<String, ExcelImportRes.SheetInfo> sheetInfoMap = new HashMap<>();
                 sheetDataList.forEach(e -> {
@@ -108,7 +108,8 @@ public class ExcelHandle {
             }
             return null;
 
-        }).supplyAsync(() -> {
+        });
+        CompletableFuture<ErrorFile> completableFuture1 = CompletableFuture.supplyAsync(() -> {
             if (excelError != null &&
                     !CollectionUtils.isEmpty(excelError.getSheetErrors())) {
                 String newFileName = "";
@@ -124,7 +125,8 @@ public class ExcelHandle {
             }
             return null;
         });
-        ErrorFile errorFile = completableFuture.join();
+        CompletableFuture.allOf(completableFuture, completableFuture1).join();
+        ErrorFile errorFile = completableFuture1.join();
         try {
             if (errorFile != null) {
                 consumeInterface.error(excelError);
