@@ -197,6 +197,16 @@
     <!--            <url>https://repo.rdc.aliyun.com/repository/105148-snapshot-u5XrNN/</url>-->
     <!--        </snapshotRepository>-->
     <!--    </distributionManagement>-->
+    <distributionManagement>
+        <repository>
+            <id>nexus</id>
+            <url>http://maven.pengzhuoxun.com:8081/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus</id>
+            <url>http://maven.pengzhuoxun.com:8081/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <licenses>
         <license>
