@@ -1,8 +1,10 @@
 package com.alanpoi.common.util;
 
+import com.alanpoi.common.algorithm.HtmlSimilar;
 import com.alanpoi.common.algorithm.Similar;
 import com.alanpoi.common.enums.SimilarPrecision;
 
+import java.io.IOException;
 import java.util.List;
 
 public class SimilarUtil {
@@ -51,5 +53,17 @@ public class SimilarUtil {
      */
     public static double calculate(String text1, String text2, SimilarPrecision precision) {
         return Similar.getInstance().calculate(text1, text2, precision);
+    }
+
+    /**
+     * Compare the similarity of the two web pages
+     *
+     * @param url1
+     * @param url2
+     * @return
+     * @throws IOException
+     */
+    public static double compare(String url1, String url2) throws IOException {
+        return HtmlSimilar.getInstance().compare(url1, url2);
     }
 }

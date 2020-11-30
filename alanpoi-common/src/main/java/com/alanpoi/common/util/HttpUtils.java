@@ -1,18 +1,16 @@
 package com.alanpoi.common.util;
 
+import com.alanpoi.common.enums.TagName;
 import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -146,5 +144,103 @@ public class HttpUtils {
         logger.info("response:{}", result);
         if (result == null) return null;
         return JSON.parseObject(result, resultClass);
+    }
+
+    /**
+     * 获取页面所有内容
+     *
+     * @param address
+     * @return
+     * @throws IOException
+     */
+    public static String getHtml(String address) throws IOException {
+        URL url = new URL(address);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+//        urlConnection.setUseCaches(false);
+//        urlConnection.setRequestProperty("Content-type", "application/x-java-serialized-object");
+        urlConnection.connect();
+//        if (urlConnection.getResponseCode() == 200) {
+        InputStream inputStream = urlConnection.getInputStream();
+
+        String contentType = urlConnection.getContentType();
+        String charset = getCharset(contentType);
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, charset));
+        StringBuffer sb = new StringBuffer();
+        String line;
+        while ((line = br.readLine()) != null) {
+            sb.append(line);
+            sb.append("\r\n");
+        }
+        return sb.toString();
+//        }
+//        throw new ServerException(urlConnection.getResponseMessage());
+    }
+
+    private static String getCharset(String contentType) {
+        String charset = "gbk";
+        if (StringUtils.isNotBlank(contentType)) {
+            String[] arr = contentType.split(";");
+            if (arr.length > 1) {
+                String[] arr1 = arr[1].split("=");
+                if ("charset".equals(arr1[0].trim())) {
+                    charset = arr1[1];
+                }
+            }
+        }
+        return charset;
+    }
+
+    /**
+     * 获取指定标签内容
+     *
+     * @param address
+     * @param tagName
+     * @return
+     * @throws IOException
+     */
+    public static List<String> getTagVal(String address, TagName tagName) throws IOException {
+        List<String> tagValList = new ArrayList<>();
+        String html = getHtml(address);
+        Pattern r = Pattern.compile(String.format("<%s.*?</%s>", tagName, tagName), Pattern.DOTALL);
+        // 现在创建 matcher 对象
+        Matcher m = r.matcher(html);
+        while (m.find()) {
+            tagValList.add(m.group());
+        }
+        return tagValList;
+    }
+
+    public static String getTitle(String address) throws IOException {
+        String html = getHtml(address);
+        Pattern r = Pattern.compile("<title.*?</title>", Pattern.DOTALL);
+        // 现在创建 matcher 对象
+        Matcher m = r.matcher(html);
+        String title = "";
+        if (m.find()) {
+            title = m.group();
+        }
+        return title;
+    }
+
+    public static String getBody(String address) throws IOException {
+        String html = getHtml(address);
+        Pattern r = Pattern.compile("<body.*?</body>", Pattern.DOTALL);
+        // 现在创建 matcher 对象
+        Matcher m = r.matcher(html);
+        String body = "";
+        if (m.find()) {
+            body = m.group();
+        }
+        return body;
+    }
+
+    public static String getBodyText(String address) throws IOException {
+        String body = getBody(address);
+        Pattern r = Pattern.compile("<.+?>");
+        Matcher m = r.matcher(body);
+        String bodyText = m.replaceAll("").replaceAll("/r/n", "");
+        //filter all <script>
+        Pattern r1 = Pattern.compile(String.format("<%s.*?</%s>", TagName.script, TagName.script), Pattern.DOTALL);
+        return r1.matcher(bodyText).replaceAll("");
     }
 }

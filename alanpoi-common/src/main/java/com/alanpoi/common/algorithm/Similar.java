@@ -2,14 +2,10 @@ package com.alanpoi.common.algorithm;
 
 import com.alanpoi.common.config.WordSegInitConfig;
 import com.alanpoi.common.enums.SimilarPrecision;
-import com.alanpoi.common.event.EventDispatcher;
 import org.apdplat.word.segmentation.SegmentationAlgorithm;
-import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Calculate the similarity between the two vectors
@@ -19,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class Similar {
 
-    private static volatile Similar similar;
+    protected static volatile Similar similar;
 
     /**
      * Get a single
@@ -87,6 +83,6 @@ public class Similar {
         //It is recommended to start initialization WordSegInitConfig
         List<String> list1 = WordSegInitConfig.segToString(text1, SegmentationAlgorithm.FullSegmentation);
         List<String> list2 = WordSegInitConfig.segToString(text2, SegmentationAlgorithm.FullSegmentation);
-        return new Similar().calculate(list1, list2, precision);
+        return calculate(list1, list2, precision);
     }
 }
