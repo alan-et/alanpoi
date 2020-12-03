@@ -5,24 +5,27 @@ import com.alanpoi.common.enums.ResponseEnum;
 /**
  *
  */
-public class AlanPoiException extends RuntimeException{
+public class AlanPoiException extends RuntimeException {
     private Integer code;
     private String message;
 
-    public AlanPoiException(int code, String msg){
+    public AlanPoiException(int code, String msg) {
         super(msg);
         this.code = code;
         this.message = msg;
     }
+
     public AlanPoiException(String msg) {
         super(msg);
-        this.message=msg;
+        this.message = msg;
     }
+
     public AlanPoiException(ResponseEnum rspEnum) {
         super(rspEnum.message());
-        this.code=rspEnum.status();
+        this.code = rspEnum.status();
         this.message = rspEnum.message();
     }
+
     public Integer getCode() {
         return code;
     }

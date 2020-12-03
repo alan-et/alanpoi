@@ -17,6 +17,9 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 
 import java.net.UnknownHostException;
 
+/**
+ * @author pengzhuoxun
+ */
 @Configuration
 public class LoadConfig {
 

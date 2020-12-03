@@ -56,6 +56,22 @@ public class SimilarUtil {
     }
 
     /**
+     * Calculate the similarity of two texts
+     *
+     * @param text1
+     * @param text2
+     * @param precision
+     * @param isAll     is return all words
+     * @return
+     */
+    public static double calculate(String text1, String text2, SimilarPrecision precision, boolean isAll) {
+        if (isAll) {
+            return Similar.getInstance().calculateByAll(text1, text2, precision);
+        }
+        return Similar.getInstance().calculate(text1, text2, precision);
+    }
+
+    /**
      * Compare the similarity of the two web pages
      *
      * @param url1

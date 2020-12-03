@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.alanpoi</groupId>
     <artifactId>alan-poi</artifactId>
-    <version>1.3.3</version>
+    <version>1.3.4</version>
     <name>alan-poi</name>
     <packaging>pom</packaging>
     <description>Alan Poi</description>
@@ -19,12 +19,23 @@
         <module>alanpoi-common</module>
         <module>alanpoi-activity</module>
         <module>alanpoi-analysis</module>
+<!--        <module>alanpoi-test</module>-->
     </modules>
 
     <properties>
-        <alanpoi.version>1.3.3</alanpoi.version>
+        <alanpoi.version>1.3.4</alanpoi.version>
         <java.version>1.8</java.version>
         <springboot.version>2.2.5.RELEASE</springboot.version>
+        <fastjson.version>1.2.9</fastjson.version>
+        <commons-lang3.version>3.7</commons-lang3.version>
+        <lombok.version>1.18.12</lombok.version>
+        <redis.version>3.1.0</redis.version>
+        <apache.poi.version>4.1.2</apache.poi.version>
+        <netty.version>4.1.9.Final</netty.version>
+        <es.client.version>7.9.3</es.client.version>
+        <elasticsearch.version>7.9.3</elasticsearch.version>
+        <httpclient.versoin>4.5.11</httpclient.versoin>
+        <jdom.version>2.0.2</jdom.version>
     </properties>
     <dependencies>
         <dependency>
@@ -34,12 +45,12 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.67</version>
+            <version>${fastjson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.7</version>
+            <version>${commons-lang3.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -55,12 +66,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.12</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jdom</groupId>
-            <artifactId>jdom</artifactId>
-            <version>2.0.2</version>
+            <version>${lombok.version}</version>
         </dependency>
     </dependencies>
     <dependencyManagement>
@@ -78,32 +84,45 @@
             <dependency>
                 <groupId>redis.clients</groupId>
                 <artifactId>jedis</artifactId>
-                <version>3.1.0</version>
+                <version>${redis.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi</artifactId>
-                <version>4.1.2</version>
+                <version>${apache.poi.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml</artifactId>
-                <version>4.1.2</version>
+                <version>${apache.poi.version}</version>
             </dependency>
 
 
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
-                <version>5.0.0.Alpha2</version>
+                <version>${netty.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>4.5.11</version>
+                <version>${httpclient.versoin}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>elasticsearch-rest-high-level-client</artifactId>
+                <version>${es.client.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jdom</groupId>
+                <artifactId>jdom</artifactId>
+                <version>${jdom.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.alanpoi</groupId>
                 <artifactId>alanpoi-common</artifactId>

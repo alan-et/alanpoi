@@ -63,10 +63,14 @@ public class WordSegInitConfig {
     }
 
     public static List<String> segToString(String text) {
-        return wordsToStringList(WordSegmenter.segWithStopWords(text));
+        return wordsToStringList(WordSegmenter.seg(text));
     }
 
     public static List<String> segToString(String text, SegmentationAlgorithm type) {
+        return wordsToStringList(WordSegmenter.seg(text, type));
+    }
+
+    public static List<String> segByAllToString(String text, SegmentationAlgorithm type) {
         return wordsToStringList(WordSegmenter.segWithStopWords(text, type));
     }
 
@@ -78,11 +82,11 @@ public class WordSegInitConfig {
         return WordSegmenter.seg(text, type);
     }
 
-    public static List<Word> segWithStopWords(String text) {
+    public static List<Word> segByAll(String text) {
         return WordSegmenter.segWithStopWords(text);
     }
 
-    public static List<Word> segWithStopWords(String text, SegmentationAlgorithm type) {
+    public static List<Word> segByAll(String text, SegmentationAlgorithm type) {
         return WordSegmenter.segWithStopWords(text, type);
     }
 }

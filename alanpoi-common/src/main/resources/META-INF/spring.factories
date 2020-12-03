@@ -1,3 +1,4 @@
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.alanpoi.common.config.LoadConfig
+com.alanpoi.common.config.LoadConfig,\
+com.alanpoi.common.esclient.ESClientBean

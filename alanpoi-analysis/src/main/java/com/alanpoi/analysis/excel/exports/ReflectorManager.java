@@ -30,7 +30,7 @@ public class ReflectorManager {
             CACHE_REFLECTOR.put(clazz, new ReflectorManager(clazz));
         }
 
-        return (ReflectorManager)CACHE_REFLECTOR.get(clazz);
+        return (ReflectorManager) CACHE_REFLECTOR.get(clazz);
     }
 
     private void addGetMethods(Class<?> cls) {
@@ -39,7 +39,7 @@ public class ReflectorManager {
         Method[] var4 = methods;
         int var5 = methods.length;
 
-        for(int var6 = 0; var6 < var5; ++var6) {
+        for (int var6 = 0; var6 < var5; ++var6) {
             Method method = var4[var6];
             String name = method.getName();
             if (name.startsWith("get") && name.length() > 3) {
@@ -59,20 +59,20 @@ public class ReflectorManager {
     private void resolveGetterConflicts(Map<String, List<Method>> conflictingGetters) {
         Iterator var2 = conflictingGetters.keySet().iterator();
 
-        while(true) {
-            while(var2.hasNext()) {
-                String propName = (String)var2.next();
-                List<Method> getters = (List)conflictingGetters.get(propName);
+        while (true) {
+            while (var2.hasNext()) {
+                String propName = (String) var2.next();
+                List<Method> getters = (List) conflictingGetters.get(propName);
                 Iterator<Method> iterator = getters.iterator();
-                Method firstMethod = (Method)iterator.next();
+                Method firstMethod = (Method) iterator.next();
                 if (getters.size() == 1) {
                     this.addGetMethod(propName, firstMethod);
                 } else {
                     Method getter = firstMethod;
                     Class getterType = firstMethod.getReturnType();
 
-                    while(iterator.hasNext()) {
-                        Method method = (Method)iterator.next();
+                    while (iterator.hasNext()) {
+                        Method method = (Method) iterator.next();
                         Class<?> methodType = method.getReturnType();
                         if (methodType.equals(getterType)) {
                             throw new RuntimeException("Illegal overloaded getter method with ambiguous type for property " + propName + " in class " + firstMethod.getDeclaringClass() + ".  This breaks the JavaBeans specification and can cause unpredicatble results.");
@@ -109,7 +109,7 @@ public class ReflectorManager {
         Method[] var4 = methods;
         int var5 = methods.length;
 
-        for(int var6 = 0; var6 < var5; ++var6) {
+        for (int var6 = 0; var6 < var5; ++var6) {
             Method method = var4[var6];
             String name = method.getName();
             if (name.startsWith("set") && name.length() > 3 && method.getParameterTypes().length == 1) {
@@ -140,31 +140,31 @@ public class ReflectorManager {
     }
 
     private void addMethodConflict(Map<String, List<Method>> conflictingMethods, String name, Method method) {
-        List<Method> list = (List)conflictingMethods.get(name);
+        List<Method> list = (List) conflictingMethods.get(name);
         if (list == null) {
             list = new ArrayList();
             conflictingMethods.put(name, list);
         }
 
-        ((List)list).add(method);
+        ((List) list).add(method);
     }
 
     private void resolveSetterConflicts(Map<String, List<Method>> conflictingSetters) {
         Iterator var2 = conflictingSetters.keySet().iterator();
 
-        while(true) {
-            while(var2.hasNext()) {
-                String propName = (String)var2.next();
-                List<Method> setters = (List)conflictingSetters.get(propName);
-                Method firstMethod = (Method)setters.get(0);
+        while (true) {
+            while (var2.hasNext()) {
+                String propName = (String) var2.next();
+                List<Method> setters = (List) conflictingSetters.get(propName);
+                Method firstMethod = (Method) setters.get(0);
                 if (setters.size() == 1) {
                     this.addSetMethod(propName, firstMethod);
                 } else {
                     Iterator<Method> methods = setters.iterator();
                     Method setter = null;
 
-                    while(methods.hasNext()) {
-                        Method method = (Method)methods.next();
+                    while (methods.hasNext()) {
+                        Method method = (Method) methods.next();
                         if (method.getParameterTypes().length == 1) {
                             setter = method;
                             break;
@@ -195,7 +195,7 @@ public class ReflectorManager {
         Field[] var3 = fields;
         int var4 = fields.length;
 
-        for(int var5 = 0; var5 < var4; ++var5) {
+        for (int var5 = 0; var5 < var4; ++var5) {
             Field field = var3[var5];
             if (this.canAccessPrivateMethods()) {
                 try {
@@ -222,27 +222,27 @@ public class ReflectorManager {
     private Method[] getClassMethods(Class<?> cls) {
         HashMap<String, Method> uniqueMethods = new HashMap();
 
-        for(Class currentClass = cls; currentClass != null; currentClass = currentClass.getSuperclass()) {
+        for (Class currentClass = cls; currentClass != null; currentClass = currentClass.getSuperclass()) {
             this.addUniqueMethods(uniqueMethods, currentClass.getDeclaredMethods());
             Class<?>[] interfaces = currentClass.getInterfaces();
             Class[] var5 = interfaces;
             int var6 = interfaces.length;
 
-            for(int var7 = 0; var7 < var6; ++var7) {
+            for (int var7 = 0; var7 < var6; ++var7) {
                 Class<?> anInterface = var5[var7];
                 this.addUniqueMethods(uniqueMethods, anInterface.getMethods());
             }
         }
 
         Collection<Method> methods = uniqueMethods.values();
-        return (Method[])methods.toArray(new Method[methods.size()]);
+        return (Method[]) methods.toArray(new Method[methods.size()]);
     }
 
     private void addUniqueMethods(HashMap<String, Method> uniqueMethods, Method[] methods) {
         Method[] var3 = methods;
         int var4 = methods.length;
 
-        for(int var5 = 0; var5 < var4; ++var5) {
+        for (int var5 = 0; var5 < var4; ++var5) {
             Method currentMethod = var3[var5];
             if (!currentMethod.isBridge()) {
                 //returnType#MethodName:paramName
@@ -272,7 +272,7 @@ public class ReflectorManager {
         sb.append(method.getName());
         Class<?>[] parameters = method.getParameterTypes();
 
-        for(int i = 0; i < parameters.length; ++i) {
+        for (int i = 0; i < parameters.length; ++i) {
             if (i == 0) {
                 sb.append(':');
             } else {
@@ -299,7 +299,7 @@ public class ReflectorManager {
     }
 
     public Method getGetMethod(String propertyName) {
-        Method method = (Method)this.getMethods.get(propertyName);
+        Method method = (Method) this.getMethods.get(propertyName);
         if (method == null) {
             throw new RuntimeException("There is no getter for property named '" + propertyName + "' in '" + this.type + "'");
         } else {
@@ -308,7 +308,7 @@ public class ReflectorManager {
     }
 
     public Method getSetMethod(String propertyName) {
-        Method method = (Method)this.setMethods.get(propertyName);
+        Method method = (Method) this.setMethods.get(propertyName);
         if (method == null) {
             throw new RuntimeException("There is no getter for property named '" + propertyName + "' in '" + this.type + "'");
         } else {
@@ -318,7 +318,7 @@ public class ReflectorManager {
 
     public Object getValue(Object obj, String property) {
         Object value = null;
-        Method m = (Method)this.getMethods.get(property);
+        Method m = (Method) this.getMethods.get(property);
         if (m != null) {
             try {
                 value = m.invoke(obj);
@@ -330,7 +330,7 @@ public class ReflectorManager {
     }
 
     public boolean setValue(Object obj, String property, Object object) {
-        Method m = (Method)this.setMethods.get(property);
+        Method m = (Method) this.setMethods.get(property);
         if (m != null) {
             try {
                 m.invoke(obj, object);
@@ -361,7 +361,7 @@ public class ReflectorManager {
         }
 
         try {
-            return ((Method)this.enumMethods.get(staticMethod)).invoke((Object)null, params);
+            return ((Method) this.enumMethods.get(staticMethod)).invoke((Object) null, params);
         } catch (Exception var4) {
             throw new RuntimeException(var4);
         }

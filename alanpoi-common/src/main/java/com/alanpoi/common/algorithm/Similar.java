@@ -85,4 +85,18 @@ public class Similar {
         List<String> list2 = WordSegInitConfig.segToString(text2, SegmentationAlgorithm.FullSegmentation);
         return calculate(list1, list2, precision);
     }
+
+    /**
+     * Calculate the similarity of two texts
+     *
+     * @param text1 text1
+     * @param text2 text2
+     * @return
+     */
+    public double calculateByAll(String text1, String text2, SimilarPrecision precision) {
+        //It is recommended to start initialization WordSegInitConfig
+        List<String> list1 = WordSegInitConfig.segByAllToString(text1, SegmentationAlgorithm.FullSegmentation);
+        List<String> list2 = WordSegInitConfig.segByAllToString(text2, SegmentationAlgorithm.FullSegmentation);
+        return calculate(list1, list2, precision);
+    }
 }

@@ -46,8 +46,8 @@ class EtActivityApplicationTests {
     }
 
     @Test
-    public void process(){
-        FlowProcessReq req=new FlowProcessReq();
+    public void process() {
+        FlowProcessReq req = new FlowProcessReq();
         req.setHandler(123456L);
         req.setTaskId(30333642257465940L);
         req.setIsAgree((byte) 1);

@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 @Documented
 @Indexed
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE,ElementType.FIELD})
+@Target({ElementType.TYPE, ElementType.FIELD})
 public @interface IService {
     String value() default "";
 }

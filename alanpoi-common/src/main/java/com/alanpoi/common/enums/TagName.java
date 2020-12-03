@@ -9,11 +9,8 @@ public enum TagName {
     text,
     tr,
     td,
-    script
-    ;
+    script;
 
-    private
-
-    TagName() {
+    private TagName() {
     }
 }

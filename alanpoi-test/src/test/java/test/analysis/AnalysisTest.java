@@ -1,4 +1,4 @@
-package com.alanpoi.analysis;
+package test.analysis;
 
 import com.alanpoi.analysis.excel.utils.ExcelExportUtil;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -12,7 +12,7 @@ import java.sql.Date;
 import java.util.*;
 
 @SpringBootTest
-class AlanpoiApplicationTests {
+class AnalysisTest {
 
     @Test
     void testExport() {

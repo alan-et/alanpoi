@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author zhuoxun.peng
  * @since 2020-2-25
- *
+ * <p>
  * 异步工具
  */
 
@@ -23,14 +23,14 @@ public class ExecutorTools {
 
     private ThreadPoolExecutor dbExecutor;
 
-    ExecutorTools(){
-        executor =  new ThreadPoolExecutor(2, 10, 300, TimeUnit.SECONDS, new LinkedBlockingDeque<>());
+    ExecutorTools() {
+        executor = new ThreadPoolExecutor(2, 10, 300, TimeUnit.SECONDS, new LinkedBlockingDeque<>());
 
         dbExecutor = new ThreadPoolExecutor(2, 10, 300, TimeUnit.SECONDS,
                 new LinkedBlockingDeque<>(), new DefaultThreadFactory("db"));
     }
 
-    public Executor getExecutor(){
+    public Executor getExecutor() {
         return executor;
     }
 
