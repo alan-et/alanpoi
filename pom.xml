@@ -36,6 +36,7 @@
         <elasticsearch.version>7.9.3</elasticsearch.version>
         <httpclient.versoin>4.5.11</httpclient.versoin>
         <jdom.version>2.0.2</jdom.version>
+        <freemarker.version>2.3.31</freemarker.version>
     </properties>
     <dependencies>
         <dependency>
@@ -132,6 +133,11 @@
                 <artifactId>et-activity-client</artifactId>
                 <version>${alanpoi.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.freemarker</groupId>
+                <artifactId>freemarker</artifactId>
+                <version>${freemarker.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -213,11 +219,11 @@
     <distributionManagement>
         <repository>
             <id>nexus</id>
-            <url>http://maven.pengzhuoxun.com:8081/nexus/content/repositories/releases/</url>
+            <url>http://maven.alanpoi.com:8081/nexus/content/repositories/releases/</url>
         </repository>
         <snapshotRepository>
             <id>nexus</id>
-            <url>http://maven.pengzhuoxun.com:8081/nexus/content/repositories/snapshots/</url>
+            <url>http://maven.alanpoi.com:8081/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 

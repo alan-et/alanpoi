@@ -1,4 +1,4 @@
-package com.alanpoi.analysis.excel.annotation;
+package com.alanpoi.analysis.word.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -6,14 +6,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * DateFormat annotation
+ * Word Define annotation
  *
  * @author zhuoxun.peng
- * @since 2020-3-17
+ * @since 1.3.4
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD})
-@Deprecated
-public @interface DateFormat {
-    String value() default "YYYY/MM/dd";
+@Target({ElementType.TYPE})
+public @interface WordDefine {
 }

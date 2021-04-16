@@ -1,9 +1,8 @@
 package com.alanpoi.analysis.excel.exports;
 
-import com.alanpoi.analysis.common.AlanColor;
+import com.alanpoi.analysis.common.enums.AlanColor;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.Hyperlink;
 
 import java.lang.reflect.Method;
 import java.util.Set;

@@ -5,6 +5,7 @@ import com.alanpoi.analysis.excel.exports.handle.ExportHandle;
 import com.alanpoi.analysis.excel.imports.ExcelInitConfig;
 import com.alanpoi.analysis.excel.imports.ExcelParser;
 import com.alanpoi.analysis.excel.imports.handle.ExcelWorkbookManage;
+import com.alanpoi.analysis.word.handle.WordHandle;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -37,6 +38,11 @@ public class InitConfig {
     @Bean
     public ExportHandle getExportHandle() {
         return new ExportHandle();
+    }
+
+    @Bean
+    public WordHandle getWordHandle() {
+        return new WordHandle();
     }
 
     @Bean

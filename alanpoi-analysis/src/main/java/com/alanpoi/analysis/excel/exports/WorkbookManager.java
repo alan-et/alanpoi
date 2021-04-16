@@ -1,6 +1,6 @@
 package com.alanpoi.analysis.excel.exports;
 
-import com.alanpoi.analysis.common.ExcelType;
+import com.alanpoi.analysis.common.enums.ExcelType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;

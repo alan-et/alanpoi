@@ -1,6 +1,7 @@
-package test.analysis;
+package test.analysis.excel;
 
 import com.alanpoi.analysis.excel.utils.ExcelExportUtil;
+import com.alanpoi.test.Application;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,7 +12,7 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.*;
 
-@SpringBootTest
+@SpringBootTest(classes = Application.class)
 class AnalysisTest {
 
     @Test
@@ -67,8 +68,8 @@ class AnalysisTest {
                 list.add(exportVO);
             }
             List<String> colList = new ArrayList<>();
-            colList.add("name");
             colList.add("value");
+            colList.add("name");
             Workbook workbook = ExcelExportUtil.getWorkbookSpecifyCol(list, ExportVO.class, colList);
             OutputStream outputStream = new FileOutputStream("/tmp/test1.xlsx");
             workbook.write(outputStream);

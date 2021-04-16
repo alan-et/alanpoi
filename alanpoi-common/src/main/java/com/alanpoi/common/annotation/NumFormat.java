@@ -1,4 +1,4 @@
-package com.alanpoi.analysis.excel.annotation;
+package com.alanpoi.common.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -6,14 +6,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * DateFormat annotation
+ * NumFormat annotation
  *
  * @author zhuoxun.peng
  * @since 2020-3-17
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
-@Deprecated
-public @interface DateFormat {
-    String value() default "YYYY/MM/dd";
+public @interface NumFormat {
+    String value() default "00.00";
 }

@@ -1,6 +1,6 @@
 package com.alanpoi.analysis.excel.utils;
 
-import com.alanpoi.analysis.common.ExcelType;
+import com.alanpoi.analysis.common.enums.ExcelType;
 import com.alanpoi.analysis.excel.exports.WorkbookEntity;
 import com.alanpoi.analysis.excel.exports.WorkbookManager;
 import com.alanpoi.analysis.excel.exports.handle.ExportHandle;

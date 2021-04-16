@@ -1,6 +1,6 @@
-package test.analysis;
+package test.analysis.excel;
 
-import com.alanpoi.analysis.common.AlanColor;
+import com.alanpoi.analysis.common.enums.AlanColor;
 import com.alanpoi.analysis.excel.annotation.DateFormat;
 import com.alanpoi.analysis.excel.annotation.ExcelColumn;
 import com.alanpoi.analysis.excel.annotation.ExcelSheet;

@@ -1,4 +1,4 @@
-package com.alanpoi.analysis.common;
+package com.alanpoi.analysis.common.enums;
 
 public enum AlanColor {
 

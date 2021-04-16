@@ -1,6 +1,6 @@
 package com.alanpoi.analysis.excel.annotation;
 
-import com.alanpoi.analysis.common.AlanColor;
+import com.alanpoi.analysis.common.enums.AlanColor;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,12 +1,12 @@
 package com.alanpoi.analysis.excel.exports.handle;
 
-import com.alanpoi.analysis.common.AlanColor;
+import com.alanpoi.analysis.common.enums.AlanColor;
 import com.alanpoi.analysis.excel.annotation.DateFormat;
 import com.alanpoi.analysis.excel.annotation.ExcelColumn;
 import com.alanpoi.analysis.excel.annotation.ExcelSheet;
 import com.alanpoi.analysis.excel.annotation.NumFormat;
 import com.alanpoi.analysis.excel.exports.ExcelParseParam;
-import com.alanpoi.analysis.excel.exports.ReflectorManager;
+import com.alanpoi.analysis.common.ReflectorManager;
 import com.alanpoi.common.exception.AlanPoiException;
 import com.alanpoi.common.util.NumberUtils;
 import com.alanpoi.common.util.Placeholder;
