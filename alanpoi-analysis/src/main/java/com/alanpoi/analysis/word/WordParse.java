@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.net.URI;
 import java.util.*;
 
 /**
@@ -35,9 +36,26 @@ public class WordParse {
      * @return
      * @throws IOException
      */
-    public WordWorkbook createDoc(List<WordEntity> entityList, Map<String, String> dataMap) throws IOException {
+    public WordWorkbook createDoc(List<WordEntity> entityList, Map<String, Object> dataMap) throws IOException {
         File ftlFile = generateFtl(entityList);
         Template template = createTemplate(ftlFile);
+        WordWorkbook workbook = new WordWorkbook(template);
+        workbook.setDataMap(dataMap);
+        ftlFile.delete();
+        return workbook;
+    }
+
+    public WordWorkbook createDoc(String templatePath, Map<String, Object> dataMap) throws IOException {
+        File file = new File(templatePath);
+        if (!file.exists()) {
+            file = new File(URI.create(getClass().getClassLoader().getResource(templatePath).getPath()).getPath());
+            if (!file.exists()) throw new FileNotFoundException("模版不存在");
+        }
+        return createDoc(file, dataMap);
+    }
+
+    public WordWorkbook createDoc(File templateFile, Map<String, Object> dataMap) throws IOException {
+        Template template = createTemplate(templateFile);
         WordWorkbook workbook = new WordWorkbook(template);
         workbook.setDataMap(dataMap);
         return workbook;
@@ -73,7 +91,7 @@ public class WordParse {
             bos.write(f2);
             return temp;
         } catch (IOException e) {
-
+            logger.error("", e);
         } finally {
             if (bos != null) bos.close();
             if (writer != null) writer.close();
@@ -158,7 +176,7 @@ public class WordParse {
 
     public Template createTemplate(File temp) throws IOException {
         //加载模板文件
-        //configure.setClassForTemplateLoading(this.getClass(), "/var/folders/3l/lsqzc9g9533dwtzcmjwz43280000gn/T/"); //将模板文件直接复制到src目录下
+        configure.setClassForTemplateLoading(this.getClass(), "/var/folders/3l/lsqzc9g9533dwtzcmjwz43280000gn/T/"); //将模板文件直接复制到src目录下
         configure.setDirectoryForTemplateLoading(new File(temp.getParent()));//模板文件在本地硬盘d
         //设置对象包装器
         configure.setObjectWrapper(new DefaultObjectWrapper());

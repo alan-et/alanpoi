@@ -10,7 +10,7 @@ public class WordWorkbook implements Closeable {
 
     private Template template;
 
-    private Map<String, String> dataMap;
+    private Map<String, Object> dataMap;
 
     public WordWorkbook(Template template) {
         this.template = template;
@@ -29,7 +29,7 @@ public class WordWorkbook implements Closeable {
         }
     }
 
-    public void setDataMap(Map<String, String> dataMap) {
+    public void setDataMap(Map<String, Object> dataMap) {
         this.dataMap = dataMap;
     }
 }

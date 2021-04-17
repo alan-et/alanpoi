@@ -11,6 +11,9 @@ import com.alanpoi.common.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -19,8 +22,14 @@ import java.util.*;
 public class WordHandle {
     private final static Logger logger = LoggerFactory.getLogger(WordHandle.class);
 
-    private WordWorkbook export(String templatePath, Map<String, ?> param) {
-        return null;
+    protected WordParse wordParse;
+
+    public WordHandle() {
+        this.wordParse = new WordParse();
+    }
+
+    public WordWorkbook getWorkbook(String templatePath, Map<String, Object> param) throws IOException {
+        return wordParse.createDoc(templatePath, param);
     }
 
     private WordWorkbook htmlToWord(String html) {
@@ -62,11 +71,49 @@ public class WordHandle {
             wordEntityList.add(wordEntity);
             index++;
         }
-        WordParse wordParse = new WordParse();
         return wordParse.createDoc(wordEntityList, null);
     }
 
+    public HtmlHandle getHtmlHandle() throws IOException {
+        return new HtmlHandle();
+    }
+
     private WordWorkbook export(Class<?> c, Collection<?> data) {
+        //TODO
         return null;
+    }
+
+    /**
+     * 基于html的处理类
+     */
+    static class HtmlHandle extends WordHandle {
+        private File htmlFile;
+
+        public HtmlHandle() throws IOException {
+            this.htmlFile = File.createTempFile(UUID.randomUUID().toString(), ".ftl");
+            this.wordParse = new WordParse();
+        }
+
+        protected synchronized boolean addContent(String part) throws IOException {
+            FileWriter writer = null;
+            BufferedWriter bos = null;
+            try {
+                writer = new FileWriter(htmlFile, true);
+                bos = new BufferedWriter(writer);
+                bos.write(part);
+            } catch (IOException e) {
+                throw new IOException(e);
+            } finally {
+                if (bos != null) bos.close();
+                if (writer != null) writer.close();
+            }
+            return true;
+        }
+
+        public WordWorkbook getWorkbook(File tempFile, Map<String, Object> param) throws IOException {
+            WordWorkbook workbook = wordParse.createDoc(tempFile, param);
+            tempFile.delete();
+            return workbook;
+        }
     }
 }
