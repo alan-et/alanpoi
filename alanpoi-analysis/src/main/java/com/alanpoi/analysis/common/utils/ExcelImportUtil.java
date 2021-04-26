@@ -1,12 +1,12 @@
-package com.alanpoi.analysis.excel.utils;
+package com.alanpoi.analysis.common.utils;
 
 import com.alanpoi.analysis.common.PoiEventManager;
 import com.alanpoi.analysis.excel.imports.AbstractFileParser;
-import com.alanpoi.common.event.Event;
-import com.alanpoi.common.util.ApplicationUtil;
 import com.alanpoi.analysis.excel.imports.ExcelImportRes;
 import com.alanpoi.analysis.excel.imports.ExcelSheetData;
 import com.alanpoi.analysis.excel.imports.handle.RowError;
+import com.alanpoi.common.event.Event;
+import com.alanpoi.common.util.ApplicationUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,9 +21,7 @@ import java.util.Map;
  *
  * @author pengzhuoxun
  * @since 2020-3-10
- * @deprecated 1.3.4
  */
-@Deprecated
 public class ExcelImportUtil {
 
     /**

@@ -1,12 +1,11 @@
 package com.alanpoi.analysis.word.handle;
 
 import com.alanpoi.analysis.common.ReflectorManager;
-import com.alanpoi.analysis.word.WordParse;
-import com.alanpoi.analysis.word.WordEntity;
-import com.alanpoi.analysis.word.WordWorkbook;
+import com.alanpoi.analysis.word.*;
 import com.alanpoi.analysis.word.annotation.WordField;
 import com.alanpoi.common.annotation.DateFormat;
 import com.alanpoi.common.annotation.NumFormat;
+import com.alanpoi.common.util.ApplicationUtil;
 import com.alanpoi.common.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,18 +24,28 @@ public class WordHandle {
     protected WordParse wordParse;
 
     public WordHandle() {
-        this.wordParse = new WordParse();
+        this.wordParse = new DocxParse();
     }
 
-    public WordWorkbook getWorkbook(String templatePath, Map<String, Object> param) throws IOException {
+    public WordHandle(boolean isDocx) {
+        if (isDocx) this.wordParse = new DocxParse();
+        else this.wordParse = new DocParse();
+
+    }
+
+    public void setWord2003() {
+        this.wordParse = new DocParse();
+    }
+
+    public IWordWorkbook getWorkbook(String templatePath, Map<String, Object> param) throws IOException {
         return wordParse.createDoc(templatePath, param);
     }
 
-    private WordWorkbook htmlToWord(String html) {
-        return null;
+    public IWordWorkbook getWorkbookByDocx(String templatePath, Map<String, Object> param, List<Media> mediaList) throws IOException {
+        return wordParse.createDoc(templatePath, param, mediaList);
     }
 
-    public WordWorkbook getWorkbook(Class<?> c, Object data) throws IOException {
+    public IWordWorkbook getWorkbook(Class<?> c, Object data) throws IOException {
         ReflectorManager reflectorManager = ReflectorManager.fromCache(c);
         List<Field> fields = reflectorManager.getFieldList();
         int fieldLength = fields.size();
@@ -74,11 +83,11 @@ public class WordHandle {
         return wordParse.createDoc(wordEntityList, null);
     }
 
-    public HtmlHandle getHtmlHandle() throws IOException {
-        return new HtmlHandle();
+    public HtmlHandle getHtmlHandle(boolean isDocx) throws IOException {
+        return new HtmlHandle(isDocx);
     }
 
-    private WordWorkbook export(Class<?> c, Collection<?> data) {
+    private IWordWorkbook export(Class<?> c, Collection<?> data) {
         //TODO
         return null;
     }
@@ -89,9 +98,10 @@ public class WordHandle {
     static class HtmlHandle extends WordHandle {
         private File htmlFile;
 
-        public HtmlHandle() throws IOException {
+        public HtmlHandle(boolean isDocx) throws IOException {
             this.htmlFile = File.createTempFile(UUID.randomUUID().toString(), ".ftl");
-            this.wordParse = new WordParse();
+            if (isDocx) this.wordParse = new DocxParse();
+            else this.wordParse = new DocParse();
         }
 
         protected synchronized boolean addContent(String part) throws IOException {
@@ -110,8 +120,8 @@ public class WordHandle {
             return true;
         }
 
-        public WordWorkbook getWorkbook(File tempFile, Map<String, Object> param) throws IOException {
-            WordWorkbook workbook = wordParse.createDoc(tempFile, param);
+        public IWordWorkbook getWorkbook(File tempFile, Map<String, Object> param) throws IOException {
+            IWordWorkbook workbook = wordParse.createDoc(tempFile, param, true);
             tempFile.delete();
             return workbook;
         }

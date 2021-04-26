@@ -1,4 +1,4 @@
-package com.alanpoi.analysis.excel.utils;
+package com.alanpoi.analysis.common.utils;
 
 import com.alanpoi.analysis.common.enums.ExcelType;
 import com.alanpoi.analysis.excel.exports.WorkbookEntity;
@@ -20,9 +20,7 @@ import java.util.*;
  *
  * @author pengzhuoxun
  * @since 2020-3-18
- * @deprecated 1.3.4
  */
-@Deprecated
 public class ExcelExportUtil {
     protected static final Logger logger = LoggerFactory.getLogger(ExcelExportUtil.class);
 

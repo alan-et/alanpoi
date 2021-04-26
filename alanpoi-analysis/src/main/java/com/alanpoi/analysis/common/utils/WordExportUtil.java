@@ -1,13 +1,9 @@
-package com.alanpoi.analysis.excel.utils;
+package com.alanpoi.analysis.common.utils;
 
-import com.alanpoi.analysis.common.enums.ExcelType;
-import com.alanpoi.analysis.excel.exports.WorkbookEntity;
-import com.alanpoi.analysis.excel.exports.WorkbookManager;
-import com.alanpoi.analysis.excel.exports.handle.ExportHandle;
-import com.alanpoi.analysis.word.WordWorkbook;
+import com.alanpoi.analysis.word.IWordWorkbook;
+import com.alanpoi.analysis.word.Media;
 import com.alanpoi.analysis.word.handle.WordHandle;
 import com.alanpoi.common.util.ApplicationUtil;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Excel Export Util
@@ -28,26 +26,42 @@ public class WordExportUtil {
     protected static final Logger logger = LoggerFactory.getLogger(WordExportUtil.class);
 
     /**
-     * get word workbook object
+     * get word workbook object (word 2003)
      *
      * @param templatePath
      * @param param
      * @return
      */
 
-    public static WordWorkbook getWorkbook(String templatePath, Map<String, Object> param) throws IOException {
+    public static IWordWorkbook getWorkbook(String templatePath, Map<String, Object> param) throws IOException {
         WordHandle exportHandle = ApplicationUtil.getBean(WordHandle.class);
+        exportHandle.setWord2003();
         return exportHandle.getWorkbook(templatePath, param);
     }
 
-    public static WordWorkbook getWorkbook(Class<?> c, Object data) throws IOException {
+    public static IWordWorkbook getWorkbook(Class<?> c, Object data) throws IOException {
         WordHandle exportHandle = ApplicationUtil.getBean(WordHandle.class);
+        exportHandle.setWord2003();
         return exportHandle.getWorkbook(c, data);
+    }
+
+    /**
+     * * get word workbook object (word 2007+)
+     *
+     * @param templatePath
+     * @param param
+     * @return
+     * @throws IOException
+     */
+    public static IWordWorkbook getWorkbookByDocx(String templatePath, Map<String, Object> param, List<Media> mediaList) throws IOException {
+        WordHandle exportHandle = ApplicationUtil.getBean(WordHandle.class);
+        return exportHandle.getWorkbookByDocx(templatePath, param, mediaList);
     }
 
 
     /**
      * export word to the browser
+     *
      * @param c
      * @param data
      * @param request
@@ -55,29 +69,41 @@ public class WordExportUtil {
      * @throws IOException
      */
     public static void export(Class<?> c, Object data, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        WordWorkbook workbook = getWorkbook(c, data);
+        IWordWorkbook workbook = getWorkbook(c, data);
         download(workbook, request, response, UUID.randomUUID().toString() + ".doc");
     }
 
     public static void export(String templatePath, Map<String, Object> param, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        WordWorkbook workbook = getWorkbook(templatePath, param);
+        IWordWorkbook workbook = getWorkbook(templatePath, param);
         download(workbook, request, response, UUID.randomUUID().toString() + ".doc");
     }
 
 
     public static void export(String templatePath, Map<String, Object> param, HttpServletRequest request, HttpServletResponse response, String fileName) throws IOException {
-        WordWorkbook workbook = getWorkbook(templatePath, param);
+        IWordWorkbook workbook = getWorkbook(templatePath, param);
+        download(workbook, request, response, fileName);
+    }
+
+
+    public static void exportByDocx(String templatePath, Map<String, Object> param, List<Media> mediaList, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        IWordWorkbook workbook = getWorkbookByDocx(templatePath, param, mediaList);
+        download(workbook, request, response, UUID.randomUUID().toString() + ".doc");
+    }
+
+
+    public static void exportByDocx(String templatePath, Map<String, Object> param, List<Media> mediaList, HttpServletRequest request, HttpServletResponse response, String fileName) throws IOException {
+        IWordWorkbook workbook = getWorkbookByDocx(templatePath, param, mediaList);
         download(workbook, request, response, fileName);
     }
 
 
     public static void export(Class<?> c, Object data, HttpServletRequest request, HttpServletResponse response, String fileName) throws IOException {
-        WordWorkbook workbook = getWorkbook(c, data);
+        IWordWorkbook workbook = getWorkbook(c, data);
         download(workbook, request, response, fileName);
     }
 
 
-    private static void download(WordWorkbook workbookEntity, HttpServletRequest request, HttpServletResponse response, String fileName) throws IOException {
+    private static void download(IWordWorkbook workbookEntity, HttpServletRequest request, HttpServletResponse response, String fileName) throws IOException {
         try {
             response.setContentType("application/force-download;charset=UTF-8");
             final String userAgent = request.getHeader("USER-AGENT");

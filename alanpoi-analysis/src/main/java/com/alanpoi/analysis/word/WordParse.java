@@ -5,28 +5,17 @@ import com.alanpoi.analysis.common.enums.WordHighlight;
 import com.alanpoi.analysis.common.enums.WordStyle;
 import com.alanpoi.common.util.StringUtils;
 import freemarker.template.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.net.URI;
 import java.util.*;
 
 /**
  * @author pengzhuoxun
  * @since 1.3.4
  */
-public class WordParse {
-    private final static Logger logger = LoggerFactory.getLogger(WordParse.class);
+public abstract class WordParse {
 
-    private Configuration configure = null;
-
-    public WordParse() {
-
-        configure = new Configuration();
-        configure.setDefaultEncoding("utf-8");
-
-    }
+    protected Configuration configure = null;
 
     /**
      * 创建word文档对象
@@ -36,67 +25,35 @@ public class WordParse {
      * @return
      * @throws IOException
      */
-    public WordWorkbook createDoc(List<WordEntity> entityList, Map<String, Object> dataMap) throws IOException {
-        File ftlFile = generateFtl(entityList);
-        Template template = createTemplate(ftlFile);
-        WordWorkbook workbook = new WordWorkbook(template);
-        workbook.setDataMap(dataMap);
-        ftlFile.delete();
-        return workbook;
+    public IWordWorkbook createDoc(List<WordEntity> entityList, Map<String, Object> dataMap) throws IOException {
+        throw new UnsupportedOperationException();
     }
 
-    public WordWorkbook createDoc(String templatePath, Map<String, Object> dataMap) throws IOException {
+    public IWordWorkbook createDoc(String zipTemplatePath, Map<String, Object> dataMap, List<Media> mediaList) throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    public IWordWorkbook createDoc(String templatePath, Map<String, Object> dataMap) throws IOException {
         File file = new File(templatePath);
         if (!file.exists()) {
-            file = new File(URI.create(getClass().getClassLoader().getResource(templatePath).getPath()).getPath());
-            if (!file.exists()) throw new FileNotFoundException("模版不存在");
+            //获取项目相对路径资源
+            String[] pathArr = templatePath.split("/");
+            String fileName = pathArr[pathArr.length - 1];
+            String parentPath = templatePath.replace(fileName, "");
+            return createDoc(File.separator + parentPath, fileName, dataMap, false);
         }
-        return createDoc(file, dataMap);
+        return createDoc(file, dataMap, true);
     }
 
-    public WordWorkbook createDoc(File templateFile, Map<String, Object> dataMap) throws IOException {
-        Template template = createTemplate(templateFile);
+    public IWordWorkbook createDoc(File templateFile, Map<String, Object> dataMap, boolean isAbsolute) throws IOException {
+        return createDoc(templateFile.getParent(), templateFile.getName(), dataMap, isAbsolute);
+    }
+
+    public IWordWorkbook createDoc(String parentPath, String fileName, Map<String, Object> dataMap, boolean isAbsolute) throws IOException {
+        Template template = createTemplate(parentPath, fileName, isAbsolute);
         WordWorkbook workbook = new WordWorkbook(template);
         workbook.setDataMap(dataMap);
         return workbook;
-    }
-
-    /**
-     * 自动匹配生成模版
-     *
-     * @param entityList
-     * @return
-     * @throws IOException
-     */
-    public File generateFtl(List<WordEntity> entityList) throws IOException {
-        String h = new String(Base64.getDecoder().decode(PdfConfig.getH()));
-        String f1 = new String(Base64.getDecoder().decode(PdfConfig.getF1()));
-        String f2 = new String(Base64.getDecoder().decode(PdfConfig.getF2()));
-        String body = null;
-        if (entityList != null && entityList.size() > 0) {
-            entityList.sort(Comparator.comparing(e -> e.getIndex()));
-            //parse
-            body = parseEntity(entityList);
-        }
-        Writer writer = null;
-        BufferedWriter bos = null;
-        File temp = null;
-        try {
-            temp = File.createTempFile(UUID.randomUUID().toString(), ".ftl");
-            writer = new FileWriter(temp);
-            bos = new BufferedWriter(writer);
-            bos.write(h);
-            if (body != null) bos.write(body);
-            bos.write(f1);
-            bos.write(f2);
-            return temp;
-        } catch (IOException e) {
-            logger.error("", e);
-        } finally {
-            if (bos != null) bos.close();
-            if (writer != null) writer.close();
-        }
-        throw new FileNotFoundException();
     }
 
     /**
@@ -105,7 +62,7 @@ public class WordParse {
      * @param entityList
      * @return
      */
-    private String parseEntity(List<WordEntity> entityList) {
+    protected String parseEntity(List<WordEntity> entityList) {
         StringBuilder wBody = new StringBuilder();
         entityList.forEach(e -> {
             Label label = new Label("w:p", null, "");
@@ -174,15 +131,29 @@ public class WordParse {
         return wBody.toString();
     }
 
-    public Template createTemplate(File temp) throws IOException {
+    public Template createTemplate(String parentPath, String fileName, boolean isAbsolute) throws IOException {
         //加载模板文件
-        configure.setClassForTemplateLoading(this.getClass(), "/var/folders/3l/lsqzc9g9533dwtzcmjwz43280000gn/T/"); //将模板文件直接复制到src目录下
-        configure.setDirectoryForTemplateLoading(new File(temp.getParent()));//模板文件在本地硬盘d
+        if (isAbsolute) {
+            configure.setDirectoryForTemplateLoading(new File(parentPath));//模板文件在本地硬盘d
+        } else {
+            configure.setClassForTemplateLoading(getClass(), parentPath); //将模板文件直接复制到src目录下
+        }
+
         //设置对象包装器
-        configure.setObjectWrapper(new DefaultObjectWrapper());
+        configure.setObjectWrapper(new DefaultObjectWrapper(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS));
         //设置异常处理器
         configure.setTemplateExceptionHandler(TemplateExceptionHandler.IGNORE_HANDLER);
         //定义Template对象,注意模板类型名字与downloadType要一致
-        return configure.getTemplate(temp.getName());  //文件名调用的时候可更换
+        return configure.getTemplate(fileName);  //文件名调用的时候可更换
+    }
+
+    public static String getTmpDir() {
+        String tmpDir = System.getProperty("java.io.tmpdir");
+        File dir = new File(tmpDir + "alanpoi");
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
+        return tmpDir + "alanpoi" + File.separator;
+
     }
 }
