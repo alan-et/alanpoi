@@ -5,15 +5,15 @@ import com.alanpoi.analysis.word.*;
 import com.alanpoi.analysis.word.annotation.WordField;
 import com.alanpoi.common.annotation.DateFormat;
 import com.alanpoi.common.annotation.NumFormat;
-import com.alanpoi.common.util.ApplicationUtil;
 import com.alanpoi.common.util.StringUtils;
+import fr.opensagres.poi.xwpf.converter.pdf.PdfConverter;
+import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -90,6 +90,13 @@ public class WordHandle {
     private IWordWorkbook export(Class<?> c, Collection<?> data) {
         //TODO
         return null;
+    }
+
+    public void wordConverterToPdf(InputStream source, OutputStream target,
+                                          PdfOptions options,
+                                          Map<String, String> params) throws IOException {
+        XWPFDocument doc = new XWPFDocument(source);
+        PdfConverter.getInstance().convert(doc, target, options);
     }
 
     /**

@@ -5,6 +5,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class WordWorkbook implements IWordWorkbook {
@@ -39,6 +40,17 @@ public class WordWorkbook implements IWordWorkbook {
             }
         }
 
+    }
+
+    @Override
+    public InputStream getInputStream() {
+        try {
+            StringWriter stringWriter = new StringWriter();
+            template.process(dataMap, stringWriter);
+            return new ByteArrayInputStream(stringWriter.toString().getBytes(StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void setDataMap(Map<String, Object> dataMap) {

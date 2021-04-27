@@ -64,4 +64,8 @@ public class XWordWorkbook implements IWordWorkbook {
         }
     }
 
+    @Override
+    public InputStream getInputStream() throws FileNotFoundException {
+        return new FileInputStream(tmpFileDir);
+    }
 }

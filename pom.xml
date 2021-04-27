@@ -19,7 +19,7 @@
         <module>alanpoi-common</module>
         <module>alanpoi-activity</module>
         <module>alanpoi-analysis</module>
-<!--        <module>alanpoi-test</module>-->
+        <module>alanpoi-test</module>
     </modules>
 
     <properties>
@@ -37,6 +37,8 @@
         <httpclient.versoin>4.5.11</httpclient.versoin>
         <jdom.version>2.0.2</jdom.version>
         <freemarker.version>2.3.31</freemarker.version>
+        <fr.opensagres.poi.version>2.0.2</fr.opensagres.poi.version>
+        <common-compress.version>1.19</common-compress.version>
     </properties>
     <dependencies>
         <dependency>
