@@ -6,8 +6,12 @@ import com.alanpoi.analysis.word.annotation.WordField;
 import com.alanpoi.common.annotation.DateFormat;
 import com.alanpoi.common.annotation.NumFormat;
 import com.alanpoi.common.util.StringUtils;
+import com.google.code.appengine.awt.Color;
+import com.lowagie.text.Font;
+import com.lowagie.text.pdf.BaseFont;
 import fr.opensagres.poi.xwpf.converter.pdf.PdfConverter;
 import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions;
+import fr.opensagres.xdocreport.itext.extension.font.IFontProvider;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 
 import org.slf4j.Logger;
@@ -93,8 +97,26 @@ public class WordHandle {
     }
 
     public void wordConverterToPdf(InputStream source, OutputStream target,
-                                          PdfOptions options,
-                                          Map<String, String> params) throws IOException {
+                                   PdfOptions options,
+                                   Map<String, String> params) throws IOException {
+        options.fontEncoding("UTF-8");
+        options.fontProvider(new IFontProvider() {
+            @Override
+            public Font getFont(String s, String s1, float v, int i, Color color) {
+                try {
+                    BaseFont baseFont = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.EMBEDDED);
+                    Font font = new Font(baseFont, v, i, color);
+                    if (s != null) {
+                        font.setFamily(s);
+                    }
+                    return font;
+                } catch (Exception e) {
+                    logger.warn("", e);
+                    return null;
+                }
+
+            }
+        });
         XWPFDocument doc = new XWPFDocument(source);
         PdfConverter.getInstance().convert(doc, target, options);
     }

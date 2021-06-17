@@ -4,8 +4,7 @@ import org.apache.commons.lang3.SystemUtils;
 
 public class NumberUtils {
     public static boolean isNumber(String str) {
-        //修复ExcelLONG类型最后以为失去精度
-        if (StringUtils.isBlank(str) || str.length() > 18) {
+        if (StringUtils.isBlank(str) || str.split("\\.")[0].length() > 19) {
             return false;
         }
         return isCreatable(str);

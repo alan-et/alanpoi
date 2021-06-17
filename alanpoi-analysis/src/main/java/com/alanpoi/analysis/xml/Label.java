@@ -1,4 +1,4 @@
-package com.alanpoi.analysis.word;
+package com.alanpoi.analysis.xml;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,7 @@ public class Label {
         childs = new ArrayList<>();
     }
 
-    protected String formatXml() {
+    public String formatXml() {
         StringBuilder label_xml = new StringBuilder("");
         StringBuilder label_prop = new StringBuilder("");
         if (prop != null && prop.size() > 0) {

@@ -1,12 +1,12 @@
 package com.alanpoi.analysis.excel.exports.handle;
 
 import com.alanpoi.analysis.common.enums.AlanColor;
-import com.alanpoi.analysis.excel.annotation.DateFormat;
 import com.alanpoi.analysis.excel.annotation.ExcelColumn;
 import com.alanpoi.analysis.excel.annotation.ExcelSheet;
-import com.alanpoi.analysis.excel.annotation.NumFormat;
 import com.alanpoi.analysis.excel.exports.ExcelParseParam;
 import com.alanpoi.analysis.common.ReflectorManager;
+import com.alanpoi.common.annotation.DateFormat;
+import com.alanpoi.common.annotation.NumFormat;
 import com.alanpoi.common.exception.AlanPoiException;
 import com.alanpoi.common.util.NumberUtils;
 import com.alanpoi.common.util.Placeholder;
@@ -15,6 +15,7 @@ import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.ss.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Field;
@@ -99,9 +100,14 @@ public class ExportHandle {
         List<ExcelParseParam> excelParseParamList = new ArrayList<>();
         for (int i = 0; i < fieldLength; i++) {
             Field field = fields.get(i);
-            ExcelColumn excelColumn = fields.get(i).getAnnotation(ExcelColumn.class);
-            DateFormat dateFormat = fields.get(i).getAnnotation(DateFormat.class);
-            NumFormat numFormat = fields.get(i).getAnnotation(NumFormat.class);
+            /**
+             * {@link com.alanpoi.analysis.excel.annotation.NumFormat
+             * @link com.alanpoi.analysis.excel.annotation.DateFormat}
+             * The above two annotations are planned to be removed in v2.0
+             */
+            ExcelColumn excelColumn = AnnotatedElementUtils.findMergedAnnotation(fields.get(i), ExcelColumn.class);
+            DateFormat dateFormat = AnnotatedElementUtils.findMergedAnnotation(fields.get(i), DateFormat.class);
+            NumFormat numFormat = AnnotatedElementUtils.findMergedAnnotation(fields.get(i), NumFormat.class);
             ExcelParseParam excelParseParam = new ExcelParseParam();
             if (excelColumn != null) {
                 Integer index = null;
@@ -264,7 +270,12 @@ public class ExportHandle {
             logger.error("Data format error:" + value);
             return value;
         } else {
-            Double d = Double.parseDouble(value.toString());
+            Number d;
+            if(value.toString().indexOf(".")==-1){
+                d = Long.parseLong(value.toString());
+            }else{
+                d = Double.parseDouble(value.toString());
+            }
             DecimalFormat df = new DecimalFormat(parseParam.getNumFormat());
             return df.format(d);
         }

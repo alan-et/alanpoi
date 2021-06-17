@@ -1,5 +1,6 @@
 package com.alanpoi.analysis.word;
 
+import com.alanpoi.analysis.xml.Label;
 import com.alanpoi.common.enums.LabelName;
 
 import java.util.Map;
@@ -14,7 +15,7 @@ public class PStyleLabel extends Label {
         this.prop = prop;
     }
 
-    protected String formatXml() {
+    public String formatXml() {
         StringBuilder label_xml = new StringBuilder("");
         StringBuilder label_prop = new StringBuilder("");
         if (prop != null && prop.size() > 0) {

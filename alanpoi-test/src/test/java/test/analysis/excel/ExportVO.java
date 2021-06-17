@@ -4,7 +4,7 @@ import com.alanpoi.analysis.common.enums.AlanColor;
 import com.alanpoi.analysis.excel.annotation.DateFormat;
 import com.alanpoi.analysis.excel.annotation.ExcelColumn;
 import com.alanpoi.analysis.excel.annotation.ExcelSheet;
-import com.alanpoi.analysis.excel.annotation.NumFormat;
+import com.alanpoi.common.annotation.NumFormat;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -17,11 +17,11 @@ public class ExportVO {
     private String name;
 
     @ExcelColumn(name = "值")
-    @NumFormat(value = "#0.0")
-    private BigDecimal value;
+    @NumFormat(value = "#0.#")
+    private String  value;
 
     @ExcelColumn(name = "金额", color = AlanColor.RED)
-    @NumFormat(value = "0.00%")
+    @NumFormat(value = "#0.00%")
     private BigDecimal amount;
 
     @ExcelColumn(name = "时间格式化")

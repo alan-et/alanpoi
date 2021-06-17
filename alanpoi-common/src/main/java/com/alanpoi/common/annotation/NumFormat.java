@@ -1,9 +1,6 @@
 package com.alanpoi.common.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * NumFormat annotation
@@ -12,7 +9,8 @@ import java.lang.annotation.Target;
  * @since 2020-3-17
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD})
+@Target({ElementType.FIELD,ElementType.TYPE})
+@Documented
 public @interface NumFormat {
     String value() default "00.00";
 }

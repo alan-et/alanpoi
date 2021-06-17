@@ -3,6 +3,7 @@ package com.alanpoi.analysis.word;
 import com.alanpoi.analysis.common.enums.WordAlign;
 import com.alanpoi.analysis.common.enums.WordHighlight;
 import com.alanpoi.analysis.common.enums.WordStyle;
+import com.alanpoi.analysis.xml.Label;
 import com.alanpoi.common.util.StringUtils;
 import freemarker.template.*;
 

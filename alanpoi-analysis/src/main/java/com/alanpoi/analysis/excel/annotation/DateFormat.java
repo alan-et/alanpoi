@@ -1,9 +1,8 @@
 package com.alanpoi.analysis.excel.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.springframework.core.annotation.AliasFor;
+
+import java.lang.annotation.*;
 
 /**
  * DateFormat annotation
@@ -13,7 +12,11 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
+@Documented
+@com.alanpoi.common.annotation.DateFormat
 @Deprecated
 public @interface DateFormat {
+
+    @AliasFor(annotation = com.alanpoi.common.annotation.DateFormat.class)
     String value() default "YYYY/MM/dd";
 }

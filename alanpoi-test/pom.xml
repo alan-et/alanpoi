@@ -20,6 +20,12 @@
             <groupId>com.alanpoi</groupId>
             <artifactId>alanpoi-analysis</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>${common-compress.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

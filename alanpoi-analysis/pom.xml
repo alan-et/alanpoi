@@ -20,12 +20,6 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-compress</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -76,6 +70,12 @@
             <version>${common-compress.version}</version>
             <scope>compile</scope>
         </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>com.itextpdf</groupId>-->
+<!--            <artifactId>font-asian</artifactId>-->
+<!--            <version>7.1.15</version>-->
+<!--        </dependency>-->
 
 
     </dependencies>
