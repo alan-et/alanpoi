@@ -5,15 +5,16 @@ import com.alanpoi.analysis.word.*;
 import com.alanpoi.analysis.word.annotation.WordField;
 import com.alanpoi.common.annotation.DateFormat;
 import com.alanpoi.common.annotation.NumFormat;
+import com.alanpoi.common.exception.AlanPoiException;
 import com.alanpoi.common.util.StringUtils;
-import com.google.code.appengine.awt.Color;
-import com.lowagie.text.Font;
-import com.lowagie.text.pdf.BaseFont;
-import fr.opensagres.poi.xwpf.converter.pdf.PdfConverter;
-import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions;
-import fr.opensagres.xdocreport.itext.extension.font.IFontProvider;
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.fop.apps.FOUserAgent;
 
+import org.docx4j.Docx4J;
+import org.docx4j.convert.out.FOSettings;
+import org.docx4j.convert.out.fo.renderers.FORendererApacheFOP;
+import org.docx4j.fonts.*;
+import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+import org.docx4j.org.apache.poi.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +28,8 @@ public class WordHandle {
 
     protected WordParse wordParse;
 
+    protected boolean saveFO;
+
     public WordHandle() {
         this.wordParse = new DocxParse();
     }
@@ -34,18 +37,21 @@ public class WordHandle {
     public WordHandle(boolean isDocx) {
         if (isDocx) this.wordParse = new DocxParse();
         else this.wordParse = new DocParse();
-
     }
 
     public void setWord2003() {
         this.wordParse = new DocParse();
     }
 
+    public void setSaveFO(Boolean bool) {
+        this.saveFO = bool;
+    }
+
     public IWordWorkbook getWorkbook(String templatePath, Map<String, Object> param) throws IOException {
         return wordParse.createDoc(templatePath, param);
     }
 
-    public IWordWorkbook getWorkbookByDocx(String templatePath, Map<String, Object> param, List<Media> mediaList) throws IOException {
+    public IWordWorkbook getWorkbook2007(String templatePath, Map<String, Object> param, List<Media> mediaList) throws IOException {
         return wordParse.createDoc(templatePath, param, mediaList);
     }
 
@@ -77,9 +83,9 @@ public class WordHandle {
             try {
                 wordEntity.setValue((String) reflectorManager.getGetMethod(field.getName()).invoke(data));
             } catch (IllegalAccessException e) {
-                logger.error("", e);
+                logger.warn("", e);
             } catch (InvocationTargetException e) {
-                logger.error("", e);
+                logger.warn("", e);
             }
             wordEntityList.add(wordEntity);
             index++;
@@ -96,29 +102,52 @@ public class WordHandle {
         return null;
     }
 
-    public void wordConverterToPdf(InputStream source, OutputStream target,
-                                   PdfOptions options,
-                                   Map<String, String> params) throws IOException {
-        options.fontEncoding("UTF-8");
-        options.fontProvider(new IFontProvider() {
-            @Override
-            public Font getFont(String s, String s1, float v, int i, Color color) {
-                try {
-                    BaseFont baseFont = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.EMBEDDED);
-                    Font font = new Font(baseFont, v, i, color);
-                    if (s != null) {
-                        font.setFamily(s);
-                    }
-                    return font;
-                } catch (Exception e) {
-                    logger.warn("", e);
-                    return null;
-                }
 
+    /**
+     * word文档转换为PDF
+     *
+     * @param docx docx文档
+     * @param os   PDF文档存储路径
+     * @throws AlanPoiException
+     */
+    public void wordToPDF(InputStream docx, OutputStream os) throws AlanPoiException {
+        try {
+            WordprocessingMLPackage mlPackage = WordprocessingMLPackage.load(docx);
+            Mapper fontMapper = new BestMatchingMapper();
+            //中文字体转换
+            fontMapper.put("华文行楷", PhysicalFonts.get("STXingkai"));
+            fontMapper.put("隶书", PhysicalFonts.get("LiSu"));
+            fontMapper.put("宋体", PhysicalFonts.get("SimSun"));
+            fontMapper.put("微软雅黑", PhysicalFonts.get("Microsoft Yahei"));
+            fontMapper.put("黑体", PhysicalFonts.get("SimHei"));
+            fontMapper.put("楷体", PhysicalFonts.get("KaiTi"));
+            fontMapper.put("新宋体", PhysicalFonts.get("NSimSun"));
+            fontMapper.put("华文行楷", PhysicalFonts.get("STXingkai"));
+            fontMapper.put("华文仿宋", PhysicalFonts.get("STFangsong"));
+            fontMapper.put("宋体扩展", PhysicalFonts.get("simsun-extB"));
+            fontMapper.put("仿宋", PhysicalFonts.get("FangSong"));
+            fontMapper.put("仿宋_GB2312", PhysicalFonts.get("FangSong_GB2312"));
+            fontMapper.put("幼圆", PhysicalFonts.get("YouYuan"));
+            fontMapper.put("华文宋体", PhysicalFonts.get("STSong"));
+            fontMapper.put("华文中宋", PhysicalFonts.get("STZhongsong"));
+            fontMapper.put("等线", PhysicalFonts.get("DengXian Regular"));
+            fontMapper.put("Source Han Sans CN", PhysicalFonts.get("Source Han Serif Simplified Chinese"));
+            mlPackage.setFontMapper(fontMapper);
+
+            FOSettings foSettings = Docx4J.createFOSettings();
+            if (saveFO) {
+                foSettings.setFoDumpFile(File.createTempFile("word2pdf", ".fo"));
             }
-        });
-        XWPFDocument doc = new XWPFDocument(source);
-        PdfConverter.getInstance().convert(doc, target, options);
+            foSettings.setOpcPackage(mlPackage);
+            FOUserAgent foUserAgent = FORendererApacheFOP.getFOUserAgent(foSettings);
+            foUserAgent.setTitle("Alan-poi");
+            Docx4J.toFO(foSettings, os, Docx4J.FLAG_EXPORT_PREFER_XSL);
+//            Docx4J.toPDF(mlPackage, os);
+        } catch (Exception e) {
+            throw new AlanPoiException(e.getMessage());
+        } finally {
+            IOUtils.closeQuietly(os);
+        }
     }
 
     /**

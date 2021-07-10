@@ -58,11 +58,12 @@
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
         </dependency>
-        <dependency>
-            <groupId>fr.opensagres.xdocreport</groupId>
-            <artifactId>fr.opensagres.poi.xwpf.converter.pdf-gae</artifactId>
-            <version>${fr.opensagres.poi.version}</version>
-        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>fr.opensagres.xdocreport</groupId>-->
+<!--            <artifactId>fr.opensagres.poi.xwpf.converter.pdf-gae</artifactId>-->
+<!--            <version>${fr.opensagres.poi.version}</version>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -71,11 +72,27 @@
             <scope>compile</scope>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>com.itextpdf</groupId>-->
-<!--            <artifactId>font-asian</artifactId>-->
-<!--            <version>7.1.15</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.docx4j</groupId>
+            <artifactId>docx4j-export-fo</artifactId>
+            <version>8.3.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.media</groupId>
+                    <artifactId>jai-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.media</groupId>
+                    <artifactId>jai-codec</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.docx4j</groupId>
+            <artifactId>docx4j-JAXB-ReferenceImpl</artifactId>
+            <version>8.3.0</version>
+        </dependency>
 
 
     </dependencies>

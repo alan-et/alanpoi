@@ -267,7 +267,7 @@ public class ExportHandle {
         if (value == null) {
             return null;
         } else if (!NumberUtils.isNumber(value.toString())) {
-            logger.error("Data format error:" + value);
+            logger.warn("Data format error:" + value);
             return value;
         } else {
             Number d;

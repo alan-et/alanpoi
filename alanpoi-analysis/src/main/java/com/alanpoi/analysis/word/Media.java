@@ -1,6 +1,13 @@
 package com.alanpoi.analysis.word;
 
+import com.alanpoi.common.util.ID;
+import com.alanpoi.common.util.StringUtils;
+
+import java.util.UUID;
+
 public class Media {
+
+    private String id;
 
     private String base64;
 
@@ -12,6 +19,17 @@ public class Media {
      * .png .mp4等媒体格式
      */
     private String fileType;
+
+    public String getId() {
+        if (StringUtils.isBlank(id)) {
+            id = String.valueOf(ID.getId().next());
+        }
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getBase64() {
         return base64;

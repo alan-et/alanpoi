@@ -5,14 +5,13 @@ import com.alanpoi.analysis.excel.exports.WorkbookEntity;
 import com.alanpoi.analysis.excel.exports.WorkbookManager;
 import com.alanpoi.analysis.excel.exports.handle.ExportHandle;
 import com.alanpoi.common.util.ApplicationUtil;
+import com.alanpoi.common.util.ResponseUtil;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -180,21 +179,7 @@ public class ExcelExportUtil {
 
     private static void download(WorkbookEntity workbookEntity, HttpServletRequest request, HttpServletResponse response, String fileName) {
         try {
-            response.setContentType("application/force-download;charset=UTF-8");
-            final String userAgent = request.getHeader("USER-AGENT");
-            try {
-                if (userAgent.contains("MSIE") || userAgent.contains("Edge")) {// IE浏览器
-                    fileName = URLEncoder.encode(fileName, "UTF8");
-                } else if (userAgent.contains("Mozilla")) {// google,火狐浏览器
-                    fileName = new String(fileName.getBytes(), "ISO8859-1");
-                } else {
-                    fileName = URLEncoder.encode(fileName, "UTF8");// 其他浏览器
-                }
-                response.setHeader("Content-disposition", "attachment; filename=" + fileName);
-            } catch (UnsupportedEncodingException e) {
-                logger.error(e.getMessage(), e);
-                return;
-            }
+            ResponseUtil.handleResponse(request, response, fileName);
             workbookEntity.getWorkbook().write(response.getOutputStream());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

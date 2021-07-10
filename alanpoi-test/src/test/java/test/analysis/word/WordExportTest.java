@@ -5,8 +5,6 @@ import com.alanpoi.analysis.word.IWordWorkbook;
 import com.alanpoi.analysis.word.Media;
 import com.alanpoi.analysis.word.handle.WordHandle;
 import com.alanpoi.test.Application;
-import fr.opensagres.poi.xwpf.converter.pdf.PdfConverter;
-import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,9 +22,9 @@ public class WordExportTest {
     @Test
     public void exportTest() throws IOException {
         WordVO wordVO = new WordVO();
-        wordVO.setTitle("word导出文档");
-        wordVO.setName("饭店还是尽快付款的");
-        wordVO.setContent("fdjkfkdsfhkds发动机放假等放假的负担");
+        wordVO.setTitle("Alanpoi");
+        wordVO.setName("名称");
+        wordVO.setContent("样例内容");
         wordHandle.setWord2003();
         IWordWorkbook workbook = wordHandle.getWorkbook(WordVO.class, wordVO);
         workbook.write(new FileOutputStream("/Users/pengzhuoxun/data/test.doc"));
@@ -47,6 +45,7 @@ public class WordExportTest {
         data.put("title", "专利趋势");
         data.put("desc", "分析该公司的申请趋势。其中专利授权率表明申请的有效率以及公司最终获得授权的提交申请成功率。蓝色代表申请总量，绿色表示当前时间段申请专利的被授权量。示例：如果2012年专利申请在2014年获得授权，授予的专利将在2012年专利申请中以绿色显示。");
         data.put("name", "imageName");
+        data.put("mediaId", "imageName");
         dataList.add(data);
 
         groupMap.put("title", "地域分布");
@@ -857,18 +856,28 @@ public class WordExportTest {
         media.setFileType(".png");
         List<Media> list = new ArrayList<>();
         list.add(media);
-        IWordWorkbook workbook = WordExportUtil.getWorkbookByDocx("docx3.zip", param, list);
+        IWordWorkbook workbook = WordExportUtil.getWorkbook2007("docx3.zip", param, list);
         workbook.write(new FileOutputStream("/Users/pengzhuoxun/data/全景报告.docx"));
 
     }
 
     @Test
-    public void docxToPdf() throws IOException {
-        FileInputStream in = new FileInputStream("/Users/pengzhuoxun/Downloads/阿里云计算有限公司.docx");
-        FileOutputStream out = new FileOutputStream("/Users/pengzhuoxun/data/阿里云计算有限公司.pdf");
-        wordHandle.wordConverterToPdf(in, out, PdfOptions.create(), null);
-//        wordHandle.wordConverterToPdf(new FileInputStream("/Users/pengzhuoxun/data/new.docx"), new FileOutputStream("/Users/pengzhuoxun/data/全景报告.pdf"), PdfOptions.create(), null);
+    public void WordToPDF() throws IOException {
+
+        FileInputStream in = new FileInputStream("/Users/pengzhuoxun/Downloads/123.docx");
+//        FileInputStream in = new FileInputStream("/Users/pengzhuoxun/Downloads/阿里云计算有限公司 (2).docx");
+        FileOutputStream out = new FileOutputStream("/Users/pengzhuoxun/data/123.pdf");
+        wordHandle.wordToPDF(in, out);
     }
+
+//    @Test
+//    public void wordConverterToPdf() throws IOException {
+//
+//        FileInputStream in = new FileInputStream("/Users/pengzhuoxun/Downloads/123.docx");
+////        FileInputStream in = new FileInputStream("/Users/pengzhuoxun/Downloads/阿里云计算有限公司 (2).docx");
+//        FileOutputStream out = new FileOutputStream("/Users/pengzhuoxun/data/专利分析.pdf");
+//        wordHandle.wordConverterToPdf(in, out, PdfOptions.create(),null);
+//    }
 
     @Test
     public void export2Test() throws IOException {

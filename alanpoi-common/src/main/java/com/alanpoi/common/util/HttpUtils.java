@@ -5,9 +5,12 @@ import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -144,6 +147,122 @@ public class HttpUtils {
         logger.info("response:{}", result);
         if (result == null) return null;
         return JSON.parseObject(result, resultClass);
+    }
+
+    /**
+     * Download from http
+     *
+     * @param httpUrl
+     * @param outputStream
+     * @return
+     */
+    public static boolean httpDownload(String httpUrl, OutputStream outputStream) {
+        int byteread = 0;
+        URL url = null;
+        try {
+            url = new URL(httpUrl);
+        } catch (MalformedURLException e1) {
+            logger.error("", e1);
+            return false;
+        }
+
+        try {
+            URLConnection conn = url.openConnection();
+            InputStream inStream = conn.getInputStream();
+
+            byte[] buffer = new byte[2048];
+            while ((byteread = inStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, byteread);
+            }
+            return true;
+        } catch (FileNotFoundException e) {
+            logger.error("", e);
+            return false;
+        } catch (IOException e) {
+            logger.error("", e);
+            return false;
+        }
+    }
+
+    /**
+     * Upload file (applicable to requests where both request and response are files)
+     *
+     * @param urlStr
+     * @param fileName
+     * @param fileStream
+     * @return
+     */
+    public static InputStream uploadFile(String urlStr, String fileName, InputStream fileStream) {
+        InputStream inputStream = null;
+        try {
+            final String newLine = "\r\n";
+            final String boundaryPrefix = "--";
+            String BOUNDARY = "--------alanpoi7f4a64158o6";// 模拟数据分隔线
+            URL url = new URL(urlStr);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");// 设置为POST请求
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(boundaryPrefix);
+            sb.append(BOUNDARY);
+            sb.append(newLine);
+            sb.append("Content-Disposition: form-data;name=\"file\";filename=\"" + fileName + "\"" + newLine);
+            sb.append("Content-Type:application/octet-stream");
+            sb.append(newLine);
+            sb.append(newLine);
+            byte[] begin_data = sb.toString().getBytes();
+            byte[] end_data = (newLine + boundaryPrefix + BOUNDARY
+                    + boundaryPrefix + newLine).getBytes();
+
+            conn.setRequestProperty("connection", "Keep-Alive");// 设置请求头参数
+            conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + BOUNDARY);
+            conn.setRequestProperty("Content-Length", String.valueOf(begin_data.length + fileStream.available() + end_data.length));
+
+            OutputStream out = conn.getOutputStream();
+            out.write(begin_data);
+
+            DataInputStream in = new DataInputStream(fileStream);
+            byte[] bufferOut = new byte[3072];
+            int bytes = 0;
+            while ((bytes = in.read(bufferOut)) != -1) {
+                out.write(bufferOut, 0, bytes);
+            }
+            in.close();
+            out.write(end_data);
+            out.flush();
+            out.close();
+            inputStream = conn.getInputStream();
+        } catch (Exception e) {
+            logger.error("", e);
+        }
+        return inputStream;
+    }
+
+    public static void uploadFileToBrowser(String url, String uploadName, String downName, InputStream fileStream, HttpServletResponse response) {
+        InputStream inputStream;
+        try {
+            inputStream = uploadFile(url, uploadName, fileStream);
+            downToBrowser(inputStream, downName, response);
+        } catch (Exception e) {
+            logger.error("", e);
+        }
+    }
+
+    public static void downToBrowser(InputStream inputStream, String fileName, HttpServletResponse response) throws IOException {
+        try {
+            ResponseUtil.handleResponse(response, fileName);
+            byte[] buffer = new byte[2048];
+            int len;
+            while ((len = inputStream.read(buffer)) != -1) {
+                response.getOutputStream().write(buffer, 0, len);
+            }
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            inputStream.close();
+        }
     }
 
     /**

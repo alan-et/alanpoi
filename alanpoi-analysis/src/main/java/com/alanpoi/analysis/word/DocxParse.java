@@ -60,6 +60,7 @@ public class DocxParse extends WordParse {
             InputStream is = getClass().getClassLoader().getResourceAsStream(zipTemplatePath);
             file = FileUtils.saveTempFile(is, "word", ".zip", getTmpDir());
         }
+        dataAddMedia(dataMap, mediaList);
         ZipFile origin_zf = null;
         InputStream origin_docIs = null;
         InputStream origin_docRelIs = null;
@@ -143,10 +144,22 @@ public class DocxParse extends WordParse {
         return workbook;
     }
 
-    private void addMedia(ZipOutputStream zipOutputStream, List<Media> mediaList) {
+    private void dataAddMedia(Map<String, Object> dataMap, List<Media> medias) {
+        List<HashMap<String, Object>> mediaList = new ArrayList<>();
+        medias.forEach(e -> {
+            HashMap mediaMap = new HashMap();
+            mediaMap.put("id", e.getId());
+            mediaMap.put("fileName", e.getFileName());
+            mediaMap.put("fileType", e.getFileType());
+            mediaList.add(mediaMap);
+        });
+        dataMap.put("mediaList", mediaList);
+    }
+
+    private void addMedia(ZipOutputStream zipOutputStream, List<Media> mediaList) throws IOException {
         if (mediaList == null || mediaList.size() == 0) return;
-        mediaList.forEach(e -> {
-            if (e == null) return;
+        for (Media e : mediaList) {
+            if (e == null) continue;
             InputStream stream = null;
             try {
                 zipOutputStream.putNextEntry(new ZipEntry("word/media/" + e.getFileName() + e.getFileType()));
@@ -166,24 +179,22 @@ public class DocxParse extends WordParse {
                     while ((length = stream.read(buffer)) != -1) {
                         zipOutputStream.write(buffer, 0, length);
                     }
-
                     zipOutputStream.closeEntry();
                     stream.close();
                 }
             } catch (IOException ioException) {
-                logger.error("", ioException);
+                throw ioException;
             } finally {
                 if (stream != null) {
                     try {
                         stream.close();
                     } catch (IOException ioException) {
-                        logger.error("", ioException);
+                        throw ioException;
                     }
                 }
 
             }
-
-        });
+        }
 
     }
 }

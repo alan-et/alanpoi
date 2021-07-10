@@ -1,8 +1,8 @@
 package com.alanpoi.analysis.excel.imports;
 
+import com.alanpoi.common.util.ResponseUtil;
 import com.alanpoi.common.enums.ResponseEnum;
 import com.alanpoi.common.exception.AlanPoiException;
-import com.alanpoi.common.util.ApplicationUtil;
 import com.alanpoi.common.util.NetworkUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alanpoi.analysis.excel.imports.handle.ExcelHandle;
@@ -20,7 +20,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -118,22 +117,7 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
 
             }
         }
-
-        response.setContentType("application/force-download;charset=UTF-8");
-        final String userAgent = request.getHeader("USER-AGENT");
-        try {
-            if (userAgent.contains("MSIE") || userAgent.contains("Edge")) {// IE浏览器
-                fileName = URLEncoder.encode(fileName, "UTF8");
-            } else if (userAgent.contains("Mozilla")) {// google,火狐浏览器
-                fileName = new String(fileName.getBytes(), "ISO8859-1");
-            } else {
-                fileName = URLEncoder.encode(fileName, "UTF8");// 其他浏览器
-            }
-            response.setHeader("Content-disposition", "attachment; filename=" + fileName);
-        } catch (UnsupportedEncodingException e) {
-            log.error(e.getMessage(), e);
-            return;
-        }
+        ResponseUtil.handleResponse(request, response, fileName);
 
         OutputStream out = null;
         try {
@@ -171,7 +155,7 @@ public abstract class AbstractFileParser<T> extends ExcelHandle {
             return res;
         } catch (Exception e2) {
             log.error("consumeHandle exception:", e2);
-            throw new RuntimeException(e2.getMessage());
+            throw e2;
         }
     }
 
