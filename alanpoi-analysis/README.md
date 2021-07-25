@@ -16,7 +16,7 @@
 # 功能介绍
 
 ## Api document
-通过 [Api doc](https://github.com/alan-et/alanpoi/alanpoi-document/alanpoi-analysis/apidocx/index.html)更加升入了解它！
+通过 [Api doc](https://github.com/alan-et/alanpoi/tree/1.3.x/alanpoi-document/alanpoi-analysis/apidocx/index.html)更加升入了解它！
 
 
 ## 一. IMPORT
