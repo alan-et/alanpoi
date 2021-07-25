@@ -10,7 +10,7 @@
 ```
 
 ## Api document
-通过 [Api doc](https://github.com/alan-et/alanpoi/tree/1.3.x/alanpoi-document/alanpoi-elasticsearch/apidocx/index.html)更加升入了解它！
+通过 [Api doc](https://alanpoi.com:8161/index.html) 更加深入了解它！
 
 ## 环境变量
 
