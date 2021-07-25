@@ -23,7 +23,7 @@ class EtActivityApplicationTests {
     @Test
     void contextLoads() {
         long begin = System.currentTimeMillis();
-        SimpleDateFormat format = new SimpleDateFormat("YYYY-MM-dd hh:mm:ss.SSS");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
         System.out.println(format.format(new Date()));
         CreateInstanceReq req = new CreateInstanceReq();
         req.setProcessId(27638201013239997L);

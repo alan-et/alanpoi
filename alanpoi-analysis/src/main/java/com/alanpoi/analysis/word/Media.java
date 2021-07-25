@@ -3,7 +3,6 @@ package com.alanpoi.analysis.word;
 import com.alanpoi.common.util.ID;
 import com.alanpoi.common.util.StringUtils;
 
-import java.util.UUID;
 
 public class Media {
 
@@ -14,6 +13,10 @@ public class Media {
     private String url;
 
     private String fileName;
+
+    private Integer width;
+
+    private Integer height;
 
     /**
      * .png .mp4等媒体格式
@@ -61,5 +64,21 @@ public class Media {
 
     public void setFileType(String fileType) {
         this.fileType = fileType;
+    }
+
+    public Integer getWidth() {
+        return width;
+    }
+
+    public void setWidth(Integer width) {
+        this.width = width;
+    }
+
+    public Integer getHeight() {
+        return height;
+    }
+
+    public void setHeight(Integer height) {
+        this.height = height;
     }
 }

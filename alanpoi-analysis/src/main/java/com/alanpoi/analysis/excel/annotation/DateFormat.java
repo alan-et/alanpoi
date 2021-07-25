@@ -18,5 +18,5 @@ import java.lang.annotation.*;
 public @interface DateFormat {
 
     @AliasFor(annotation = com.alanpoi.common.annotation.DateFormat.class)
-    String value() default "YYYY/MM/dd";
+    String value() default "yyyy/MM/dd";
 }

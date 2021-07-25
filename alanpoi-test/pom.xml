@@ -12,13 +12,15 @@
     <artifactId>alanpoi-test</artifactId>
 
     <dependencies>
-        <dependency>
-            <groupId>com.alanpoi</groupId>
-            <artifactId>alanpoi-common</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>com.alanpoi</groupId>
             <artifactId>alanpoi-analysis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alanpoi</groupId>
+            <artifactId>alanpoi-elasticsearch</artifactId>
         </dependency>
 
         <dependency>

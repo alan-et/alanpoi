@@ -2,6 +2,7 @@ package com.alanpoi.common.util;
 
 import com.alanpoi.common.enums.TagName;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,10 +34,10 @@ public class HttpUtils {
         return httpGet(urlStr, "application/json; charset=utf-8", headerMap);
     }
 
-    public static <T> T httpGet(String urlStr, Map<String, String> headerMap, Class<? extends T> c) {
+    public static <T> T httpGet(String urlStr, Map<String, String> headerMap, TypeReference<T> typeReference) {
         String result = httpGet(urlStr, "application/json; charset=utf-8", headerMap);
         if (result == null) return null;
-        return JSON.parseObject(result, c);
+        return JSON.parseObject(result, typeReference);
     }
 
     public static String httpGet(String urlStr, String contentType, Map<String, String> headerMap) {
@@ -84,21 +85,21 @@ public class HttpUtils {
         return JSON.parseObject(result, c);
     }
 
-    public static <T> T httpGet(String urlStr, String contentType, Class<? extends T> c) {
+    public static <T> T httpGet(String urlStr, String contentType, TypeReference<T> typeReference) {
         String result = httpGet(urlStr, contentType);
         if (result == null) return null;
-        return JSON.parseObject(result, c);
+        return JSON.parseObject(result, typeReference);
     }
 
-    public static String httpPost(String urlStr) {
+    public static String httpPost(String urlStr) throws IOException {
         return httpPostWithBody(urlStr, "");
     }
 
-    public static String httpPostWithBody(String urlStr, String body) {
+    public static String httpPostWithBody(String urlStr, String body) throws IOException {
         return httpPostWithBody(urlStr, body, new HashMap<>());
     }
 
-    public static String httpPostWithBody(String urlStr, String body, Map<String, String> headerMap) {
+    public static String httpPostWithBody(String urlStr, String body, Map<String, String> headerMap) throws IOException {
         BufferedReader in = null;
         OutputStream os = null;
         try {
@@ -127,26 +128,27 @@ public class HttpUtils {
             return buf.toString().trim();
         } catch (Exception e) {
             logger.error("request {} fail,message:", urlStr, e);
+            throw e;
         } finally {
             try {
                 if (os != null) os.close();
                 if (in != null) in.close();
             } catch (Exception e1) {
                 logger.error("close BufferedReader exception:", e1);
+                throw e1;
             }
         }
-        return null;
     }
 
-    public static <T> T httpPostWithBody(String urlStr, String body, Class<? extends T> resultClass) {
-        return httpPostWithBody(urlStr, body, new HashMap<>(), resultClass);
+    public static <T> T httpPostWithBody(String urlStr, String body, TypeReference<T> typeReference) throws IOException {
+        return httpPostWithBody(urlStr, body, new HashMap<>(), typeReference);
     }
 
-    public static <T> T httpPostWithBody(String urlStr, String body, Map<String, String> headerMap, Class<? extends T> resultClass) {
+    public static <T> T httpPostWithBody(String urlStr, String body, Map<String, String> headerMap, TypeReference<T> typeReference) throws IOException {
         String result = httpPostWithBody(urlStr, body, headerMap);
         logger.info("response:{}", result);
         if (result == null) return null;
-        return JSON.parseObject(result, resultClass);
+        return JSON.parseObject(result, typeReference);
     }
 
     /**
@@ -192,15 +194,15 @@ public class HttpUtils {
      * @param fileStream
      * @return
      */
-    public static InputStream uploadFile(String urlStr, String fileName, InputStream fileStream) {
+    public static InputStream uploadFile(String urlStr, String fileName, InputStream fileStream) throws IOException {
         InputStream inputStream = null;
         try {
             final String newLine = "\r\n";
             final String boundaryPrefix = "--";
-            String BOUNDARY = "--------alanpoi7f4a64158o6";// 模拟数据分隔线
+            String BOUNDARY = "--------alanpoi7f4a64158o6";
             URL url = new URL(urlStr);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");// 设置为POST请求
+            conn.setRequestMethod("POST");
             conn.setDoOutput(true);
             conn.setDoInput(true);
 
@@ -216,7 +218,7 @@ public class HttpUtils {
             byte[] end_data = (newLine + boundaryPrefix + BOUNDARY
                     + boundaryPrefix + newLine).getBytes();
 
-            conn.setRequestProperty("connection", "Keep-Alive");// 设置请求头参数
+            conn.setRequestProperty("connection", "Keep-Alive");
             conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + BOUNDARY);
             conn.setRequestProperty("Content-Length", String.valueOf(begin_data.length + fileStream.available() + end_data.length));
 
@@ -235,18 +237,18 @@ public class HttpUtils {
             out.close();
             inputStream = conn.getInputStream();
         } catch (Exception e) {
-            logger.error("", e);
+            throw e;
         }
         return inputStream;
     }
 
-    public static void uploadFileToBrowser(String url, String uploadName, String downName, InputStream fileStream, HttpServletResponse response) {
+    public static void uploadFileToBrowser(String url, String uploadName, String downName, InputStream fileStream, HttpServletResponse response) throws IOException {
         InputStream inputStream;
         try {
             inputStream = uploadFile(url, uploadName, fileStream);
             downToBrowser(inputStream, downName, response);
         } catch (Exception e) {
-            logger.error("", e);
+            throw e;
         }
     }
 

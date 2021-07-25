@@ -8,12 +8,16 @@
   <dependency>
       <groupId>com.alanpoi</groupId>
       <artifactId>alanpoi-analysis</artifactId>
-      <version>1.3.0</version>
+      <version>1.3.4</version>
   </dependency>
 ```
 
 
 # 功能介绍
+
+## Api document
+通过 [Api doc](https://github.com/alan-et/alanpoi/alanpoi-document/alanpoi-analysis/apidocx/index.html)更加升入了解它！
+
 
 ## 一. IMPORT
 

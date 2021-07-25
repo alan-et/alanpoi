@@ -5,9 +5,12 @@
   <dependency>
       <groupId>com.alanpoi</groupId>
       <artifactId>alanpoi-common</artifactId>
-      <version>1.3.0</version>
+      <version>1.3.4</version>
   </dependency>
 ```
+
+## Api document
+通过 [Api doc](https://github.com/alan-et/alanpoi/alanpoi-document/alanpoi-common/apidocx/index.html)更加升入了解它！
 
 ## Event事件
 (参照JQuery事件原理)

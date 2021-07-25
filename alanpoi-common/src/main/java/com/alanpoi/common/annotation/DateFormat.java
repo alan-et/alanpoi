@@ -12,5 +12,5 @@ import java.lang.annotation.*;
 @Target({ElementType.FIELD,ElementType.TYPE})
 @Documented
 public @interface DateFormat {
-    String value() default "YYYY/MM/dd";
+    String value() default "yyyy/MM/dd";
 }
