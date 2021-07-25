@@ -10,7 +10,7 @@
 ```
 
 ## Api document
-通过 [Api doc](https://alanpoi.com:8160/index.html)更加升入了解它！
+通过 [Api doc](https://alanpoi.com:8160/index.html) 更加深入了解它！
 
 ## Event事件
 (参照JQuery事件原理)
