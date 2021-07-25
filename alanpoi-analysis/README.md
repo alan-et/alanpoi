@@ -16,7 +16,7 @@
 # 功能介绍
 
 ## Api document
-通过 [Api doc](https://alanpoi.com:8162/index.html)更加升入了解它！
+通过 [Api doc](https://alanpoi.com:8162/index.html) 更加深入了解它！
 
 
 ## 一. IMPORT
