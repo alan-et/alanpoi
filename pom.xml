@@ -34,7 +34,7 @@
         <lombok.version>1.18.12</lombok.version>
         <redis.version>3.1.0</redis.version>
         <apache.poi.version>4.1.2</apache.poi.version>
-        <netty.version>4.1.9.Final</netty.version>
+        <netty.version>4.1.42.Final</netty.version>
         <es.client.version>7.9.3</es.client.version>
         <elasticsearch.version>7.9.3</elasticsearch.version>
         <httpclient.versoin>4.5.13</httpclient.versoin>
