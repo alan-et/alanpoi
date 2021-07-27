@@ -29,12 +29,12 @@
         <alanpoi-es.version>1.0.0</alanpoi-es.version>
         <java.version>1.8</java.version>
         <springboot.version>2.2.5.RELEASE</springboot.version>
-        <fastjson.version>1.2.9</fastjson.version>
+        <fastjson.version>1.2.25</fastjson.version>
         <commons-lang3.version>3.7</commons-lang3.version>
         <lombok.version>1.18.12</lombok.version>
         <redis.version>3.1.0</redis.version>
         <apache.poi.version>4.1.2</apache.poi.version>
-        <netty.version>4.1.9.Final</netty.version>
+        <netty.version>4.1.42.Final</netty.version>
         <es.client.version>7.9.3</es.client.version>
         <elasticsearch.version>7.9.3</elasticsearch.version>
         <httpclient.versoin>4.5.13</httpclient.versoin>

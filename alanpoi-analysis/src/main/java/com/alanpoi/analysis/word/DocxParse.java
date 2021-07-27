@@ -1,6 +1,7 @@
 package com.alanpoi.analysis.word;
 
 import com.alanpoi.common.exception.AlanPoiException;
+import com.alanpoi.common.util.CloseUtils;
 import com.alanpoi.common.util.FileUtils;
 import com.alanpoi.common.util.ID;
 import com.alanpoi.common.util.StringUtils;
@@ -34,31 +35,18 @@ public class DocxParse extends WordParse {
 
     }
 
-    public void close(Closeable closeable) throws IOException {
-        if (null != closeable) {
-            try {
-                if (closeable instanceof OutputStream) {
-                    ((OutputStream) closeable).flush();
-                }
-                closeable.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     @Override
     public IWordWorkbook createDoc(String templatePath, Map<String, Object> dataMap) throws IOException {
         return createDoc(templatePath, dataMap, null);
     }
 
     public IWordWorkbook createDoc(String zipTemplatePath, Map<String, Object> dataMap, List<Media> mediaList) throws IOException {
-        String zipPath = getTmpDir() + ID.getId().next() + ".zip";
+        String zipPath = FileUtils.getTmpDir() + ID.getId().next() + ".zip";
         File file = new File(zipTemplatePath);
         if (!file.exists()) {
             //获取项目相对路径资源
             InputStream is = getClass().getClassLoader().getResourceAsStream(zipTemplatePath);
-            file = FileUtils.saveTempFile(is, "word", ".zip", getTmpDir());
+            file = FileUtils.saveTempFile(is, "word", ".zip", FileUtils.getTmpDir());
         }
         dataAddMedia(dataMap, mediaList);
         ZipFile origin_zf = null;
@@ -89,7 +77,7 @@ public class DocxParse extends WordParse {
                 if (entryName.endsWith(DOCUMENT_PATH)) {
                     //获取原始压缩文件 文档文件
                     origin_docIs = origin_zf.getInputStream(originZi);
-                    documentFtl = FileUtils.saveTempFile(origin_docIs, "document", ".ftl", getTmpDir() + "template");
+                    documentFtl = FileUtils.saveTempFile(origin_docIs, "document", ".ftl", FileUtils.getTmpDir() + "template");
                     //获取文档模版
                     Template docTemplate = createTemplate(documentFtl.getParent(), documentFtl.getName(), true);
                     //模版填充
@@ -102,7 +90,7 @@ public class DocxParse extends WordParse {
                 } else if (entryName.endsWith(DOCUMENT_REL_PATH)) {
                     //获取原始压缩文件 文档关系文件
                     origin_docRelIs = origin_zf.getInputStream(originZi);
-                    documentRelFtl = FileUtils.saveTempFile(origin_docRelIs, "d-rel", ".ftl", getTmpDir() + "template");
+                    documentRelFtl = FileUtils.saveTempFile(origin_docRelIs, "d-rel", ".ftl", FileUtils.getTmpDir() + "template");
                     //获取文档关系模版
                     Template docRelTemplate = createTemplate(documentRelFtl.getParent(), documentRelFtl.getName(), true);
                     //模版填充
@@ -126,17 +114,15 @@ public class DocxParse extends WordParse {
         } catch (TemplateException templateException) {
             throw new AlanPoiException(templateException.toString());
         } catch (IOException ioException) {
-            throw new IOException(ioException);
+            throw ioException;
         } finally {
-            close(origin_zf);
-            close(origin_docIs);
-            close(origin_docRelIs);
-            close(origin_docIs);
-            close(origin_docRelIs);
-            close(docIs);
-            close(docRelIs);
-            close(zipInputStream);
-            close(zipOutputStream);
+            CloseUtils.close(origin_zf);
+            CloseUtils.close(origin_docIs);
+            CloseUtils.close(origin_docRelIs);
+            CloseUtils.close(docIs);
+            CloseUtils.close(docRelIs);
+            CloseUtils.close(zipInputStream);
+            CloseUtils.close(zipOutputStream);
             FileUtils.deleteTempFile(documentFtl);
             FileUtils.deleteTempFile(documentRelFtl);
         }

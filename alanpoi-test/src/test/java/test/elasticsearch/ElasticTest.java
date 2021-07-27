@@ -1,8 +1,8 @@
 package test.elasticsearch;
 
-import com.alanpoi.common.esclient.BatchRequest;
-import com.alanpoi.common.esclient.ESClientApi;
-import com.alanpoi.common.esclient.ESOpType;
+import com.alanpoi.elasticsearch.ESOpType;
+import com.alanpoi.elasticsearch.client.BatchRequest;
+import com.alanpoi.elasticsearch.client.ESClientApi;
 import com.alanpoi.test.Application;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
