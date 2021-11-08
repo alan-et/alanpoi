@@ -48,9 +48,9 @@ public class DocParse extends WordParse {
      * @throws IOException
      */
     public File generateFtl(List<WordEntity> entityList) throws IOException {
-        String h = new String(Base64.getDecoder().decode(PdfConfig.getH()));
-        String f1 = new String(Base64.getDecoder().decode(PdfConfig.getF1()));
-        String f2 = new String(Base64.getDecoder().decode(PdfConfig.getF2()));
+        String h = new String(Base64.getDecoder().decode(WordConfig.getH()));
+        String f1 = new String(Base64.getDecoder().decode(WordConfig.getF1()));
+        String f2 = new String(Base64.getDecoder().decode(WordConfig.getF2()));
         String body = null;
         if (entityList != null && entityList.size() > 0) {
             entityList.sort(Comparator.comparing(e -> e.getIndex()));

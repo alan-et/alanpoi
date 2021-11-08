@@ -47,6 +47,8 @@ public class PdfConvert extends AbstractParse {
 
     private ITextFontResolver _fontResolver;
 
+    private String tmpPath;
+
 
     private static final String CONTENT_PATH = "pdf/content.ftl";
     private static final String COVER_PATH = "pdf/cover.ftl";
@@ -60,6 +62,7 @@ public class PdfConvert extends AbstractParse {
                 //获取项目相对路径资源
                 InputStream is = getClass().getClassLoader().getResourceAsStream(templatePath);
                 file = FileUtils.saveTempFile(is, "pdf", ".zip", FileUtils.getTmpDir());
+                tmpPath = file.getPath();
             }
             loadZip(file, templateParam);
         } else {
@@ -69,6 +72,7 @@ public class PdfConvert extends AbstractParse {
             Template template = createTemplate(parentPath, fileName, false);
             StringWriter writer = new StringWriter();
             template.process(templateParam, writer);
+            content = writer.toString();
         }
     }
 
@@ -80,6 +84,7 @@ public class PdfConvert extends AbstractParse {
             return;
         } else {
             File file = FileUtils.saveTempFile(templateIs, "pdf", ".ftl", FileUtils.getTmpDir() + "template");
+            tmpPath = file.getPath();
             Template template = createTemplate(file.getParent(), file.getName(), true);
             StringWriter writer = new StringWriter();
             template.process(templateParam, writer);
@@ -150,7 +155,7 @@ public class PdfConvert extends AbstractParse {
                     InputStream water_is = origin_zf.getInputStream(originZi);
                     File waterFile = FileUtils.saveTempFile(water_is, "pdf-cover", ".ftl", FileUtils.getTmpDir() + "template");
                     waterUrl = waterFile.getAbsolutePath();
-                    FileUtils.deleteTempFileOnExit(waterFile);
+//                    FileUtils.deleteTempFileOnExit(waterFile);
                 }
             }
         } catch (TemplateException templateException) {
@@ -205,6 +210,16 @@ public class PdfConvert extends AbstractParse {
             _renderer.finishPDF();
         } finally {
             outputStream.close();
+            File tmp = new File(tmpPath);
+            if (tmp.exists()) {
+                tmp.delete();
+            }
+            if (StringUtils.isNotBlank(waterUrl)) {
+                File waterTmp = new File(waterUrl);
+                if (waterTmp.exists()) {
+                    waterTmp.delete();
+                }
+            }
         }
     }
 

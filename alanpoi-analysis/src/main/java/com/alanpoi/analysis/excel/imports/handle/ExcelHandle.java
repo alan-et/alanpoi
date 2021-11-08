@@ -1,6 +1,7 @@
 package com.alanpoi.analysis.excel.imports.handle;
 
 import com.alanpoi.analysis.common.ExecutorTools;
+import com.alanpoi.analysis.excel.exports.handle.ExportHandle;
 import com.alanpoi.common.enums.ResponseEnum;
 import com.alanpoi.common.util.ApplicationUtil;
 import com.alanpoi.analysis.excel.imports.*;
@@ -8,10 +9,10 @@ import com.alanpoi.common.util.NetworkUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.CollectionUtils;
@@ -34,8 +35,9 @@ import java.util.stream.Collectors;
  * @author zhuoxun.peng
  * @since 2020-2-26
  */
-@Slf4j
 public class ExcelHandle {
+    protected static final Logger log = LoggerFactory.getLogger(ExportHandle.class);
+
     public ExcelWorkbookManage excelWorkbookManage;
 
     public ExecutorTools executorTools;
