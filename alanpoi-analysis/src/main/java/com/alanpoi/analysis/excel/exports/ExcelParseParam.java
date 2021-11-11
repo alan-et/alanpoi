@@ -75,7 +75,6 @@ public class ExcelParseParam {
             cellStyle.setFillForegroundColor((short) this.color);
             cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         }
-        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
         this.cellStyle = cellStyle;
     }
 

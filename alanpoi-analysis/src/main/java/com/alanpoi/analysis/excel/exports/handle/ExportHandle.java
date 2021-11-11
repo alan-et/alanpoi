@@ -165,6 +165,8 @@ public class ExportHandle {
                 }
                 CellStyle style = workbook.createCellStyle();
                 style.setAlignment(excelColumn.align().val);
+                style.setVerticalAlignment(excelColumn.vertical().val);
+                style.setWrapText(excelColumn.wrapText());
                 excelParseParam.setDataType(excelColumn.type());
                 excelParseParam.setHeight(excelColumn.height());
                 excelParseParam.setColor(excelColumn.color().index);
