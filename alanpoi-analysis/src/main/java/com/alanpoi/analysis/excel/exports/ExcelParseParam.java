@@ -1,8 +1,11 @@
 package com.alanpoi.analysis.excel.exports;
 
 import com.alanpoi.analysis.common.enums.AlanColor;
+import com.alanpoi.analysis.common.enums.DataType;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 
 import java.lang.reflect.Method;
 import java.util.Set;
@@ -37,6 +40,8 @@ public class ExcelParseParam {
 
     private Set<String> specifyCol;
 
+    private DataType dataType;
+
     public Integer getIndex() {
         return index;
     }
@@ -70,6 +75,7 @@ public class ExcelParseParam {
             cellStyle.setFillForegroundColor((short) this.color);
             cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         }
+        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
         this.cellStyle = cellStyle;
     }
 
@@ -127,5 +133,13 @@ public class ExcelParseParam {
 
     public void setSpecifyCol(Set<String> specifyCol) {
         this.specifyCol = specifyCol;
+    }
+
+    public DataType getDataType() {
+        return dataType;
+    }
+
+    public void setDataType(DataType dataType) {
+        this.dataType = dataType;
     }
 }

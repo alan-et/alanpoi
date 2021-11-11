@@ -9,10 +9,11 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.sql.Date;
 import java.util.*;
 
@@ -24,6 +25,12 @@ class AnalysisTest {
         try {
             List<ExportVO> list = new ArrayList<>();
             List<Export2VO> list2 = new ArrayList<>();
+            BufferedImage bufferImg;
+            ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
+
+            bufferImg = ImageIO.read(new File("C:\\Users\\86186\\Downloads\\图片1.png"));
+
+            ImageIO.write(bufferImg, "png", byteArrayOut);
             for (int i = 0; i < 500; i++) {
                 ExportVO exportVO = new ExportVO();
                 exportVO.setName("name" + i);
@@ -40,6 +47,8 @@ class AnalysisTest {
                 export2VO.setAmount(new BigDecimal(6666.666 + i * 10));
                 export2VO.setDate(new Date(132324343 + i * 100));
                 export2VO.setDateTime(new java.util.Date());
+                export2VO.setImage("https://t7.baidu.com/it/u=1569919947,316169633&fm=218&app=92&f=PNG?w=121&h=75&s=6ED4EC1A07384D8A0654DCDE03007031");
+                export2VO.setImage2(byteArrayOut.toByteArray());
                 list2.add(export2VO);
             }
 //            Workbook workbook = ExcelExportUtil.getWorkbook(list, ExportVO.class);

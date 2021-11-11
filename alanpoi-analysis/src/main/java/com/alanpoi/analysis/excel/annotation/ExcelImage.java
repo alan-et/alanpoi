@@ -1,8 +1,6 @@
 package com.alanpoi.analysis.excel.annotation;
 
 import com.alanpoi.analysis.common.enums.AlanColor;
-import com.alanpoi.analysis.common.enums.Align;
-import com.alanpoi.analysis.common.enums.DataType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,14 +8,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Excel Column annotation
+ * Excel Image annotation
  *
  * @author zhuoxun.peng
  * @since 2020-3-17
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
-public @interface ExcelColumn {
+public @interface ExcelImage {
     String name() default "";
 
     String index() default "";
@@ -28,11 +26,7 @@ public @interface ExcelColumn {
 
     int width() default 30;
 
-    Align align() default Align.LEFT;
-
     String link() default "";
-
-    DataType type() default DataType.TEXT;
 
     AlanColor color() default AlanColor.NONE;
 }
