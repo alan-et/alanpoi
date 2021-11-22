@@ -240,9 +240,10 @@ public class ExportHandle {
                     excelParseParam.getCellStyle().setFont(font);
                 }
                 if (excelParseParam.getDataType() == DataType.IMAGE) {
-                    if (drawingImage(workbook, sheet, cell, value)) {
-                        return;
+                    if (!drawingImage(workbook, sheet, cell, value)) {
+                        logger.warn("图片信息异常 sheet[{}] row-index[{}] cell-index[{}] value[{}]", sheet.getSheetName(), cell.getRowIndex(), cell.getColumnIndex(), value);
                     }
+                    return;
                 }
                 boolean isFormat = false;
                 if (StringUtils.isNotBlank(excelParseParam.getFormat())) {
