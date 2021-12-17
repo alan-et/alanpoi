@@ -68,6 +68,10 @@ public class ExcelExportUtil {
         return getWorkbookByMultiSheet(ExcelType.EXCEL_2007, dataMap);
     }
 
+    public static Workbook getWorkbookByMultiSheet(Map<Class<?>, Collection<?>> dataMap, Map<Integer, List<String>> specifyCol) {
+        return getWorkbookMulti(WorkbookManager.newWorkbook(ExcelType.EXCEL_2007, dataMap.keySet()), dataMap, specifyCol);
+    }
+
     private static Workbook getWorkbook(Workbook workbook, Collection<?> singleSheetData, Class<?> c) {
         ExportHandle exportHandle = ApplicationUtil.getBean(ExportHandle.class);
         return exportHandle.exportData(workbook, singleSheetData, c);
