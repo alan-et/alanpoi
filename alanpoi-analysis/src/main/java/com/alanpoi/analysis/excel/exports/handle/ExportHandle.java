@@ -56,21 +56,29 @@ public class ExportHandle {
         return workbook;
     }
 
-    public Workbook exportMultipleSheet(Workbook workbook, Map<Class<?>, Collection<?>> dataMap) {
+    public Workbook exportMultipleSheet(Workbook workbook, Map<?, Collection<?>> dataMap) {
         return exportMultipleSheet(workbook, dataMap, new HashMap<>());
     }
 
-    public Workbook exportMultipleSheet(Workbook workbook, Map<Class<?>, Collection<?>> dataMap, Map<Integer, List<String>> specifyCol) {
+    public Workbook exportMultipleSheet(Workbook workbook, Map<?, Collection<?>> dataMap, Map<Integer, List<String>> specifyCol) {
         try {
             getWorkVersion(workbook);
             int sheetAt = 0;
-            for (Class<?> c : dataMap.keySet()) {
-                Collection<?> collection = dataMap.get(c);
-                ExcelSheet excelSheet = c.getAnnotation(ExcelSheet.class);
-                if (excelSheet != null)
-                    loadSheet(workbook, collection, c, sheetAt, specifyCol.get(excelSheet.index()));
-                else
-                    loadSheet(workbook, collection, c, sheetAt, specifyCol.get(sheetAt));
+            int preSheetAt = -1;
+            for (Object key : dataMap.keySet()) {
+                Collection<?> collection = dataMap.get(key);
+                Object c = collection.stream().findFirst().get();
+                ExcelSheet excelSheet = c.getClass().getAnnotation(ExcelSheet.class);
+                if (excelSheet != null) {
+                    if (preSheetAt == excelSheet.index()) {
+                        preSheetAt = excelSheet.index() + 1;
+                    } else {
+                        preSheetAt = excelSheet.index();
+                    }
+                    loadSheet(workbook, collection, c.getClass(), key, sheetAt, specifyCol.get(preSheetAt));
+                } else {
+                    loadSheet(workbook, collection, c.getClass(), key, sheetAt, specifyCol.get(sheetAt));
+                }
                 sheetAt++;
             }
         } catch (Exception e) {
@@ -89,6 +97,10 @@ public class ExportHandle {
     }
 
     private void loadSheet(Workbook workbook, Collection<?> data, Class<?> c, final int sheetAt, List<String> specifyCol) {
+        loadSheet(workbook, data, c, null, sheetAt, specifyCol);
+    }
+
+    private void loadSheet(Workbook workbook, Collection<?> data, Class<?> c, Object key, final int sheetAt, List<String> specifyCol) {
         CellStyle headStyle = workbook.createCellStyle();
         headStyle.setWrapText(true);
         ReflectorManager reflectorManager = ReflectorManager.fromCache(c);
@@ -97,24 +109,27 @@ public class ExportHandle {
         Sheet sheet = null;
         Row headRow = null;
         if (excelSheet != null) {
-
-            sheet = workbook.getSheetAt(excelSheet.index());
-            workbook.setSheetName(excelSheet.index(), excelSheet.name());
-
-            headRow = sheet.createRow(rowInd);
-            headRow.setHeightInPoints(excelSheet.rowHeight());
-            Font font = workbook.createFont();
-            font.setFontName(excelSheet.font());
-            font.setFontHeightInPoints((short) excelSheet.fontSize());//设置字体大小
-            headStyle.setFont(font);
-            headStyle.setAlignment(HorizontalAlignment.CENTER);
-            headStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-            headStyle.setFillForegroundColor(excelSheet.backColor().index);
-            headStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            sheet = workbook.getSheetAt(sheetAt);
+            if (StringUtils.isBlank(excelSheet.name())) {
+                workbook.setSheetName(sheetAt, (String) key);
+            } else {
+                workbook.setSheetName(sheetAt, excelSheet.name());
+            }
         } else {
             sheet = workbook.getSheetAt(sheetAt);
             logger.warn("请在导出类上加上注解，以便导出文件更加完整");
         }
+        headRow = sheet.createRow(rowInd);
+        headRow.setHeightInPoints(excelSheet.rowHeight());
+        Font font = workbook.createFont();
+        font.setFontName(excelSheet.font());
+        font.setFontHeightInPoints((short) excelSheet.fontSize());//设置字体大小
+        headStyle.setFont(font);
+        headStyle.setAlignment(HorizontalAlignment.CENTER);
+        headStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        headStyle.setFillForegroundColor(excelSheet.backColor().index);
+        headStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
         List<Field> fields = reflectorManager.getFieldList();
         int fieldLength = fields.size();
         int cellNum = 0;
@@ -232,12 +247,14 @@ public class ExportHandle {
                     String link = excelParseParam.getSourceLink();
                     if (null != excelParseParam.getLinkMethod())
                         link = (String) excelParseParam.getLinkMethod().invoke(object);
-                    hyperlink.setAddress(StringUtils.replace(excelParseParam.getSourceLink(), link, Placeholder.TYPE0));
-                    cell.setHyperlink(hyperlink);
-                    Font font = workbook.createFont();
-                    font.setUnderline((byte) 1);
-                    font.setColor(AlanColor.BLUE.index);
-                    excelParseParam.getCellStyle().setFont(font);
+                    if(StringUtils.isNotBlank(link)){
+                        hyperlink.setAddress(StringUtils.replace(excelParseParam.getSourceLink(), link, Placeholder.TYPE0));
+                        cell.setHyperlink(hyperlink);
+                        Font font = workbook.createFont();
+                        font.setUnderline((byte) 1);
+                        font.setColor(AlanColor.BLUE.index);
+                        excelParseParam.getCellStyle().setFont(font);
+                    }
                 }
                 if (excelParseParam.getDataType() == DataType.IMAGE) {
                     if (!drawingImage(workbook, sheet, cell, value)) {
