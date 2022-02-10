@@ -300,8 +300,8 @@ public class ExportHandle {
             ClientAnchor anchor;
             if (is2007) {
                 anchor = new XSSFClientAnchor(
-                        0,
-                        0,
+                        30000,
+                        30000,
                         0,
                         0,
                         cell.getColumnIndex(),
@@ -311,8 +311,8 @@ public class ExportHandle {
                 );
             } else {
                 anchor = new HSSFClientAnchor(
-                        0,
-                        0,
+                        30000,
+                        30000,
                         0,
                         0,
                         (short) cell.getColumnIndex(),
