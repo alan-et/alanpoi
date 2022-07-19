@@ -59,7 +59,6 @@ public class ExportHandle {
 
     @Deprecated
     public Workbook exportMultipleSheet(Workbook workbook, Map<Class<?>, Collection<?>> dataMap) {
-    public Workbook exportMultipleSheet(Workbook workbook, Map<?, Collection<?>> dataMap) {
         return exportMultipleSheet(workbook, dataMap, new HashMap<>());
     }
 
@@ -68,21 +67,6 @@ public class ExportHandle {
         try {
             getWorkVersion(workbook);
             int sheetAt = 0;
-            int preSheetAt = -1;
-            for (Object key : dataMap.keySet()) {
-                Collection<?> collection = dataMap.get(key);
-                Object c = collection.stream().findFirst().get();
-                ExcelSheet excelSheet = c.getClass().getAnnotation(ExcelSheet.class);
-                if (excelSheet != null) {
-                    if (preSheetAt == excelSheet.index()) {
-                        preSheetAt = excelSheet.index() + 1;
-                    } else {
-                        preSheetAt = excelSheet.index();
-                    }
-                    loadSheet(workbook, collection, c.getClass(), key, sheetAt, specifyCol.get(preSheetAt));
-                } else {
-                    loadSheet(workbook, collection, c.getClass(), key, sheetAt, specifyCol.get(sheetAt));
-                }
             for (Class<?> c : dataMap.keySet()) {
                 Collection<?> collection = dataMap.get(c);
                 ExcelSheet excelSheet = c.getAnnotation(ExcelSheet.class);

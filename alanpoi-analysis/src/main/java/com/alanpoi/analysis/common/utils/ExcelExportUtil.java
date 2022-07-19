@@ -60,16 +60,16 @@ public class ExcelExportUtil {
      * @param dataMap
      * @return Workbook
      */
-    public static Workbook getWorkbookByMultiSheet(ExcelType excelType, Map<?, Collection<?>> dataMap) {
+    public static Workbook getWorkbookByMultiSheet(ExcelType excelType, Map<Class<?>, Collection<?>> dataMap) {
         ExportHandle exportHandle = ApplicationUtil.getBean(ExportHandle.class);
         return exportHandle.exportMultipleSheet(WorkbookManager.newWorkbook(excelType, dataMap.keySet()), dataMap);
     }
 
-    public static Workbook getWorkbookByMultiSheet(Map<?, Collection<?>> dataMap) {
+    public static Workbook getWorkbookByMultiSheet(Map<Class<?>, Collection<?>> dataMap) {
         return getWorkbookByMultiSheet(ExcelType.EXCEL_2007, dataMap);
     }
 
-    public static Workbook getWorkbookByMultiSheet(Map<?, Collection<?>> dataMap, Map<Integer, List<String>> specifyCol) {
+    public static Workbook getWorkbookByMultiSheet(Map<Class<?>, Collection<?>> dataMap, Map<Integer, List<String>> specifyCol) {
         return getWorkbookMulti(WorkbookManager.newWorkbook(ExcelType.EXCEL_2007, dataMap.keySet()), dataMap, specifyCol);
     }
 
@@ -92,7 +92,7 @@ public class ExcelExportUtil {
         return exportHandle.exportData(workbook, singleSheetData, c, specifyCol);
     }
 
-    private static Workbook getWorkbookMulti(Workbook workbook, Map<?, Collection<?>> dataMap, Map<Integer, List<String>> specifyCol) {
+    private static Workbook getWorkbookMulti(Workbook workbook, Map<Class<?>, Collection<?>> dataMap, Map<Integer, List<String>> specifyCol) {
         ExportHandle exportHandle = ApplicationUtil.getBean(ExportHandle.class);
         return exportHandle.exportMultipleSheet(workbook, dataMap, specifyCol);
     }
