@@ -79,8 +79,8 @@ public class ID {
     }
 
     public long next() {
-        getVersion();
-        return getTimestamp() | version | (serverId | 0L);
+
+        return getTimestamp() | getVersion() | (serverId | 0L);
     }
 
     public static ID getId() {
@@ -96,7 +96,7 @@ public class ID {
     }
 
     private long getVersion() {
-        version = atomicInt.incrementAndGet();
+        long version = atomicInt.incrementAndGet();
         if (version == 0x3fff) atomicInt = new AtomicInteger(0);
         if (version == 1 && modCount > 0) {
             modCount++;
@@ -111,11 +111,11 @@ public class ID {
                 } catch (InterruptedException e) {
                     logger.error("", e);
                 }
-                return version = (version | 0L) << 7;
+                return this.version = (version | 0L) << 7;
             }
         } else {
             modCount++;
-            return version = (version | 0L) << 7;
+            return this.version = (version | 0L) << 7;
         }
     }
 

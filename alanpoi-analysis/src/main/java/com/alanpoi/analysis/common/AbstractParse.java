@@ -31,6 +31,10 @@ public abstract class AbstractParse {
         //设置异常处理器
         configure.setTemplateExceptionHandler(TemplateExceptionHandler.IGNORE_HANDLER);
         //定义Template对象,注意模板类型名字与downloadType要一致
-        return configure.getTemplate(fileName);  //文件名调用的时候可更换
+        Template template = configure.getTemplate(fileName);  //文件名调用的时候可更换
+        template.setDateTimeFormat("yyyy-MM-dd HH:mm:ss");
+        template.setDateFormat("yyyy-MM-dd");
+        template.setTimeFormat("HH:mm:ss");
+        return template;
     }
 }

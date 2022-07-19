@@ -59,6 +59,7 @@ public class ExportHandle {
 
     @Deprecated
     public Workbook exportMultipleSheet(Workbook workbook, Map<Class<?>, Collection<?>> dataMap) {
+    public Workbook exportMultipleSheet(Workbook workbook, Map<?, Collection<?>> dataMap) {
         return exportMultipleSheet(workbook, dataMap, new HashMap<>());
     }
 
@@ -67,6 +68,21 @@ public class ExportHandle {
         try {
             getWorkVersion(workbook);
             int sheetAt = 0;
+            int preSheetAt = -1;
+            for (Object key : dataMap.keySet()) {
+                Collection<?> collection = dataMap.get(key);
+                Object c = collection.stream().findFirst().get();
+                ExcelSheet excelSheet = c.getClass().getAnnotation(ExcelSheet.class);
+                if (excelSheet != null) {
+                    if (preSheetAt == excelSheet.index()) {
+                        preSheetAt = excelSheet.index() + 1;
+                    } else {
+                        preSheetAt = excelSheet.index();
+                    }
+                    loadSheet(workbook, collection, c.getClass(), key, sheetAt, specifyCol.get(preSheetAt));
+                } else {
+                    loadSheet(workbook, collection, c.getClass(), key, sheetAt, specifyCol.get(sheetAt));
+                }
             for (Class<?> c : dataMap.keySet()) {
                 Collection<?> collection = dataMap.get(c);
                 ExcelSheet excelSheet = c.getAnnotation(ExcelSheet.class);
@@ -271,12 +287,14 @@ public class ExportHandle {
                     String link = excelParseParam.getSourceLink();
                     if (null != excelParseParam.getLinkMethod())
                         link = (String) excelParseParam.getLinkMethod().invoke(object);
-                    hyperlink.setAddress(StringUtils.replace(excelParseParam.getSourceLink(), link, Placeholder.TYPE0));
-                    cell.setHyperlink(hyperlink);
-                    Font font = workbook.createFont();
-                    font.setUnderline((byte) 1);
-                    font.setColor(AlanColor.BLUE.index);
-                    excelParseParam.getCellStyle().setFont(font);
+                    if(StringUtils.isNotBlank(link)){
+                        hyperlink.setAddress(StringUtils.replace(excelParseParam.getSourceLink(), link, Placeholder.TYPE0));
+                        cell.setHyperlink(hyperlink);
+                        Font font = workbook.createFont();
+                        font.setUnderline((byte) 1);
+                        font.setColor(AlanColor.BLUE.index);
+                        excelParseParam.getCellStyle().setFont(font);
+                    }
                 }
                 if (excelParseParam.getDataType() == DataType.IMAGE) {
                     if (!drawingImage(workbook, sheet, cell, value)) {
@@ -322,8 +340,8 @@ public class ExportHandle {
             ClientAnchor anchor;
             if (is2007) {
                 anchor = new XSSFClientAnchor(
-                        0,
-                        0,
+                        30000,
+                        30000,
                         0,
                         0,
                         cell.getColumnIndex(),
@@ -333,8 +351,8 @@ public class ExportHandle {
                 );
             } else {
                 anchor = new HSSFClientAnchor(
-                        0,
-                        0,
+                        30000,
+                        30000,
                         0,
                         0,
                         (short) cell.getColumnIndex(),
