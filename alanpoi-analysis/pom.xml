@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.alanpoi</groupId>
         <artifactId>alan-poi</artifactId>
-        <version>1.3.5</version>
+        <version>1.3.6</version>
     </parent>
     <groupId>com.alanpoi</groupId>
     <artifactId>alanpoi-analysis</artifactId>
@@ -84,6 +84,10 @@
                 <exclusion>
                     <groupId>com.sun.media</groupId>
                     <artifactId>jai-codec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

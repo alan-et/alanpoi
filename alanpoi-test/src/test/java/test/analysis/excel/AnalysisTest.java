@@ -1,19 +1,18 @@
 package test.analysis.excel;
 
-import com.alanpoi.analysis.excel.utils.ExcelExportUtil;
-import com.alanpoi.common.util.HttpUtils;
+import com.alanpoi.analysis.common.ExportMultipleSheetParam;
+import com.alanpoi.analysis.common.utils.ExcelExportUtil;
 import com.alanpoi.test.Application;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
+import com.fasterxml.jackson.databind.util.BeanUtil;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.BeanUtils;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigDecimal;
-import java.net.URL;
 import java.sql.Date;
 import java.util.*;
 
@@ -28,13 +27,12 @@ class AnalysisTest {
             BufferedImage bufferImg;
             ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
 
-            bufferImg = ImageIO.read(new File("C:\\Users\\86186\\Downloads\\图片1.png"));
+            bufferImg = ImageIO.read(new File("/Users/pengzhuoxun/Downloads/image1.png"));
 
             ImageIO.write(bufferImg, "png", byteArrayOut);
             for (int i = 0; i < 500; i++) {
                 ExportVO exportVO = new ExportVO();
                 exportVO.setName("name" + i);
-//                exportVO.setValue(new BigDecimal(1111181.11 + i * 0.09));
                 exportVO.setValue("113343434343898888");
                 exportVO.setAmount(new BigDecimal(6666.666 + i * 10));
                 exportVO.setDate(new Date(132324343 + i * 100));
@@ -52,10 +50,10 @@ class AnalysisTest {
                 list2.add(export2VO);
             }
 //            Workbook workbook = ExcelExportUtil.getWorkbook(list, ExportVO.class);
-            Map<Class<?>, Collection<?>> map = new HashMap<>();
-            map.put(ExportVO.class, list);
-            map.put(Export2VO.class, list2);
-            Workbook workbook = ExcelExportUtil.getWorkbookByMultiSheet(map);
+            ExportMultipleSheetParam param=new ExportMultipleSheetParam();
+            param.put(1,"测试1",ExportVO.class,list);
+            param.put(0,"测试2",Export2VO.class,list2);
+            Workbook workbook = ExcelExportUtil.getByMultiSheet(param);
             OutputStream outputStream = new FileOutputStream("/tmp/test.xlsx");
             workbook.write(outputStream);
             workbook.close();
@@ -66,6 +64,8 @@ class AnalysisTest {
         } finally {
 
         }
+
+
     }
 
     @Test

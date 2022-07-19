@@ -10,7 +10,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@ExcelSheet(name = "测试问额", backColor = AlanColor.BLUE, font = "黑体", fontSize = 25)
+@ExcelSheet(name = "测试问额", backColor = AlanColor.BLUE, font = "黑体",fontSize = 25)
 @Data
 public class ExportVO {
     @ExcelColumn(name = "名称", width = 60)
@@ -29,6 +29,6 @@ public class ExportVO {
     private Date dateTime;
 
     @DateFormat
-    @ExcelColumn(name = "日期格式化")
+    @ExcelColumn(name = "日期格式化",isExist = false)
     private java.sql.Date date;
 }

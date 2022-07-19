@@ -12,7 +12,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@ExcelSheet(name = "测试2", backColor = AlanColor.YELLOW, font = "宋体", index = 1, fontSize = 25)
+@ExcelSheet(name = "测试2", backColor = AlanColor.YELLOW, font = "宋体", fontSize = 25)
 @Data
 public class Export2VO {
     @ExcelColumn(name = "名称", width = 32, height = 150, index = "0", align = Align.CENTER, link = "http://alanpoi.com/${value}")

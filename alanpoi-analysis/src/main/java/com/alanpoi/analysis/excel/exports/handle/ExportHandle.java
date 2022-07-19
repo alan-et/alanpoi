@@ -1,5 +1,6 @@
 package com.alanpoi.analysis.excel.exports.handle;
 
+import com.alanpoi.analysis.common.ExportMultipleSheetParam;
 import com.alanpoi.analysis.common.enums.AlanColor;
 import com.alanpoi.analysis.common.enums.DataType;
 import com.alanpoi.analysis.excel.annotation.ExcelColumn;
@@ -56,10 +57,12 @@ public class ExportHandle {
         return workbook;
     }
 
+    @Deprecated
     public Workbook exportMultipleSheet(Workbook workbook, Map<Class<?>, Collection<?>> dataMap) {
         return exportMultipleSheet(workbook, dataMap, new HashMap<>());
     }
 
+    @Deprecated
     public Workbook exportMultipleSheet(Workbook workbook, Map<Class<?>, Collection<?>> dataMap, Map<Integer, List<String>> specifyCol) {
         try {
             getWorkVersion(workbook);
@@ -68,9 +71,34 @@ public class ExportHandle {
                 Collection<?> collection = dataMap.get(c);
                 ExcelSheet excelSheet = c.getAnnotation(ExcelSheet.class);
                 if (excelSheet != null)
-                    loadSheet(workbook, collection, c, sheetAt, specifyCol.get(excelSheet.index()));
+                    loadSheet(workbook, collection, c, null, sheetAt, specifyCol.get(excelSheet.index()));
                 else
-                    loadSheet(workbook, collection, c, sheetAt, specifyCol.get(sheetAt));
+                    loadSheet(workbook, collection, c, null, sheetAt, specifyCol.get(sheetAt));
+                sheetAt++;
+            }
+        } catch (Exception e) {
+            logger.error("", e);
+            throw new AlanPoiException(e.getMessage());
+        }
+        return workbook;
+    }
+
+    public Workbook genMultipleSheet(Workbook workbook, ExportMultipleSheetParam param) {
+        try {
+            getWorkVersion(workbook);
+            int sheetAt = 0;
+            for (String sheet : param.getMap().keySet()) {
+                Collection<?> collection = param.getData(sheet);
+                Class<?> cls = param.getDataClass(sheet);
+                int index = param.getSheetIndex(sheet);
+                if (index == -1) {
+                    index = sheetAt;
+                }
+                ExcelSheet excelSheet = cls.getAnnotation(ExcelSheet.class);
+                if (excelSheet != null)
+                    loadSheet(workbook, collection, cls, sheet, index, param.getSpecifyCol(sheet).get(excelSheet.index()));
+                else
+                    loadSheet(workbook, collection, cls, sheet, index, param.getSpecifyCol(sheet).get(sheetAt));
                 sheetAt++;
             }
         } catch (Exception e) {
@@ -88,19 +116,30 @@ public class ExportHandle {
         }
     }
 
+
     private void loadSheet(Workbook workbook, Collection<?> data, Class<?> c, final int sheetAt, List<String> specifyCol) {
+        loadSheet(workbook, data, c, null, sheetAt, specifyCol);
+    }
+
+    private void loadSheet(Workbook workbook, Collection<?> data, Class<?> c, String sheetName, final int sheetAt, List<String> specifyCol) {
         CellStyle headStyle = workbook.createCellStyle();
         headStyle.setWrapText(true);
         ReflectorManager reflectorManager = ReflectorManager.fromCache(c);
         ExcelSheet excelSheet = c.getAnnotation(ExcelSheet.class);
+        if (StringUtils.isBlank(sheetName)) {
+            sheetName = excelSheet.name();
+        }
+        int sheetIndex = excelSheet.index();
+        //禁用自定义sheet页签位置，取系统生成的值
+        if (sheetIndex == -1) {
+            sheetIndex = sheetAt;
+        }
         int rowInd = 0;
         Sheet sheet = null;
         Row headRow = null;
         if (excelSheet != null) {
-
-            sheet = workbook.getSheetAt(excelSheet.index());
-            workbook.setSheetName(excelSheet.index(), excelSheet.name());
-
+            sheet = workbook.getSheetAt(sheetIndex);
+            workbook.setSheetName(sheetIndex, sheetName);
             headRow = sheet.createRow(rowInd);
             headRow.setHeightInPoints(excelSheet.rowHeight());
             Font font = workbook.createFont();
