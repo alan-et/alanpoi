@@ -1,8 +1,8 @@
 ## alanpoi
 
-[alanpoi-common(公共组件)](https://github.com/alan-et/alanpoi/blob/develop/alanpoi-common/README.md)
+[alanpoi-common(公共组件)](https://github.com/alan-et/alanpoi/blob/1.3.x/alanpoi-common/README.md)
 
-[alanpoi-analysis(解析服务)](https://github.com/alan-et/alanpoi/blob/develop/alanpoi-analysis/README.md)
+[alanpoi-analysis(解析服务)](https://github.com/alan-et/alanpoi/blob/1.3.x/alanpoi-analysis/README.md)
 
 
 
