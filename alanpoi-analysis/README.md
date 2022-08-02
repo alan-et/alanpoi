@@ -199,11 +199,15 @@ ExcelExportUtil.getWorkbook(Collection<?> singleSheetData, Class<?> c)<br>
         export2VO.setImage2(byteArrayOut.toByteArray());
         list2.add(export2VO);
     }
-    Map<Class<?>, Collection<?>> map = new HashMap<>();
-    map.put(ExportVO.class, list);
-    map.put(Export2VO.class, list2);
+    # Map<Class<?>, Collection<?>> map = new HashMap<>();
+    # map.put(ExportVO.class, list);
+    # map.put(Export2VO.class, list2);
     //调用获取workbook对象；也可以直接调用exportByMultiSheet方法导出到浏览器
-    Workbook workbook = ExcelExportUtil.getWorkbookByMultiSheet(map);
+    # Workbook workbook = ExcelExportUtil.getWorkbookByMultiSheet(map);
+    ExportMultipleSheetParam param = new ExportMultipleSheetParam();
+    param.put(0, "测试1", ExportVO.class, list);
+    param.put(1, "测试2", Export2VO.class, list2);
+    Workbook workbook = ExcelExportUtil.getByMultiSheet(param);
 ```
 
 # Word
