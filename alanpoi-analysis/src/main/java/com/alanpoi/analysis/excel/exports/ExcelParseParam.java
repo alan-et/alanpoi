@@ -42,6 +42,14 @@ public class ExcelParseParam {
 
     private DataType dataType;
 
+    /**
+     * 自动合并
+     *
+     * @since 1.3.7
+     */
+    private boolean autoMerge;
+
+
     public Integer getIndex() {
         return index;
     }
@@ -140,5 +148,13 @@ public class ExcelParseParam {
 
     public void setDataType(DataType dataType) {
         this.dataType = dataType;
+    }
+
+    public boolean isAutoMerge() {
+        return autoMerge;
+    }
+
+    public void setAutoMerge(boolean autoMerge) {
+        this.autoMerge = autoMerge;
     }
 }

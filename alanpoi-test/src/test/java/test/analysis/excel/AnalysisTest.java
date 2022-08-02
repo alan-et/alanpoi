@@ -32,7 +32,11 @@ class AnalysisTest {
             ImageIO.write(bufferImg, "png", byteArrayOut);
             for (int i = 0; i < 500; i++) {
                 ExportVO exportVO = new ExportVO();
-                exportVO.setName("name" + i);
+                if ((i > 100 && i < 103) || (i > 108 && i < 111)) {
+                    exportVO.setName("name");
+                } else {
+                    exportVO.setName("name" + i);
+                }
                 exportVO.setValue("113343434343898888");
                 exportVO.setAmount(new BigDecimal(6666.666 + i * 10));
                 exportVO.setDate(new Date(132324343 + i * 100));
@@ -45,14 +49,14 @@ class AnalysisTest {
                 export2VO.setAmount(new BigDecimal(6666.666 + i * 10));
                 export2VO.setDate(new Date(132324343 + i * 100));
                 export2VO.setDateTime(new java.util.Date());
-                export2VO.setImage("https://t7.baidu.com/it/u=1569919947,316169633&fm=218&app=92&f=PNG?w=121&h=75&s=6ED4EC1A07384D8A0654DCDE03007031");
-                export2VO.setImage2(byteArrayOut.toByteArray());
+//                export2VO.setImage("https://t7.baidu.com/it/u=1569919947,316169633&fm=218&app=92&f=PNG?w=121&h=75&s=6ED4EC1A07384D8A0654DCDE03007031");
+//                export2VO.setImage2(byteArrayOut.toByteArray());
                 list2.add(export2VO);
             }
 //            Workbook workbook = ExcelExportUtil.getWorkbook(list, ExportVO.class);
-            ExportMultipleSheetParam param=new ExportMultipleSheetParam();
-            param.put(1,"测试1",ExportVO.class,list);
-            param.put(0,"测试2",Export2VO.class,list2);
+            ExportMultipleSheetParam param = new ExportMultipleSheetParam();
+            param.put(0, "测试1", ExportVO.class, list);
+            param.put(1, "测试2", Export2VO.class, list2);
             Workbook workbook = ExcelExportUtil.getByMultiSheet(param);
             OutputStream outputStream = new FileOutputStream("/tmp/test.xlsx");
             workbook.write(outputStream);

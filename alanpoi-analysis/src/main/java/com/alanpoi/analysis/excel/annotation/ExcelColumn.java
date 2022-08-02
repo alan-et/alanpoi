@@ -45,6 +45,7 @@ public @interface ExcelColumn {
 
     /**
      * 垂直布局
+     *
      * @return
      */
     VertAlign vertical() default VertAlign.CENTER;
@@ -54,4 +55,12 @@ public @interface ExcelColumn {
     DataType type() default DataType.TEXT;
 
     AlanColor color() default AlanColor.NONE;
+
+    /**
+     * 自动合并
+     *
+     * @return
+     * @since 1.3.7
+     */
+    boolean autoMerge() default false;
 }

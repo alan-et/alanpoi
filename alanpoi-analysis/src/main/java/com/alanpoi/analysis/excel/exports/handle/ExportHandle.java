@@ -5,6 +5,7 @@ import com.alanpoi.analysis.common.enums.AlanColor;
 import com.alanpoi.analysis.common.enums.DataType;
 import com.alanpoi.analysis.excel.annotation.ExcelColumn;
 import com.alanpoi.analysis.excel.annotation.ExcelSheet;
+import com.alanpoi.analysis.excel.exports.CellDict;
 import com.alanpoi.analysis.excel.exports.ExcelParseParam;
 import com.alanpoi.analysis.common.ReflectorManager;
 import com.alanpoi.common.annotation.DateFormat;
@@ -16,12 +17,14 @@ import com.alanpoi.common.util.StringUtils;
 import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -210,6 +213,7 @@ public class ExportHandle {
                 excelParseParam.setHeight(excelColumn.height());
                 excelParseParam.setColor(excelColumn.color().index);
                 excelParseParam.setCellStyle(style);
+                excelParseParam.setAutoMerge(excelColumn.autoMerge());
             } else {
                 Cell cell = headRow.createCell(cellNum);
                 cell.setCellValue(field.getName());
@@ -230,9 +234,10 @@ public class ExportHandle {
 
         rowInd++;
         Iterator iterator = data.iterator();
+        CellDict cellDict = new CellDict(excelParseParamList.size(), data.size());
         while (iterator.hasNext()) {
             Object object = iterator.next();
-            handleRow(sheet.createRow(rowInd), object, excelParseParamList);
+            handleRow(sheet.createRow(rowInd), object, excelParseParamList, cellDict);
             rowInd++;
         }
         logger.info("excel sheet({}) handle completed !", sheet.getSheetName());
@@ -245,7 +250,7 @@ public class ExportHandle {
      * @param object
      * @param excelParseParams
      */
-    private void handleRow(Row row, Object object, List<ExcelParseParam> excelParseParams) {
+    private void handleRow(Row row, Object object, List<ExcelParseParam> excelParseParams, CellDict cellDict) {
         if (CollectionUtils.isEmpty(excelParseParams)) {
             return;
         }
@@ -253,11 +258,11 @@ public class ExportHandle {
             row.setHeightInPoints(excelParseParams.get(0).getHeight());
         for (int j = 0; j < excelParseParams.size(); j++) {
             Integer index = excelParseParams.get(j).getIndex();
-            handleCell(row.createCell(index != null ? index : j), object, excelParseParams.get(j));
+            handleCell(row.createCell(index != null ? index : j), row.getRowNum(), object, excelParseParams.get(j), cellDict);
         }
     }
 
-    private void handleCell(Cell cell, Object object, ExcelParseParam excelParseParam) {
+    private void handleCell(Cell cell, int rowIndex, Object object, ExcelParseParam excelParseParam, CellDict cellDict) {
         if (object instanceof Map) {
 
         } else {
@@ -271,7 +276,7 @@ public class ExportHandle {
                     String link = excelParseParam.getSourceLink();
                     if (null != excelParseParam.getLinkMethod())
                         link = (String) excelParseParam.getLinkMethod().invoke(object);
-                    if(StringUtils.isNotBlank(link)){
+                    if (StringUtils.isNotBlank(link)) {
                         hyperlink.setAddress(StringUtils.replace(excelParseParam.getSourceLink(), link, Placeholder.TYPE0));
                         cell.setHyperlink(hyperlink);
                         Font font = workbook.createFont();
@@ -280,7 +285,7 @@ public class ExportHandle {
                         excelParseParam.getCellStyle().setFont(font);
                     }
                 }
-                if (excelParseParam.getDataType() == DataType.IMAGE) {
+                if (excelParseParam.getDataType() == DataType.IMAGE && !ObjectUtils.isEmpty(value)) {
                     if (!drawingImage(workbook, sheet, cell, value)) {
                         logger.warn("图片信息异常 sheet[{}] row-index[{}] cell-index[{}] value[{}]", sheet.getSheetName(), cell.getRowIndex(), cell.getColumnIndex(), value);
                     }
@@ -306,6 +311,23 @@ public class ExportHandle {
 
                 } else {
                     cell.setCellValue(value == null ? "" : value.toString());
+                }
+                if (excelParseParam.isAutoMerge()) {
+                    int cellIndex = excelParseParam.getIndex();
+                    if (ObjectUtils.isEmpty(cellDict.getCell(cellIndex))) {
+                        cellDict.putCell(value, cellIndex);
+                    } else if (cellDict.getCell(cellIndex).equals(value)) {
+                        int duplicateNum = cellDict.increase(cellIndex, 1);
+                        if (cellDict.getRowSize() == rowIndex + 1 && duplicateNum > 0) {
+                            sheet.addMergedRegion(new CellRangeAddress(rowIndex - duplicateNum, rowIndex + 1, excelParseParam.getIndex(), excelParseParam.getIndex()));
+                        }
+                    } else {
+                        int duplicateNum = cellDict.getCellDuplicateNum(cellIndex);
+                        if (duplicateNum > 0) {
+                            sheet.addMergedRegion(new CellRangeAddress(rowIndex - duplicateNum - 1, rowIndex - 1, excelParseParam.getIndex(), excelParseParam.getIndex()));
+                        }
+                        cellDict.putCell(value, cellIndex);
+                    }
                 }
                 cell.setCellStyle(excelParseParam.getCellStyle());
             } catch (IllegalAccessException e) {
