@@ -115,9 +115,6 @@ NumFormat注解: 用于导入类的属性上，可以按照指定格式输出到
 public class ExportVO {
     @ExcelColumn(name = "名称", width = 32, link = "${url}")
     private String name;
-    
-    @ExcelColumn(name = "图片", index = "5", width = 50, height = 100, type = DataType.IMAGE)
-    private String image;
 
     @ExcelColumn(name = "值",autoMerge = true, align = Align.CENTER)
     private String value;
@@ -130,10 +127,10 @@ public class ExportVO {
     @DateFormat(value = "yyyy-MM-dd hh:mm:ss")
     private Date dateTime;
     
-    @ExcelColumn(name = "图片", index = "5", width = 50, height = 100, type = DataType.IMAGE)
+    @ExcelColumn(name = "图片", width = 50, height = 100, type = DataType.IMAGE)
     private String image;
 
-    @ExcelColumn(name = "图片2", index = "6", width = 50, height = 100, type = DataType.IMAGE)
+    @ExcelColumn(name = "图片2",width = 50, height = 100, type = DataType.IMAGE)
     private byte[] image2;
 
     @DateFormat

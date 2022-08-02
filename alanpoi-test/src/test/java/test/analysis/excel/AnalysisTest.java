@@ -3,10 +3,8 @@ package test.analysis.excel;
 import com.alanpoi.analysis.common.ExportMultipleSheetParam;
 import com.alanpoi.analysis.common.utils.ExcelExportUtil;
 import com.alanpoi.test.Application;
-import com.fasterxml.jackson.databind.util.BeanUtil;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.BeanUtils;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.imageio.ImageIO;
