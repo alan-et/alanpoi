@@ -1,6 +1,6 @@
 package com.alanpoi.analysis.excel.exports;
 
-import com.alanpoi.analysis.common.ExcelType;
+import com.alanpoi.analysis.common.enums.ExcelType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -27,9 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class WorkbookManager {
 
-    private Map<String, WorkbookManager> workbookManagerMap = new ConcurrentHashMap();
-    private String workbookId;
-    private Workbook workbook;
+    private Map<String, WorkbookEntity> workbookManagerMap = new ConcurrentHashMap();
 
     @PreDestroy
     public void destroy() {
@@ -46,38 +44,41 @@ public class WorkbookManager {
         workbookManagerMap.clear();
     }
 
-    public WorkbookManager getWorkbookManager(String url) {
+    public WorkbookEntity getWorkbookManager(String url) {
         if (workbookManagerMap.containsKey(url)) {
             return workbookManagerMap.get(url);
         }
-        WorkbookManager workbookManager = new WorkbookManager();
+        WorkbookEntity workbookEntity = new WorkbookEntity();
         Workbook workbook = null;
         try {
             workbook = WorkbookFactory.create(new FileInputStream(new File(url)));
         } catch (Exception e) {
             log.error("", e);
         }
-        workbookManager.setWorkbookId(url);
-        workbookManager.setWorkbook(workbook);
-        workbookManagerMap.put(url, workbookManager);
-        return workbookManagerMap.get(workbookManager.workbookId);
+        workbookEntity.setWorkbookId(url);
+        workbookEntity.setWorkbook(workbook);
+        workbookManagerMap.put(url, workbookEntity);
+        return workbookManagerMap.get(workbookEntity.getWorkbookId());
     }
 
-    public WorkbookManager getWorkbookManager(ExcelType excelType) {
-        WorkbookManager workbookManager = new WorkbookManager();
+    public WorkbookEntity getWorkbookManager(ExcelType excelType) {
+        WorkbookEntity workbookEntity = new WorkbookEntity();
 
-        workbookManager.workbook = newWorkbook(excelType);
-        workbookManager.workbookId = UUID.randomUUID().toString();
-        workbookManagerMap.put(workbookManager.workbookId, workbookManager);
-        return workbookManagerMap.get(workbookManager.workbookId);
+        workbookEntity.setWorkbook(newWorkbook(excelType));
+        workbookEntity.setWorkbookId(UUID.randomUUID().toString());
+        workbookManagerMap.put(workbookEntity.getWorkbookId(), workbookEntity);
+        return workbookManagerMap.get(workbookEntity.getWorkbookId());
     }
 
-    public Workbook getWorkbook() {
-        if (workbook == null) {
-            workbook = new XSSFWorkbook();
-        }
-        return workbook;
+    public WorkbookEntity getWorkbookManager(ExcelType excelType, Collection<?> collection) {
+        WorkbookEntity workbookEntity = new WorkbookEntity();
+
+        workbookEntity.setWorkbook(newWorkbook(excelType, collection));
+        workbookEntity.setWorkbookId(UUID.randomUUID().toString());
+        workbookManagerMap.put(workbookEntity.getWorkbookId(), workbookEntity);
+        return workbookManagerMap.get(workbookEntity.getWorkbookId());
     }
+
 
     public static Workbook newWorkbook(ExcelType excelType) {
         return newWorkbook(excelType, null);
@@ -105,27 +106,15 @@ public class WorkbookManager {
         return workbook;
     }
 
-    public void setWorkbook(Workbook workbook) {
-        this.workbook = workbook;
-    }
-
-    public String getWorkbookId() {
-        return workbookId;
-    }
-
-    public void setWorkbookId(String workbookId) {
-        this.workbookId = workbookId;
-    }
-
     public void close(String workbookId) {
         try {
             Workbook wb = workbookManagerMap.get(workbookId).getWorkbook();
-            wb.close();
+            if (wb != null)
+                wb.close();
         } catch (Exception e) {
             log.error("Close workbook exception:" + e);
         } finally {
             workbookManagerMap.remove(workbookId);
         }
     }
-
 }

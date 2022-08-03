@@ -15,7 +15,7 @@ public class ExcelSheetData<T> implements Serializable {
     private String sheetName;
     private List<T> data;
 
-    public ExcelSheetData(){
+    public ExcelSheetData() {
 
     }
 }

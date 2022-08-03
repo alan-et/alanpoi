@@ -1,6 +1,7 @@
 package com.alanpoi.analysis.excel.imports.handle;
 
 import com.alanpoi.analysis.common.ExecutorTools;
+import com.alanpoi.analysis.excel.exports.handle.ExportHandle;
 import com.alanpoi.common.enums.ResponseEnum;
 import com.alanpoi.common.util.ApplicationUtil;
 import com.alanpoi.analysis.excel.imports.*;
@@ -8,10 +9,10 @@ import com.alanpoi.common.util.NetworkUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.CollectionUtils;
@@ -22,11 +23,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 
 /**
@@ -35,8 +35,9 @@ import java.util.concurrent.TimeUnit;
  * @author zhuoxun.peng
  * @since 2020-2-26
  */
-@Slf4j
 public class ExcelHandle {
+    protected static final Logger log = LoggerFactory.getLogger(ExportHandle.class);
+
     public ExcelWorkbookManage excelWorkbookManage;
 
     public ExecutorTools executorTools;
@@ -58,19 +59,23 @@ public class ExcelHandle {
         String fileName = excel.getFileName();
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         int total = sheetDataList.get(0).getData().size();
-        ExcelImportRes excelImportRes = new ExcelImportRes();
+        final ExcelImportRes excelImportRes = new ExcelImportRes();
         ExcelConsumeInterface consumeInterface = ApplicationUtil.getBean(c);
         consumeInterface.validData(workbookId, sheetDataList, excel.getCustomParam());
         ExcelError excelError = excelWorkbookManage.getExcelError(workbookId);
         int rowStart = sheetDataList.get(0).getRowStart();
-        CompletableFuture<String> completableFuture = CompletableFuture.supplyAsync(() -> {
+        CompletableFuture completableFuture = CompletableFuture.supplyAsync(() -> {
             if (excelError != null && !CollectionUtils.isEmpty(excelError.getSheetErrors())) {
+                Map<String, ExcelImportRes.SheetInfo> sheetInfoMap = new HashMap<>();
                 sheetDataList.forEach(e -> {
+                    ExcelImportRes.SheetInfo sheetInfo = new ExcelImportRes.SheetInfo();
                     int sTotal = e.getData().size();
                     List<Object> errorDataList = new ArrayList<>();
                     e.getData().forEach(vo -> {
                         JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(vo));
-                        excelError.getSheetErrors().forEach(er -> {
+                        //filter mismatch sheet error
+                        List<ExcelError.SheetError> sheetErrors = excelError.getSheetErrors().stream().filter(fe -> fe.getIndex() == e.getIndex()).collect(Collectors.toList());
+                        sheetErrors.forEach(er -> {
                             er.getRowErrors().forEach(re -> {
                                 if (re.getRowIndex() == jsonObject.getInteger("rowIndex")) {
                                     errorDataList.add(vo);
@@ -78,9 +83,18 @@ public class ExcelHandle {
                             });
                         });
                     });
-                    log.info("ExcelSheet({}) import success:{},error:{}", e.getSheetName(), sTotal - errorDataList.size(), errorDataList.size());
+                    //Record the import details of each sheet
+                    int sucNum = sTotal - errorDataList.size();
+                    int failNum = errorDataList.size();
+                    sheetInfo.setIndex(e.getIndex());
+                    sheetInfo.setSucNum(sucNum);
+                    sheetInfo.setFailNum(failNum);
+                    sheetInfo.setSheetName(e.getSheetName());
+                    sheetInfoMap.put(e.getSheetName(), sheetInfo);
+                    log.info("ExcelSheet({}) import success:{},error:{}", e.getSheetName(), sucNum, failNum);
                     e.getData().removeAll(errorDataList);
                 });
+                excelImportRes.setErrorMap(sheetInfoMap);
             }
             RequestContextHolder.setRequestAttributes(requestAttributes, true);
             try {
@@ -96,7 +110,8 @@ public class ExcelHandle {
             }
             return null;
 
-        }).supplyAsync(() -> {
+        });
+        CompletableFuture<ErrorFile> completableFuture1 = CompletableFuture.supplyAsync(() -> {
             if (excelError != null &&
                     !CollectionUtils.isEmpty(excelError.getSheetErrors())) {
                 String newFileName = "";
@@ -108,17 +123,18 @@ public class ExcelHandle {
                 } else {
                     newFileName = new Date().getTime() + ".xlsx";
                 }
-                writeError(workbookId, excelError, excelWorkbookManage.getWorkbook(workbookId), newFileName, rowStart);
-                return newFileName;
+                return writeError(workbookId, excelError, excelWorkbookManage.getWorkbook(workbookId), newFileName, rowStart);
             }
             return null;
         });
-        completableFuture.join();
+        CompletableFuture.allOf(completableFuture, completableFuture1).join();
+        ErrorFile errorFile = completableFuture1.join();
         try {
-            if (StringUtils.isNotEmpty(completableFuture.get())) {
+            if (errorFile != null) {
                 consumeInterface.error(excelError);
                 excelImportRes.setStatus(ResponseEnum.IMPORT_FILE_DATA_EXP.status());
                 excelImportRes.setDownErrorUrl(downloadPath + workbookId);
+                excelImportRes.setErrorFile(errorFile);
             } else {
                 ByteArrayOutputStream bytes = new ByteArrayOutputStream(3072);
                 excelWorkbookManage.getWorkbook(workbookId).write(bytes);
@@ -133,11 +149,11 @@ public class ExcelHandle {
 
     }
 
-    private void writeError(String workbookId, ExcelError excelError, Workbook workbook, String fileName, int rowStart) {
+    private ErrorFile writeError(String workbookId, ExcelError excelError, Workbook workbook, String fileName, int rowStart) {
+        ErrorFile errorFile = new ErrorFile(workbookId, NetworkUtil.getLocalIP(), port, tmpPath, fileName);
         executorTools.getExecutor().execute(new Runnable() {
             @Override
             public void run() {
-                ErrorFile errorFile = new ErrorFile(workbookId, NetworkUtil.getLocalIP(), port, tmpPath, fileName);
                 redisTemplate.opsForValue().set("$$poi-excel:import:" + workbookId, JSON.toJSONString(errorFile), 15, TimeUnit.DAYS);
             }
         });
@@ -185,7 +201,7 @@ public class ExcelHandle {
         } catch (Exception e1) {
             log.error("", e1);
         }
-
+        return errorFile;
     }
 
     public void addErrorInfo(String workbookId, List<RowError> rowErrors) {

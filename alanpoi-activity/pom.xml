@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.alanpoi</groupId>
         <artifactId>alan-poi</artifactId>
-        <version>1.2.3</version>
+        <version>1.3.7</version>
     </parent>
     <groupId>com.alanpoi</groupId>
     <artifactId>et-activity-client</artifactId>
@@ -13,5 +13,13 @@
     <description>Alan POI Et-activity Client</description>
 
     <dependencies>
+        <dependency>
+            <groupId>com.alanpoi</groupId>
+            <artifactId>alanpoi-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+        </dependency>
     </dependencies>
 </project>

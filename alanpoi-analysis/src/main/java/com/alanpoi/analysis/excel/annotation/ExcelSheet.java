@@ -1,6 +1,6 @@
 package com.alanpoi.analysis.excel.annotation;
 
-import com.alanpoi.analysis.common.AlanColor;
+import com.alanpoi.analysis.common.enums.AlanColor;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 public @interface ExcelSheet {
     String name() default "";
 
-    int index() default 0;
+    int index() default -1;
 
     int rowHeight() default 30;
 

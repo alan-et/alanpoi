@@ -1,15 +1,16 @@
 package com.alanpoi.analysis.excel.imports;
 
+import com.alanpoi.common.annotation.DateFormat;
+import com.alanpoi.common.annotation.NumFormat;
 import com.alanpoi.common.util.AlanList;
 import com.alanpoi.common.util.FieldUtil;
-import com.alanpoi.analysis.excel.annotation.DateFormat;
 import com.alanpoi.analysis.excel.annotation.ExcelColumn;
-import com.alanpoi.analysis.excel.annotation.NumFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.InputStream;
@@ -142,9 +143,12 @@ public class ExcelInitConfig implements Serializable {
         for (int i = 0; i < fields.length; i++) {
             ExcelColumnEntity entity = new ExcelColumnEntity();
             Field field = fields[i];
-            ExcelColumn excelColumn = field.getAnnotation(ExcelColumn.class);
-            DateFormat dateFormat = field.getAnnotation(DateFormat.class);
-            NumFormat numFormat = field.getAnnotation(NumFormat.class);
+//            ExcelColumn excelColumn = field.getAnnotation(ExcelColumn.class);
+//            DateFormat dateFormat = field.getAnnotation(DateFormat.class);
+//            NumFormat numFormat = field.getAnnotation(NumFormat.class);
+            ExcelColumn excelColumn = AnnotatedElementUtils.findMergedAnnotation(field, ExcelColumn.class);
+            DateFormat dateFormat = AnnotatedElementUtils.findMergedAnnotation(field, DateFormat.class);
+            NumFormat numFormat = AnnotatedElementUtils.findMergedAnnotation(field, NumFormat.class);
             entity.setValue(field.getName());
             entity.setField(field);
             if (excelColumn != null) {

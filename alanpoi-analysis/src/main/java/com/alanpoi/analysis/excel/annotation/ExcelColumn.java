@@ -1,6 +1,9 @@
 package com.alanpoi.analysis.excel.annotation;
 
-import com.alanpoi.analysis.common.AlanColor;
+import com.alanpoi.analysis.common.enums.AlanColor;
+import com.alanpoi.analysis.common.enums.Align;
+import com.alanpoi.analysis.common.enums.DataType;
+import com.alanpoi.analysis.common.enums.VertAlign;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -26,5 +29,38 @@ public @interface ExcelColumn {
 
     int width() default 30;
 
+    /**
+     * 左右布局
+     *
+     * @return
+     */
+    Align align() default Align.LEFT;
+
+    /**
+     * 自动换行
+     *
+     * @return
+     */
+    boolean wrapText() default true;
+
+    /**
+     * 垂直布局
+     *
+     * @return
+     */
+    VertAlign vertical() default VertAlign.CENTER;
+
+    String link() default "";
+
+    DataType type() default DataType.TEXT;
+
     AlanColor color() default AlanColor.NONE;
+
+    /**
+     * 自动合并
+     *
+     * @return
+     * @since 1.3.7
+     */
+    boolean autoMerge() default false;
 }

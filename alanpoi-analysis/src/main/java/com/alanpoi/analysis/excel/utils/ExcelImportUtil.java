@@ -21,7 +21,9 @@ import java.util.Map;
  *
  * @author pengzhuoxun
  * @since 2020-3-10
+ * @deprecated 1.3.4
  */
+@Deprecated
 public class ExcelImportUtil {
 
     /**

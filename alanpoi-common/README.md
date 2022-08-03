@@ -1,5 +1,17 @@
 # anpoi common 
 
+项目中使用:
+```
+  <dependency>
+      <groupId>com.alanpoi</groupId>
+      <artifactId>alanpoi-common</artifactId>
+      <version>1.3.4</version>
+  </dependency>
+```
+
+## Api document
+通过 [Api doc](https://alanpoi.com:8160/index.html) 更加深入了解它！
+
 ## Event事件
 (参照JQuery事件原理)
 
@@ -88,6 +100,22 @@ public class PoiEventManager {
     }
 ```
 3. 基础用法，ID.getId().next()、ID.getId.current()
+
+### 集成到Mybatis-plus(baomidou)
+
+**前提** :baomidou版本3.3.1.tmp或者以上
+
+```
+    /**
+     * 注册ID生成器
+     * @return
+     */
+    @Bean
+    public IdentifierGenerator idGenerator() {
+        return entity -> ID.getId().next();
+    }
+```
+配置类中加入上面这段代码，就会自动在实体注入ID属性值了
 
 
 

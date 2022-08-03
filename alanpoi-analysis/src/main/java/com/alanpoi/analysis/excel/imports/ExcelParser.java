@@ -5,10 +5,11 @@ import com.alanpoi.analysis.common.PoiEventManager;
 import com.alanpoi.analysis.excel.imports.handle.ExcelWorkbookManage;
 import com.alanpoi.common.event.Event;
 import com.alanpoi.common.event.EventListener;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +33,8 @@ import java.util.Map;
  * @author zhuoxun.peng
  * @since 2020-2-25
  */
-@Slf4j
 public class ExcelParser<T> extends AbstractFileParser<T> implements EventListener {
-
+    private final static Logger log = LoggerFactory.getLogger(ExcelParser.class);
 
     @Autowired
     public ExcelParser(ExcelInitConfig excelInitConfig,
