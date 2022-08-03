@@ -1,6 +1,7 @@
 package test.analysis.excel;
 
 import com.alanpoi.analysis.common.enums.AlanColor;
+import com.alanpoi.analysis.common.enums.Align;
 import com.alanpoi.analysis.excel.annotation.DateFormat;
 import com.alanpoi.analysis.excel.annotation.ExcelColumn;
 import com.alanpoi.analysis.excel.annotation.ExcelSheet;
@@ -13,12 +14,12 @@ import java.util.Date;
 @ExcelSheet(name = "测试问额", backColor = AlanColor.BLUE, font = "黑体", fontSize = 25)
 @Data
 public class ExportVO {
-    @ExcelColumn(name = "名称", width = 60)
+    @ExcelColumn(name = "名称", width = 60, autoMerge = true, align = Align.CENTER)
     private String name;
 
     @ExcelColumn(name = "值")
     @NumFormat(value = "#0.#")
-    private String  value;
+    private String value;
 
     @ExcelColumn(name = "金额", color = AlanColor.RED)
     @NumFormat(value = "#0.00%")
@@ -29,6 +30,6 @@ public class ExportVO {
     private Date dateTime;
 
     @DateFormat
-    @ExcelColumn(name = "日期格式化")
+    @ExcelColumn(name = "日期格式化", isExist = false)
     private java.sql.Date date;
 }

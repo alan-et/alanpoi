@@ -35,7 +35,7 @@ public class ResponseUtil {
             } else {
                 fileName = URLEncoder.encode(fileName, "UTF8");// 其他浏览器
             }
-            response.setHeader("Content-disposition", "attachment; filename=" + fileName);
+            response.setHeader("Content-disposition", "attachment; filename=" + fileName + "; filename*=utf-8''" + fileName);
         } catch (UnsupportedEncodingException e) {
             logger.error(e.getMessage(), e);
             return;
@@ -51,8 +51,8 @@ public class ResponseUtil {
     public static void handleResponse(HttpServletResponse response, String fileName) {
         response.setContentType("application/force-download;charset=UTF-8");
         try {
-            fileName = URLEncoder.encode(fileName, "UTF8");// 其他浏览器
-            response.setHeader("Content-disposition", "attachment; filename=" + fileName);
+            fileName = URLEncoder.encode(fileName, "UTF8");
+            response.setHeader("Content-disposition", "attachment; filename=" + fileName + "; filename*=utf-8''" + fileName);
         } catch (UnsupportedEncodingException e) {
             logger.error(e.getMessage(), e);
             return;

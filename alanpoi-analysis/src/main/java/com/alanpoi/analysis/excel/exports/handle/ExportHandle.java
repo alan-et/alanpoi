@@ -1,8 +1,11 @@
 package com.alanpoi.analysis.excel.exports.handle;
 
+import com.alanpoi.analysis.common.ExportMultipleSheetParam;
 import com.alanpoi.analysis.common.enums.AlanColor;
+import com.alanpoi.analysis.common.enums.DataType;
 import com.alanpoi.analysis.excel.annotation.ExcelColumn;
 import com.alanpoi.analysis.excel.annotation.ExcelSheet;
+import com.alanpoi.analysis.excel.exports.CellDict;
 import com.alanpoi.analysis.excel.exports.ExcelParseParam;
 import com.alanpoi.analysis.common.ReflectorManager;
 import com.alanpoi.common.annotation.DateFormat;
@@ -12,14 +15,25 @@ import com.alanpoi.common.util.NumberUtils;
 import com.alanpoi.common.util.Placeholder;
 import com.alanpoi.common.util.StringUtils;
 import org.apache.poi.common.usermodel.HyperlinkType;
+import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
@@ -29,12 +43,15 @@ import java.util.*;
 public class ExportHandle {
     protected static final Logger logger = LoggerFactory.getLogger(ExportHandle.class);
 
+    public static boolean is2007 = true;
+
     public Workbook exportData(Workbook workbook, Collection<?> data, Class<?> c) {
         return exportData(workbook, data, c, null);
     }
 
     public Workbook exportData(Workbook workbook, Collection<?> data, Class<?> c, List<String> specifyCol) {
         try {
+            getWorkVersion(workbook);
             loadSheet(workbook, data, c, 0, specifyCol);
         } catch (Exception e) {
             logger.error("", e);
@@ -43,20 +60,23 @@ public class ExportHandle {
         return workbook;
     }
 
+    @Deprecated
     public Workbook exportMultipleSheet(Workbook workbook, Map<Class<?>, Collection<?>> dataMap) {
         return exportMultipleSheet(workbook, dataMap, new HashMap<>());
     }
 
+    @Deprecated
     public Workbook exportMultipleSheet(Workbook workbook, Map<Class<?>, Collection<?>> dataMap, Map<Integer, List<String>> specifyCol) {
         try {
+            getWorkVersion(workbook);
             int sheetAt = 0;
             for (Class<?> c : dataMap.keySet()) {
                 Collection<?> collection = dataMap.get(c);
                 ExcelSheet excelSheet = c.getAnnotation(ExcelSheet.class);
                 if (excelSheet != null)
-                    loadSheet(workbook, collection, c, sheetAt, specifyCol.get(excelSheet.index()));
+                    loadSheet(workbook, collection, c, null, sheetAt, specifyCol.get(excelSheet.index()));
                 else
-                    loadSheet(workbook, collection, c, sheetAt, specifyCol.get(sheetAt));
+                    loadSheet(workbook, collection, c, null, sheetAt, specifyCol.get(sheetAt));
                 sheetAt++;
             }
         } catch (Exception e) {
@@ -66,19 +86,63 @@ public class ExportHandle {
         return workbook;
     }
 
+    public Workbook genMultipleSheet(Workbook workbook, ExportMultipleSheetParam param) {
+        try {
+            getWorkVersion(workbook);
+            int sheetAt = 0;
+            for (String sheet : param.getMap().keySet()) {
+                Collection<?> collection = param.getData(sheet);
+                Class<?> cls = param.getDataClass(sheet);
+                int index = param.getSheetIndex(sheet);
+                if (index == -1) {
+                    index = sheetAt;
+                }
+                ExcelSheet excelSheet = cls.getAnnotation(ExcelSheet.class);
+                if (excelSheet != null)
+                    loadSheet(workbook, collection, cls, sheet, index, param.getSpecifyCol(sheet).get(excelSheet.index()));
+                else
+                    loadSheet(workbook, collection, cls, sheet, index, param.getSpecifyCol(sheet).get(sheetAt));
+                sheetAt++;
+            }
+        } catch (Exception e) {
+            logger.error("", e);
+            throw new AlanPoiException(e.getMessage());
+        }
+        return workbook;
+    }
+
+    private void getWorkVersion(Workbook workbook) {
+        if (workbook instanceof XSSFWorkbook) {
+            is2007 = true;
+        } else {
+            is2007 = false;
+        }
+    }
+
+
     private void loadSheet(Workbook workbook, Collection<?> data, Class<?> c, final int sheetAt, List<String> specifyCol) {
+        loadSheet(workbook, data, c, null, sheetAt, specifyCol);
+    }
+
+    private void loadSheet(Workbook workbook, Collection<?> data, Class<?> c, String sheetName, final int sheetAt, List<String> specifyCol) {
         CellStyle headStyle = workbook.createCellStyle();
         headStyle.setWrapText(true);
         ReflectorManager reflectorManager = ReflectorManager.fromCache(c);
         ExcelSheet excelSheet = c.getAnnotation(ExcelSheet.class);
+        if (StringUtils.isBlank(sheetName)) {
+            sheetName = excelSheet.name();
+        }
+        int sheetIndex = excelSheet.index();
+        //禁用自定义sheet页签位置，取系统生成的值
+        if (sheetIndex == -1) {
+            sheetIndex = sheetAt;
+        }
         int rowInd = 0;
         Sheet sheet = null;
         Row headRow = null;
         if (excelSheet != null) {
-
-            sheet = workbook.getSheetAt(excelSheet.index());
-            workbook.setSheetName(excelSheet.index(), excelSheet.name());
-
+            sheet = workbook.getSheetAt(sheetIndex);
+            workbook.setSheetName(sheetIndex, sheetName);
             headRow = sheet.createRow(rowInd);
             headRow.setHeightInPoints(excelSheet.rowHeight());
             Font font = workbook.createFont();
@@ -141,14 +205,21 @@ public class ExportHandle {
                     if (link.indexOf("${") != -1)
                         excelParseParam.setLinkMethod(reflectorManager.getGetMethod(StringUtils.findReplace(link, Placeholder.TYPE0)));
                 }
+                CellStyle style = workbook.createCellStyle();
+                style.setAlignment(excelColumn.align().val);
+                style.setVerticalAlignment(excelColumn.vertical().val);
+                style.setWrapText(excelColumn.wrapText());
+                excelParseParam.setDataType(excelColumn.type());
                 excelParseParam.setHeight(excelColumn.height());
                 excelParseParam.setColor(excelColumn.color().index);
-                excelParseParam.setCellStyle(workbook.createCellStyle());
+                excelParseParam.setCellStyle(style);
+                excelParseParam.setAutoMerge(excelColumn.autoMerge());
             } else {
                 Cell cell = headRow.createCell(cellNum);
                 cell.setCellValue(field.getName());
                 cell.setCellStyle(headStyle);
                 excelParseParam.setIndex(cellNum);
+                excelParseParam.setDataType(DataType.TEXT);
             }
             if (dateFormat != null) {
                 excelParseParam.setFormat(dateFormat.value());
@@ -163,9 +234,10 @@ public class ExportHandle {
 
         rowInd++;
         Iterator iterator = data.iterator();
+        CellDict cellDict = new CellDict(excelParseParamList.size(), data.size());
         while (iterator.hasNext()) {
             Object object = iterator.next();
-            handleRow(sheet.createRow(rowInd), object, excelParseParamList);
+            handleRow(sheet.createRow(rowInd), object, excelParseParamList, cellDict);
             rowInd++;
         }
         logger.info("excel sheet({}) handle completed !", sheet.getSheetName());
@@ -178,7 +250,7 @@ public class ExportHandle {
      * @param object
      * @param excelParseParams
      */
-    private void handleRow(Row row, Object object, List<ExcelParseParam> excelParseParams) {
+    private void handleRow(Row row, Object object, List<ExcelParseParam> excelParseParams, CellDict cellDict) {
         if (CollectionUtils.isEmpty(excelParseParams)) {
             return;
         }
@@ -186,16 +258,17 @@ public class ExportHandle {
             row.setHeightInPoints(excelParseParams.get(0).getHeight());
         for (int j = 0; j < excelParseParams.size(); j++) {
             Integer index = excelParseParams.get(j).getIndex();
-            handleCell(row.createCell(index != null ? index : j), object, excelParseParams.get(j));
+            handleCell(row.createCell(index != null ? index : j), row.getRowNum(), object, excelParseParams.get(j), cellDict);
         }
     }
 
-    private void handleCell(Cell cell, Object object, ExcelParseParam excelParseParam) {
+    private void handleCell(Cell cell, int rowIndex, Object object, ExcelParseParam excelParseParam, CellDict cellDict) {
         if (object instanceof Map) {
 
         } else {
             try {
-                Workbook workbook = cell.getSheet().getWorkbook();
+                Sheet sheet = cell.getSheet();
+                Workbook workbook = sheet.getWorkbook();
                 Object value = excelParseParam.getMethod().invoke(object);
                 if (StringUtils.isNotBlank(excelParseParam.getSourceLink())) {
                     //set hyperlink and style
@@ -203,12 +276,20 @@ public class ExportHandle {
                     String link = excelParseParam.getSourceLink();
                     if (null != excelParseParam.getLinkMethod())
                         link = (String) excelParseParam.getLinkMethod().invoke(object);
-                    hyperlink.setAddress(StringUtils.replace(excelParseParam.getSourceLink(), link, Placeholder.TYPE0));
-                    cell.setHyperlink(hyperlink);
-                    Font font = workbook.createFont();
-                    font.setUnderline((byte) 1);
-                    font.setColor(AlanColor.BLUE.index);
-                    excelParseParam.getCellStyle().setFont(font);
+                    if (StringUtils.isNotBlank(link)) {
+                        hyperlink.setAddress(StringUtils.replace(excelParseParam.getSourceLink(), link, Placeholder.TYPE0));
+                        cell.setHyperlink(hyperlink);
+                        Font font = workbook.createFont();
+                        font.setUnderline((byte) 1);
+                        font.setColor(AlanColor.BLUE.index);
+                        excelParseParam.getCellStyle().setFont(font);
+                    }
+                }
+                if (excelParseParam.getDataType() == DataType.IMAGE && !ObjectUtils.isEmpty(value)) {
+                    if (!drawingImage(workbook, sheet, cell, value)) {
+                        logger.warn("图片信息异常 sheet[{}] row-index[{}] cell-index[{}] value[{}]", sheet.getSheetName(), cell.getRowIndex(), cell.getColumnIndex(), value);
+                    }
+                    return;
                 }
                 boolean isFormat = false;
                 if (StringUtils.isNotBlank(excelParseParam.getFormat())) {
@@ -231,6 +312,23 @@ public class ExportHandle {
                 } else {
                     cell.setCellValue(value == null ? "" : value.toString());
                 }
+                if (excelParseParam.isAutoMerge()) {
+                    int cellIndex = excelParseParam.getIndex();
+                    if (ObjectUtils.isEmpty(cellDict.getCell(cellIndex))) {
+                        cellDict.putCell(value, cellIndex);
+                    } else if (cellDict.getCell(cellIndex).equals(value)) {
+                        int duplicateNum = cellDict.increase(cellIndex, 1);
+                        if (cellDict.getRowSize() == rowIndex + 1 && duplicateNum > 0) {
+                            sheet.addMergedRegion(new CellRangeAddress(rowIndex - duplicateNum, rowIndex + 1, excelParseParam.getIndex(), excelParseParam.getIndex()));
+                        }
+                    } else {
+                        int duplicateNum = cellDict.getCellDuplicateNum(cellIndex);
+                        if (duplicateNum > 0) {
+                            sheet.addMergedRegion(new CellRangeAddress(rowIndex - duplicateNum - 1, rowIndex - 1, excelParseParam.getIndex(), excelParseParam.getIndex()));
+                        }
+                        cellDict.putCell(value, cellIndex);
+                    }
+                }
                 cell.setCellStyle(excelParseParam.getCellStyle());
             } catch (IllegalAccessException e) {
                 logger.error("", e);
@@ -240,6 +338,77 @@ public class ExportHandle {
                 logger.error("", e);
             }
         }
+    }
+
+    private boolean drawingImage(Workbook workbook, Sheet sheet, Cell cell, Object value) {
+        try {
+            Drawing drawing = sheet.createDrawingPatriarch();
+            ClientAnchor anchor;
+            if (is2007) {
+                anchor = new XSSFClientAnchor(
+                        30000,
+                        30000,
+                        0,
+                        0,
+                        cell.getColumnIndex(),
+                        cell.getRowIndex(),
+                        cell.getColumnIndex() + 1,
+                        cell.getRowIndex() + 1
+                );
+            } else {
+                anchor = new HSSFClientAnchor(
+                        30000,
+                        30000,
+                        0,
+                        0,
+                        (short) cell.getColumnIndex(),
+                        cell.getRowIndex(),
+                        (short) (cell.getColumnIndex() + 1),
+                        cell.getRowIndex() + 1
+                );
+            }
+            anchor.setAnchorType(ClientAnchor.AnchorType.MOVE_DONT_RESIZE);
+            if (value instanceof byte[]) {
+                drawing.createPicture(anchor, workbook.addPicture((byte[]) value, Workbook.PICTURE_TYPE_PNG));
+                return true;
+            } else if (value instanceof String) {
+                String img = (String) value;
+                BufferedImage bufferImg;
+                ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
+                if (img.startsWith("http://") || img.startsWith("https://")) {
+                    URL url = new URL(img);
+                    bufferImg = ImageIO.read(url);
+                } else {
+                    bufferImg = ImageIO.read(new File(img));
+                }
+                int h = bufferImg.getHeight();
+                int w = bufferImg.getWidth();
+                double cellWidth = sheet.getColumnWidthInPixels(cell.getColumnIndex());
+                double cellHeight = cell.getRow().getHeightInPoints() / 72 * 96;
+                ImageIO.write(bufferImg, "png", byteArrayOut);
+                Picture picture = drawing.createPicture(anchor, workbook.addPicture(byteArrayOut.toByteArray(), XSSFWorkbook.PICTURE_TYPE_PNG));
+                double h_r = h / cellHeight;
+                double w_r = w / cellWidth;
+                if (h_r <= 1.0 && w_r <= 1.0) {
+                    picture.resize(w_r, h_r);
+                } else {
+                    if (h_r > w_r) {
+                        picture.resize(1 / h_r * w_r, 1);
+                    } else {
+                        picture.resize(1, 1 / w_r * h_r);
+                    }
+                }
+
+                return true;
+            } else {
+                logger.warn("单元格为图片时，值必须是路径或者图片字节类型[rowIndex({})]", cell.getRowIndex());
+            }
+        } catch (IOException ioException) {
+            logger.warn("写入图片到单元格异常", ioException);
+        } catch (Exception e) {
+            logger.warn("写入图片到单元格异常", e);
+        }
+        return false;
     }
 
     private Object dateFormatValue(Object value, ExcelParseParam parseParam) throws Exception {
@@ -271,9 +440,9 @@ public class ExportHandle {
             return value;
         } else {
             Number d;
-            if(value.toString().indexOf(".")==-1){
+            if (value.toString().indexOf(".") == -1) {
                 d = Long.parseLong(value.toString());
-            }else{
+            } else {
                 d = Double.parseDouble(value.toString());
             }
             DecimalFormat df = new DecimalFormat(parseParam.getNumFormat());

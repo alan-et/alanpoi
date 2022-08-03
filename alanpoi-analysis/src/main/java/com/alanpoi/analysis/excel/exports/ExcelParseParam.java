@@ -1,8 +1,11 @@
 package com.alanpoi.analysis.excel.exports;
 
 import com.alanpoi.analysis.common.enums.AlanColor;
+import com.alanpoi.analysis.common.enums.DataType;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 
 import java.lang.reflect.Method;
 import java.util.Set;
@@ -36,6 +39,16 @@ public class ExcelParseParam {
     private Method linkMethod;
 
     private Set<String> specifyCol;
+
+    private DataType dataType;
+
+    /**
+     * 自动合并
+     *
+     * @since 1.3.7
+     */
+    private boolean autoMerge;
+
 
     public Integer getIndex() {
         return index;
@@ -127,5 +140,21 @@ public class ExcelParseParam {
 
     public void setSpecifyCol(Set<String> specifyCol) {
         this.specifyCol = specifyCol;
+    }
+
+    public DataType getDataType() {
+        return dataType;
+    }
+
+    public void setDataType(DataType dataType) {
+        this.dataType = dataType;
+    }
+
+    public boolean isAutoMerge() {
+        return autoMerge;
+    }
+
+    public void setAutoMerge(boolean autoMerge) {
+        this.autoMerge = autoMerge;
     }
 }

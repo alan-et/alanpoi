@@ -59,6 +59,21 @@ public class FileUtils {
         file.delete();
     }
 
+    public static void deleteTempFileOnExit(File file) {
+        if (file == null) return;
+        file.deleteOnExit();
+    }
+
+    public static String getTmpDir() {
+        String tmpDir = System.getProperty("java.io.tmpdir");
+        File dir = new File(tmpDir + "alanpoi");
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
+        return tmpDir + "alanpoi" + File.separator;
+
+    }
+
     public static boolean isWindows() {
         return System.getProperties().getProperty("os.name").toUpperCase().indexOf("WINDOWS") != -1;
     }

@@ -1,5 +1,6 @@
 package com.alanpoi.analysis.common.utils;
 
+import com.alanpoi.analysis.common.ExportMultipleSheetParam;
 import com.alanpoi.analysis.common.enums.ExcelType;
 import com.alanpoi.analysis.excel.exports.WorkbookEntity;
 import com.alanpoi.analysis.excel.exports.WorkbookManager;
@@ -68,6 +69,19 @@ public class ExcelExportUtil {
         return getWorkbookByMultiSheet(ExcelType.EXCEL_2007, dataMap);
     }
 
+    public static Workbook getWorkbookByMultiSheet(Map<Class<?>, Collection<?>> dataMap, Map<Integer, List<String>> specifyCol) {
+        return getWorkbookMulti(WorkbookManager.newWorkbook(ExcelType.EXCEL_2007, dataMap.keySet()), dataMap, specifyCol);
+    }
+
+    public static Workbook getByMultiSheet(ExcelType excelType, ExportMultipleSheetParam param) {
+        ExportHandle exportHandle = ApplicationUtil.getBean(ExportHandle.class);
+        return exportHandle.genMultipleSheet(WorkbookManager.newWorkbook(excelType, param.getMap().keySet()), param);
+    }
+
+    public static Workbook getByMultiSheet(ExportMultipleSheetParam param) {
+        return getWorkbook(WorkbookManager.newWorkbook(ExcelType.EXCEL_2007, param.getMap().keySet()),param);
+    }
+
     private static Workbook getWorkbook(Workbook workbook, Collection<?> singleSheetData, Class<?> c) {
         ExportHandle exportHandle = ApplicationUtil.getBean(ExportHandle.class);
         return exportHandle.exportData(workbook, singleSheetData, c);
@@ -81,6 +95,11 @@ public class ExcelExportUtil {
     private static Workbook getWorkbookMulti(Workbook workbook, Map<Class<?>, Collection<?>> dataMap, Map<Integer, List<String>> specifyCol) {
         ExportHandle exportHandle = ApplicationUtil.getBean(ExportHandle.class);
         return exportHandle.exportMultipleSheet(workbook, dataMap, specifyCol);
+    }
+
+    private static Workbook getWorkbook(Workbook workbook, ExportMultipleSheetParam param) {
+        ExportHandle exportHandle = ApplicationUtil.getBean(ExportHandle.class);
+        return exportHandle.genMultipleSheet(workbook, param);
     }
 
 
@@ -132,22 +151,23 @@ public class ExcelExportUtil {
         export(singleSheetData, c, request, response, getDefaultFileName(ExcelType.EXCEL_2007));
     }
 
-    public static void exportByMultiSheet(Map<Class<?>, Collection<?>> dataMap, HttpServletRequest request, HttpServletResponse response) {
-        exportByMultiSheet(dataMap, getDefaultFileName(ExcelType.EXCEL_2007), request, response);
+    public static void exportByMultiSheet(ExportMultipleSheetParam param, HttpServletRequest request, HttpServletResponse response) {
+        exportByMultiSheet(param, getDefaultFileName(ExcelType.EXCEL_2007), request, response);
     }
 
     /**
      * Export multiple sheet tab Excel to the browser
      *
-     * @param dataMap
+     * @param param
      * @param fileName
      * @param request
      * @param response
      */
-    public static void exportByMultiSheet(Map<Class<?>, Collection<?>> dataMap, String fileName, HttpServletRequest request, HttpServletResponse response) {
+
+    public static void exportByMultiSheet(ExportMultipleSheetParam param, String fileName, HttpServletRequest request, HttpServletResponse response) {
         WorkbookManager workbookManager = ApplicationUtil.getBean(WorkbookManager.class);
-        WorkbookEntity workbookEntity = workbookManager.getWorkbookManager(ExcelType.EXCEL_2007, dataMap.keySet());
-        getWorkbookMulti(workbookEntity.getWorkbook(), dataMap, new HashMap<>());
+        WorkbookEntity workbookEntity = workbookManager.getWorkbookManager(ExcelType.EXCEL_2007, param.getMap().keySet());
+        getWorkbook(workbookEntity.getWorkbook(),param);
         download(workbookEntity, request, response, fileName);
     }
 

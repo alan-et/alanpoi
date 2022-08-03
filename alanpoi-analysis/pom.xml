@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.alanpoi</groupId>
         <artifactId>alan-poi</artifactId>
-        <version>1.3.4</version>
+        <version>1.3.7</version>
     </parent>
     <groupId>com.alanpoi</groupId>
     <artifactId>alanpoi-analysis</artifactId>
@@ -59,11 +59,11 @@
             <artifactId>freemarker</artifactId>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>fr.opensagres.xdocreport</groupId>-->
-<!--            <artifactId>fr.opensagres.poi.xwpf.converter.pdf-gae</artifactId>-->
-<!--            <version>${fr.opensagres.poi.version}</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.xhtmlrenderer</groupId>
+            <artifactId>flying-saucer-pdf</artifactId>
+            <version>9.1.9</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -85,6 +85,10 @@
                     <groupId>com.sun.media</groupId>
                     <artifactId>jai-codec</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -93,7 +97,5 @@
             <artifactId>docx4j-JAXB-ReferenceImpl</artifactId>
             <version>8.3.0</version>
         </dependency>
-
-
     </dependencies>
 </project>

@@ -1,5 +1,6 @@
 package com.alanpoi.analysis.word;
 
+import com.alanpoi.analysis.common.AbstractParse;
 import com.alanpoi.analysis.common.enums.WordAlign;
 import com.alanpoi.analysis.common.enums.WordHighlight;
 import com.alanpoi.analysis.common.enums.WordStyle;
@@ -14,9 +15,7 @@ import java.util.*;
  * @author pengzhuoxun
  * @since 1.3.4
  */
-public abstract class WordParse {
-
-    protected Configuration configure = null;
+public abstract class WordParse extends AbstractParse {
 
     /**
      * 创建word文档对象
@@ -130,31 +129,5 @@ public abstract class WordParse {
             wBody.append(label.formatXml());
         });
         return wBody.toString();
-    }
-
-    public Template createTemplate(String parentPath, String fileName, boolean isAbsolute) throws IOException {
-        //加载模板文件
-        if (isAbsolute) {
-            configure.setDirectoryForTemplateLoading(new File(parentPath));//模板文件在本地硬盘d
-        } else {
-            configure.setClassForTemplateLoading(getClass(), parentPath); //将模板文件直接复制到src目录下
-        }
-
-        //设置对象包装器
-        configure.setObjectWrapper(new DefaultObjectWrapper(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS));
-        //设置异常处理器
-        configure.setTemplateExceptionHandler(TemplateExceptionHandler.IGNORE_HANDLER);
-        //定义Template对象,注意模板类型名字与downloadType要一致
-        return configure.getTemplate(fileName);  //文件名调用的时候可更换
-    }
-
-    public static String getTmpDir() {
-        String tmpDir = System.getProperty("java.io.tmpdir");
-        File dir = new File(tmpDir + "alanpoi");
-        if (!dir.exists()) {
-            dir.mkdir();
-        }
-        return tmpDir + "alanpoi" + File.separator;
-
     }
 }
