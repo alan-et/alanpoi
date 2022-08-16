@@ -9,7 +9,7 @@
   <dependency>
       <groupId>com.alanpoi</groupId>
       <artifactId>alanpoi-analysis</artifactId>
-      <version>1.3.4</version>
+      <version>1.3.7</version>
   </dependency>
 ```
 
