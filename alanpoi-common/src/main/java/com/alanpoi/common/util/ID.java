@@ -19,6 +19,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ID {
 
+    private static volatile ID defaultId = null;
+
     private static Logger logger = LoggerFactory.getLogger(ID.class);
 
     /**
@@ -54,20 +56,24 @@ public class ID {
     private transient String lock = "";
 
     public ID() {
-        init();
+        init(null);
+    }
+
+    public ID(ServerID serverID) {
+        init(serverID);
     }
 
     public ID(long begin) {
         this.begin = begin;
-        init();
+        init(null);
     }
 
-    private void init() {
+    private void init(ServerID serverID) {
         atomicInt = new AtomicInteger(0);
         random = new Random();
         getTimestamp();
         getSeq();
-        ServerID serverID = ApplicationUtil.getBean(ServerID.class);
+//        ServerID serverID = ApplicationUtil.getBean(ServerID.class);
         if (serverID == null)
             serverId = (short) random.nextInt(0x7f + 1);
         else
@@ -84,7 +90,18 @@ public class ID {
     }
 
     public static ID getId() {
-        return ApplicationUtil.getBean(ID.class);
+        ID id = ApplicationUtil.getBean(ID.class);
+        if (id == null) {
+            if (defaultId == null) {
+                synchronized (ID.class) {
+                    if (defaultId == null) {
+                        defaultId = new ID();
+                    }
+                }
+            }
+            return defaultId;
+        }
+        return id;
     }
 
     private long getTimestamp() {
@@ -117,28 +134,5 @@ public class ID {
             modCount++;
             return this.version = (version | 0L) << 7;
         }
-    }
-
-    public static void main(String[] args) {
-        List<Long> list = new AlanList<>();
-        System.out.println(list);
-        ID id = new ID();
-        int i = 0;
-        do {
-            Long idLong = id.next();
-            if (list.contains(idLong)) {
-                System.out.println("重复:" + idLong);
-                break;
-            }
-            if (idLong < 0) {
-                System.out.println("出现负数:" + idLong);
-                break;
-            }
-            System.out.println(idLong);
-            list.add(idLong);
-            i++;
-        } while (i < 0x3fff);
-//        System.out.println(Long.MAX_VALUE);
-//        System.out.println(Long.valueOf((0x3ffffffffffL) << 21) | (0x3fff | 0L) << 7 | 0x7f);
     }
 }

@@ -1,5 +1,7 @@
 package com.alanpoi.common.util;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,7 +31,7 @@ public class StringUtils {
             String key = matcher.group(0);
             String repVal = formatParam(key);
             if (param.containsKey(repVal)) {
-                source = source.replace(key, param.get(repVal));
+                source = source.replaceAll(key, param.get(repVal));
             }
         }
         return source;
@@ -46,6 +48,26 @@ public class StringUtils {
         return formatParam(key);
     }
 
+    public static List<String> findReplaceAll(String source, Placeholder placeholder) {
+        Pattern regex = Pattern.compile(placeholder.regex);
+        Matcher matcher = regex.matcher(source);
+        List<String> result = new ArrayList<>();
+        while (matcher.find()) {
+            result.add(formatParam(matcher.group()));
+        }
+        return result;
+    }
+
+    public static List<String> findReplaceAllWithP(String source, Placeholder placeholder) {
+        Pattern regex = Pattern.compile(placeholder.regex);
+        Matcher matcher = regex.matcher(source);
+        List<String> result = new ArrayList<>();
+        while (matcher.find()) {
+            result.add(matcher.group());
+        }
+        return result;
+    }
+
     public static String replace(String source, String replaceVal, Placeholder placeholder) {
         Pattern regex = Pattern.compile(placeholder.regex);
         Matcher matcher = regex.matcher(source);
@@ -54,7 +76,7 @@ public class StringUtils {
             return null;
         }
         String key = matcher.group(0);
-        return source.replace(key, replaceVal);
+        return source.replaceAll(key, replaceVal);
     }
 
     public static String formatParam(String paramCode) {
