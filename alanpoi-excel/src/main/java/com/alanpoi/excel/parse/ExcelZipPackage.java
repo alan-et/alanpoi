@@ -67,7 +67,6 @@ public class ExcelZipPackage extends ZipPackage {
                     originIs = originZf.getInputStream(originZi);
                     File file = FileUtils.saveTempFile(originIs, "sheet-rel", ".ftl", FileUtils.getTmpDir() + "template");
                     //获取文档关系模版
-                    Template docRelTemplate = createTemplate(file.getParent(), file.getName(), true);
                     zipItem.put(ZIP_ENTRY_XL_REL, file);
                 } else if (entryName.startsWith(ZIP_ENTRY_SHARED_STRINGS)) {
                     //获取原始压缩文件 文档关系文件
@@ -118,7 +117,8 @@ public class ExcelZipPackage extends ZipPackage {
             RowEntity rowEntity = new RowEntity();
             rowEntity.setRowIndex(i + beginRow);
             List<RowEntity.ColEntity> cols = new ArrayList<>();
-            for (Field field : fields) {
+            for (int j = 0; j < fields.size(); j++) {
+                Field field=fields.get(j);
                 if (strList.contains(field.getName())) {
                     RowEntity.ColEntity colEntity = new RowEntity.ColEntity();
                     try {
@@ -170,7 +170,6 @@ public class ExcelZipPackage extends ZipPackage {
         writer.write(str);
         writer.flush();
         writer.close();
-
         Map<String, Object> param = new HashMap<>();
         param.put("dataList", valList);
         Template docTemplate = createTemplate(sharedStrings.getParent(), sharedStrings.getName(), true);
@@ -178,7 +177,7 @@ public class ExcelZipPackage extends ZipPackage {
         parseSheet(rowEntities);
     }
 
-    public void parseSheet(List<RowEntity> rowEntities) throws IOException, JDOMException {
+    public void parseSheet(List<RowEntity> rowEntities) throws IOException, JDOMException, TemplateException {
         File sheetFile = this.getEntity(ExcelZipPackage.ZIP_ENTRY_XL);
         Document doc = saxBuilder.build(sheetFile);
         Element root = doc.getRootElement();
@@ -201,11 +200,18 @@ public class ExcelZipPackage extends ZipPackage {
                 }
                 sw.flush();
                 sw.close();
-                String str = sw.toString().replace("#alanpoi#replace#sheet", workbookBuild.buildSheet());
+                //TODO 50万数据耗时6秒
+//                String str = sw.toString().replace("#alanpoi#replace#sheet", workbookBuild.buildSheet());
+                String str = sw.toString().replace("#alanpoi#replace#sheet", "${sheetData}");
                 Writer writer = new FileWriter(sheetFile, false);
                 writer.write(str);
                 writer.flush();
                 writer.close();
+
+                Map<String, Object> param = new HashMap<>();
+                param.put("sheetData", workbookBuild.buildSheet());
+                Template docTemplate = createTemplate(sheetFile.getParent(), sheetFile.getName(), true);
+                docTemplate.process(param, new BufferedWriter(new OutputStreamWriter(new FileOutputStream(sheetFile), "utf-8")));
                 break;
             }
         }

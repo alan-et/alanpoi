@@ -23,7 +23,7 @@ public class Main {
     private static void test2() throws IOException {
         TemplateHandle templateHandle = new TemplateHandle();
         List<ExportVO> list = new ArrayList<>();
-        for (int i = 0; i < 500000; i++) {
+        for (int i = 0; i < 1000000; i++) {
             ExportVO exportVO = new ExportVO();
             if ((i > 100 && i < 103) || (i > 108 && i < 111)) {
                 exportVO.setName("name");
@@ -38,7 +38,7 @@ public class Main {
         }
         long begin = System.currentTimeMillis();
         ZipPackage zipPackage = templateHandle.getExcelStream("/Users/pengzhuoxun/Downloads/testTem.xlsx", list, ExportVO.class, 1);
-        System.out.println("耗时 " + (System.currentTimeMillis() - begin) + "毫秒");
+        System.out.println("alanpoi 总耗时 " + (System.currentTimeMillis() - begin) + "毫秒");
         zipPackage.write(new FileOutputStream("/Users/pengzhuoxun/Downloads/test666.xlsx"));
     }
 
@@ -51,7 +51,7 @@ public class Main {
         bufferImg = ImageIO.read(new File("/Users/pengzhuoxun/Downloads/image1.png"));
 
         ImageIO.write(bufferImg, "png", byteArrayOut);
-        for (int i = 0; i < 500; i++) {
+        for (int i = 0; i < 1000000; i++) {
             ExportVO exportVO = new ExportVO();
             if ((i > 100 && i < 103) || (i > 108 && i < 111)) {
                 exportVO.setName("name");
@@ -64,22 +64,24 @@ public class Main {
             exportVO.setDateTime(new java.util.Date());
             list.add(exportVO);
 
-            Export2VO export2VO = new Export2VO();
-            export2VO.setName("name" + i);
-            export2VO.setValue("value" + i);
-            export2VO.setAmount(new BigDecimal(6666.666 + i * 10));
-            export2VO.setDate(new Date(132324343 + i * 100));
-            export2VO.setDateTime(new java.util.Date());
-            export2VO.setImage("https://t7.baidu.com/it/u=1569919947,316169633&fm=218&app=92&f=PNG?w=121&h=75&s=6ED4EC1A07384D8A0654DCDE03007031");
-            export2VO.setImage2(byteArrayOut.toByteArray());
-            list2.add(export2VO);
+//            Export2VO export2VO = new Export2VO();
+//            export2VO.setName("name" + i);
+//            export2VO.setValue("value" + i);
+//            export2VO.setAmount(new BigDecimal(6666.666 + i * 10));
+//            export2VO.setDate(new Date(132324343 + i * 100));
+//            export2VO.setDateTime(new java.util.Date());
+//            export2VO.setImage("https://t7.baidu.com/it/u=1569919947,316169633&fm=218&app=92&f=PNG?w=121&h=75&s=6ED4EC1A07384D8A0654DCDE03007031");
+//            export2VO.setImage2(byteArrayOut.toByteArray());
+//            list2.add(export2VO);
         }
-//            Workbook workbook = ExcelExportUtil.getWorkbook(list, ExportVO.class);
-        ExportMultipleSheetParam param = new ExportMultipleSheetParam();
-        param.put(0, "测试1", ExportVO.class, list);
-        param.put(1, "测试2", Export2VO.class, list2);
-        Workbook workbook = ExcelExportUtil.getByMultiSheet(param);
-        OutputStream outputStream = new FileOutputStream("/tmp/test.xlsx");
+        long begin = System.currentTimeMillis();
+            Workbook workbook = ExcelExportUtil.getWorkbook(list, ExportVO.class);
+        System.out.println("apache poi耗时 " + (System.currentTimeMillis() - begin) + "毫秒");
+//        ExportMultipleSheetParam param = new ExportMultipleSheetParam();
+//        param.put(0, "测试1", ExportVO.class, list);
+//        param.put(1, "测试2", Export2VO.class, list2);
+//        Workbook workbook = ExcelExportUtil.getByMultiSheet(param);
+        OutputStream outputStream = new FileOutputStream("/Users/pengzhuoxun/Downloads/test.xlsx");
         workbook.write(outputStream);
         workbook.close();
         outputStream.flush();
