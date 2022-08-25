@@ -19,7 +19,7 @@ public class TemplateHandle {
             excelDataParse.exec(dataList, cls, dataRowIndex);
             return zipPackage;
         } catch (Exception e) {
-            throw new AlanPoiException("" + e.getMessage());
+            throw new AlanPoiException(e);
         }
 
     }

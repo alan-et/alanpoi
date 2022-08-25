@@ -14,6 +14,10 @@ import java.util.Date;
 @ExcelSheet(name = "测试问额", backColor = AlanColor.BLUE, font = "黑体", fontSize = 25)
 @Data
 public class ExportVO {
+
+    @ExcelColumn(isExist = false)
+    private String title;
+
     @ExcelColumn(name = "名称", width = 60, autoMerge = true, align = Align.CENTER)
     private String name;
 

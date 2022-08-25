@@ -1,5 +1,6 @@
 package com.alanpoi.excel.parse;
 
+import com.alanpoi.common.exception.AlanPoiException;
 import com.alanpoi.common.util.*;
 import com.alanpoi.excel.exports.RowEntity;
 import freemarker.template.Template;
@@ -35,6 +36,8 @@ public class ExcelZipPackage extends ZipPackage {
     public static String ZIP_ENTRY_DRAWING_REL = "xl/drawings/drawing/_rels/drawing";
 
     public static String ZIP_ENTRY_SHARED_STRINGS = "xl/sharedStrings.xml";
+
+    private DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private SAXBuilder saxBuilder;
 
@@ -109,35 +112,45 @@ public class ExcelZipPackage extends ZipPackage {
             }
 
         });
-        int initNum = childList.size();
-        List<RowEntity> rowEntities = new ArrayList<>();
         List<Object> valList = new ArrayList<>();
+        List<Object> replaceList = new ArrayList<>();
+        int initNum = childList.size();
+        childList.forEach(e -> {
+            valList.add(e.getValue());
+        });
+        List<RowEntity> rowEntities = new ArrayList<>();
+
         int p = 0;
         for (int i = 0; i < dataList.size(); i++) {
             RowEntity rowEntity = new RowEntity();
             rowEntity.setRowIndex(i + beginRow);
-            List<RowEntity.ColEntity> cols = new ArrayList<>();
+            List<RowEntity.ColEntity> cols = new AlanList<>();
             for (int j = 0; j < fields.size(); j++) {
-                Field field=fields.get(j);
+                Field field = fields.get(j);
                 if (strList.contains(field.getName())) {
                     RowEntity.ColEntity colEntity = new RowEntity.ColEntity();
                     try {
                         Method method = reflectorManager.getGetMethod(field.getName());
-                        colEntity.setValue(method.invoke(dataList.get(i)));
-                        if (colEntity.getValue() instanceof Number) {
+                        Object value = method.invoke(dataList.get(i));
+                        if (value instanceof Number) {
                             colEntity.setType("n");
                         } else {
                             colEntity.setType("s");
-                            if (ObjectUtils.isNotEmpty(colEntity.getValue())) {
-                                if (colEntity.getValue() instanceof Date) {
-                                    DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                    colEntity.setValue(format.format(colEntity.getValue()));
+                            if (ObjectUtils.isNotEmpty(value)) {
+                                if (value instanceof Date) {
+                                    value = format.format(value);
                                 }
-                                valList.add(colEntity.getValue());
+//                                int index = valList.indexOf(colEntity.getValue());
+//                                if (index != -1) {
+//                                    colEntity.setPosition(initNum + index);
+//                                } else {
+                                replaceList.add(value);
                                 colEntity.setPosition(initNum + p++);
+//                                }
                             }
                         }
-
+                        colEntity.setFieldName(field.getName());
+                        colEntity.setValue(value);
                     } catch (Exception e) {
                         log.warn("", e);
                     }
@@ -163,58 +176,50 @@ public class ExcelZipPackage extends ZipPackage {
         for (String s : strList1) {
             result = result.replace(s, "");
         }
-        String str = result.replaceAll("#alanpoi#replace", "<#list dataList as record>" +
-                "<si><t>\\${record}</t></si>" +
+        String str = result.replace("#alanpoi#replace", "<#list dataList as record>" +
+                "<si><t>${record}</t></si>" +
                 "</#list>");
         Writer writer = new FileWriter(sharedStrings, false);
         writer.write(str);
         writer.flush();
         writer.close();
         Map<String, Object> param = new HashMap<>();
-        param.put("dataList", valList);
+        param.put("dataList", replaceList);
         Template docTemplate = createTemplate(sharedStrings.getParent(), sharedStrings.getName(), true);
         docTemplate.process(param, new BufferedWriter(new OutputStreamWriter(new FileOutputStream(sharedStrings), "utf-8")));
-        parseSheet(rowEntities);
+        valList.addAll(replaceList);
+        parseSheet(rowEntities, valList);
     }
 
-    public void parseSheet(List<RowEntity> rowEntities) throws IOException, JDOMException, TemplateException {
+    public void parseSheet(List<RowEntity> rowEntities, List<Object> valList) throws IOException, JDOMException, TemplateException {
+        long beginRowIndex = -1;
+        if (rowEntities != null && rowEntities.size() > 0) {
+            beginRowIndex = rowEntities.get(0).getRowIndex();
+        }
         File sheetFile = this.getEntity(ExcelZipPackage.ZIP_ENTRY_XL);
         Document doc = saxBuilder.build(sheetFile);
-        Element root = doc.getRootElement();
-        Element sheet = root.getChildren("sheetData", root.getNamespace()).get(0);
-        RowEntity first = rowEntities.get(0);
-        List<Element> rows = sheet.getChildren("row", sheet.getNamespace());
-        for (Element row : rows) {
-            String r = row.getAttributeValue("r");
-            if (r.equals(String.valueOf(first.getRowIndex() + 1))) {
-                WorkbookBuild workbookBuild = new WorkbookBuild(rowEntities, row);
-                sheet.removeContent(row);
-                sheet.addContent(rows.size(), new Text("#alanpoi#replace#sheet"));
-                XMLOutputter outPutter = new XMLOutputter();
-                outPutter.output(doc, new FileOutputStream(sheetFile));
-                Reader reader = new FileReader(sheetFile);
-                int len = 0;
-                StringWriter sw = new StringWriter();
-                while ((len = reader.read()) != -1) {
-                    sw.write(len);
-                }
-                sw.flush();
-                sw.close();
-                //TODO 50万数据耗时6秒
-//                String str = sw.toString().replace("#alanpoi#replace#sheet", workbookBuild.buildSheet());
-                String str = sw.toString().replace("#alanpoi#replace#sheet", "${sheetData}");
-                Writer writer = new FileWriter(sheetFile, false);
-                writer.write(str);
-                writer.flush();
-                writer.close();
 
-                Map<String, Object> param = new HashMap<>();
-                param.put("sheetData", workbookBuild.buildSheet());
-                Template docTemplate = createTemplate(sheetFile.getParent(), sheetFile.getName(), true);
-                docTemplate.process(param, new BufferedWriter(new OutputStreamWriter(new FileOutputStream(sheetFile), "utf-8")));
-                break;
-            }
+        if (beginRowIndex == -1) {
+            //标准处理
+            Conversion conversion = new ColorfulConversion(rowEntities, doc, valList, sheetFile);
+            conversion.start(null);
+        } else {
+            //标准处理
+            Conversion conversion = new StandardConversion(rowEntities, doc, valList, sheetFile);
+            conversion.start((p, k) -> {
+                Template docTemplate = null;
+                try {
+                    docTemplate = createTemplate(k.getParent(), k.getName(), true);
+                    docTemplate.process(p, new BufferedWriter(new OutputStreamWriter(new FileOutputStream(sheetFile), "utf-8")));
+                } catch (Exception e) {
+                    throw new AlanPoiException(e);
+                }
+
+                return true;
+            });
         }
+
+
     }
 
     private void composite() throws IOException {

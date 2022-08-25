@@ -112,4 +112,11 @@ public class NumberUtils {
             }
         }
     }
+
+    public static boolean isInteger(String str) {
+        if (isNumber(str)) {
+            return !str.contains(".");
+        }
+        return false;
+    }
 }

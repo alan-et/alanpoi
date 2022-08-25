@@ -1,6 +1,7 @@
 package com.alanpoi.excel.exports;
 
 import java.util.List;
+import java.util.Objects;
 
 public class RowEntity {
 
@@ -28,6 +29,8 @@ public class RowEntity {
     public static class ColEntity {
         private int position = -1;
 
+        private String fieldName;
+
         private Object value;
 
         private String type;
@@ -38,6 +41,14 @@ public class RowEntity {
 
         public void setPosition(int position) {
             this.position = position;
+        }
+
+        public String getFieldName() {
+            return fieldName;
+        }
+
+        public void setFieldName(String fieldName) {
+            this.fieldName = fieldName;
         }
 
         public Object getValue() {
@@ -54,6 +65,22 @@ public class RowEntity {
 
         public void setType(String type) {
             this.type = type;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null) return false;
+            if (o instanceof String) {
+                return Objects.equals(fieldName, (String) o);
+            }
+            ColEntity colEntity = (ColEntity) o;
+            return Objects.equals(fieldName, colEntity.fieldName);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(fieldName);
         }
     }
 }

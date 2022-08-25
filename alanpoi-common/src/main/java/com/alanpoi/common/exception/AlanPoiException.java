@@ -26,6 +26,10 @@ public class AlanPoiException extends RuntimeException {
         this.message = rspEnum.message();
     }
 
+    public AlanPoiException(Throwable e) {
+        super(e.getMessage(), e);
+    }
+
     public Integer getCode() {
         return code;
     }

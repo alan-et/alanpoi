@@ -23,8 +23,9 @@ public class Main {
     private static void test2() throws IOException {
         TemplateHandle templateHandle = new TemplateHandle();
         List<ExportVO> list = new ArrayList<>();
-        for (int i = 0; i < 1000000; i++) {
+        for (int i = 0; i < 1000; i++) {
             ExportVO exportVO = new ExportVO();
+            exportVO.setTitle("业绩部");
             if ((i > 100 && i < 103) || (i > 108 && i < 111)) {
                 exportVO.setName("name");
             } else {
@@ -37,7 +38,7 @@ public class Main {
             list.add(exportVO);
         }
         long begin = System.currentTimeMillis();
-        ZipPackage zipPackage = templateHandle.getExcelStream("/Users/pengzhuoxun/Downloads/testTem.xlsx", list, ExportVO.class, 1);
+        ZipPackage zipPackage = templateHandle.getExcelStream("/Users/pengzhuoxun/Downloads/复杂模版.xlsx", list, ExportVO.class, -1);
         System.out.println("alanpoi 总耗时 " + (System.currentTimeMillis() - begin) + "毫秒");
         zipPackage.write(new FileOutputStream("/Users/pengzhuoxun/Downloads/test666.xlsx"));
     }

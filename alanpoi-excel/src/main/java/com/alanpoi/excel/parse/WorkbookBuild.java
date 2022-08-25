@@ -32,7 +32,7 @@ public class WorkbookBuild {
     }
 
     private String buildRow(RowEntity entity) {
-        StringBuffer rowSb = new StringBuffer("<row ");
+        StringBuilder rowSb = new StringBuilder("<row ");
         rowAttributes.forEach(e -> {
             rowSb.append(e.getName()).append("=\"");
             if (e.getName().equals("r")) {
@@ -44,10 +44,9 @@ public class WorkbookBuild {
         rowSb.append(">");
         List<RowEntity.ColEntity> colList = entity.getCols();
         for (int i = 0; i < colList.size(); i++) {
-            StringBuffer colSb = new StringBuffer("<c ");
+            StringBuilder colSb = new StringBuilder("<c ");
             int finalI = i;
             colAttributes.forEach(e -> {
-
                 if (e.getName().equals("r")) {
                     colSb.append(e.getName()).append("=\"");
                     colSb.append(LetterUtils.getColLetter(finalI) + (entity.getRowIndex() + 1)).append("\" ");
@@ -72,7 +71,7 @@ public class WorkbookBuild {
             } else {
                 int position = colList.get(i).getPosition();
                 if (position == -1) {
-                    colSb.append("").append("</v>");
+                    colSb.append("</v>");
                 } else {
                     colSb.append(position).append("</v>");
                 }
