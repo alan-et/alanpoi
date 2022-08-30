@@ -80,7 +80,6 @@ public class ColorfulConversion extends AbstractConversion {
             });
             delRowList.clear();
             super.mergeCell(rIndex, -1, rowEntities.size(), tempRowList.size());
-//            rIndex++;
             for (int i = 0; i < rowEntities.size(); i++) {
                 RowEntity rowEntity = rowEntities.get(i);
                 for (int j = 0; j < tempRowList.size(); j++) {

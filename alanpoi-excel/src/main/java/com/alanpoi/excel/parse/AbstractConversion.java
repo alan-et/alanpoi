@@ -30,6 +30,9 @@ public abstract class AbstractConversion {
 
     private List<Hyperlink> hyperlinkList = new ArrayList<>();
 
+    private static String NAMESPACE_RELATIONSHIPS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+    private static String NAMESPACE_XR = "http://schemas.microsoft.com/office/spreadsheetml/2014/revision";
+
     public List<Hyperlink> getHyperlinkList() {
         return hyperlinkList;
     }
@@ -132,11 +135,11 @@ public abstract class AbstractConversion {
                         }
                     }
                     String cellR = cell.getAttributeValue("r");
-                    Element link = new Element("hyperlink", hyperlinks.getNamespace());
+                    Element link = new Element("hyperlink", root.getNamespace());
                     String rid = "cusrid" + cellR;
-                    link.setAttribute("uid", UUID.randomUUID().toString(), Namespace.getNamespace("xr", link.getNamespaceURI()));
+                    link.setAttribute("uid", "{" + UUID.randomUUID().toString() + "}", Namespace.getNamespace("xr", NAMESPACE_XR));
                     link.setAttribute("ref", cellR);
-                    link.setAttribute("id", rid, Namespace.getNamespace("r", link.getNamespaceURI()));
+                    link.setAttribute("id", rid, Namespace.getNamespace("r", NAMESPACE_RELATIONSHIPS));
                     link.setAttribute("display", displayVal);
                     hyperlinks.addContent(link);
                     Hyperlink hyperlink = new Hyperlink(cellR, rid, displayVal, linkVal);
