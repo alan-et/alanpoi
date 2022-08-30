@@ -22,7 +22,7 @@ public class ZipPackage extends AbstractParse {
 
     public File inFile;
 
-    public static Map<String, File> zipItem = new ConcurrentHashMap<>();
+    public Map<String, File> zipItem = new ConcurrentHashMap<>();
 
 
     public ZipPackage(String path, String type) throws IOException {

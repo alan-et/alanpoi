@@ -2,6 +2,7 @@ package com.alanpoi.excel.parse;
 
 import com.alanpoi.common.exception.AlanPoiException;
 import com.alanpoi.common.util.*;
+import com.alanpoi.excel.common.Hyperlink;
 import com.alanpoi.excel.exports.RowEntity;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -18,6 +19,7 @@ import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -94,7 +96,7 @@ public class ExcelZipPackage extends ZipPackage {
     }
 
 
-    public void loadShared(List<?> dataList, ReflectorManager reflectorManager, int beginRow) throws IOException, TemplateException, JDOMException {
+    public void writeShared(List<?> dataList, ReflectorManager reflectorManager, int beginRow) throws IOException, TemplateException, JDOMException {
         File sharedStrings = this.getEntity(ExcelZipPackage.ZIP_ENTRY_SHARED_STRINGS);
 //        InputStream in = new FileInputStream(sharedStrings);
         Document doc = saxBuilder.build(sharedStrings);
@@ -103,15 +105,19 @@ public class ExcelZipPackage extends ZipPackage {
         List<Element> childList = root.getChildren("si", root.getNamespace());
         String text = root.getValue();
         List<String> strList = StringUtils.findReplaceAll(text, Placeholder.TYPE0);
-        strList.forEach(e -> {
+        strList = strList.stream().map(e -> {
             if (e.contains(":")) {
                 String val = e.split(":")[1];
                 if (val.contains("/.")) {
                     e = val.split("\\.")[1];
                 }
             }
+            if (e.contains("?")) {
+                e = e.split("\\?")[0];
+            }
+            return e;
+        }).collect(Collectors.toList());
 
-        });
         List<Object> valList = new ArrayList<>();
         List<Object> replaceList = new ArrayList<>();
         int initNum = childList.size();
@@ -188,10 +194,10 @@ public class ExcelZipPackage extends ZipPackage {
         Template docTemplate = createTemplate(sharedStrings.getParent(), sharedStrings.getName(), true);
         docTemplate.process(param, new BufferedWriter(new OutputStreamWriter(new FileOutputStream(sharedStrings), "utf-8")));
         valList.addAll(replaceList);
-        parseSheet(rowEntities, valList);
+        writeSheet(rowEntities, valList);
     }
 
-    public void parseSheet(List<RowEntity> rowEntities, List<Object> valList) throws IOException, JDOMException, TemplateException {
+    public void writeSheet(List<RowEntity> rowEntities, List<Object> valList) throws IOException, JDOMException, TemplateException {
         long beginRowIndex = -1;
         if (rowEntities != null && rowEntities.size() > 0) {
             beginRowIndex = rowEntities.get(0).getRowIndex();
@@ -200,12 +206,16 @@ public class ExcelZipPackage extends ZipPackage {
         Document doc = saxBuilder.build(sheetFile);
 
         if (beginRowIndex == -1) {
-            //标准处理
-            Conversion conversion = new ColorfulConversion(rowEntities, doc, valList, sheetFile);
+            //复杂处理
+            AbstractConversion conversion = new ColorfulConversion(rowEntities, doc, valList, sheetFile);
             conversion.start(null);
+            List<Hyperlink> hyperlinks = conversion.getHyperlinkList();
+            if (hyperlinks != null && hyperlinks.size() > 0) {
+                new WorkRelDocument(zipItem.get(ZIP_ENTRY_XL_REL)).write(hyperlinks);
+            }
         } else {
             //标准处理
-            Conversion conversion = new StandardConversion(rowEntities, doc, valList, sheetFile);
+            AbstractConversion conversion = new StandardConversion(rowEntities, doc, valList, sheetFile);
             conversion.start((p, k) -> {
                 Template docTemplate = null;
                 try {

@@ -6,7 +6,7 @@ import com.alanpoi.etactivity.api.req.CreateInstanceReq;
 import com.alanpoi.etactivity.api.req.FlowProcessReq;
 import com.alanpoi.etactivity.api.rsp.InstanceInfoRsp;
 
-import javax.validation.constraints.NotNull;
+//import javax.validation.constraints.NotNull;
 import java.util.Collection;
 
 @IService
@@ -21,7 +21,7 @@ public interface EtFlowApi {
      * @return
      * @since 2020-9-8
      */
-    InstanceInfoRsp start(@NotNull CreateInstanceReq createInstanceReq);
+    InstanceInfoRsp start(CreateInstanceReq createInstanceReq);
 
     /**
      * Create an instance and task asynchronously, and return the instance id
@@ -30,9 +30,9 @@ public interface EtFlowApi {
      * @return
      * @since 2020-9-8
      */
-    Long asyncStart(@NotNull CreateInstanceReq createInstanceReq);
+    Long asyncStart(CreateInstanceReq createInstanceReq);
 
-    boolean process(@NotNull FlowProcessReq flowProcessReq);
+    boolean process(FlowProcessReq flowProcessReq);
 
     boolean addHandler(Collection<?> collection);
 

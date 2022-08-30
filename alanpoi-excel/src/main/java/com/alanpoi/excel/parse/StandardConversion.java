@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-public class StandardConversion extends Conversion {
+public class StandardConversion extends AbstractConversion {
 
 
     public StandardConversion(List<RowEntity> rowEntities,
@@ -27,6 +27,7 @@ public class StandardConversion extends Conversion {
     }
 
 
+    @Override
     public void start(BiFunction<Map<String, Object>, File, Boolean> callback) throws AlanPoiException {
         try {
             Element root = document.getRootElement();

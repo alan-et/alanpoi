@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 
-public class ColorfulConversion extends Conversion {
+public class ColorfulConversion extends AbstractConversion {
 
     public ColorfulConversion(List<RowEntity> rowEntities,
                               Document document,
@@ -79,7 +79,7 @@ public class ColorfulConversion extends Conversion {
                 sheet.removeContent(e);
             });
             delRowList.clear();
-            mergeCell(rIndex, -1, rowEntities.size(), tempRowList.size());
+            super.mergeCell(rIndex, -1, rowEntities.size(), tempRowList.size());
 //            rIndex++;
             for (int i = 0; i < rowEntities.size(); i++) {
                 RowEntity rowEntity = rowEntities.get(i);
@@ -88,6 +88,7 @@ public class ColorfulConversion extends Conversion {
                     row.setAttribute("r", String.valueOf(rIndex));
                     int finalInrIndex = rIndex;
                     AtomicInteger colIndex = new AtomicInteger();
+                    int finalI = i;
                     row.getChildren("c", row.getNamespace()).forEach(e -> {
                         String type = e.getAttributeValue("t");
                         e.setAttribute("r", LetterUtils.getColLetter(colIndex.getAndIncrement()) + finalInrIndex);
@@ -95,17 +96,18 @@ public class ColorfulConversion extends Conversion {
                         if ("s".equals(type) && StringUtils.isNotBlank(text)) {
                             String val = (String) sharedList.get(Integer.valueOf(text));
                             if (StringUtils.isNotBlank(val) && val.startsWith("${")) {
-                                val = val.replace("${", "").replace("}", "");
-                                int index = rowEntity.getCols().indexOf(val);
-                                if (index != -1) {
-                                    int position = rowEntity.getCols().get(index).getPosition();
-                                    if (position == -1) {
-                                        e.getChildren("v", e.getNamespace()).get(0).setText("");
-                                    } else {
-                                        e.getChildren("v", e.getNamespace()).get(0).setText(String.valueOf(position));
-                                    }
-
-                                }
+//                                val = val.replace("${", "").replace("}", "");
+//                                int index = rowEntity.getCols().indexOf(val);
+//                                if (index != -1) {
+//                                    int position = rowEntity.getCols().get(index).getPosition();
+//                                    if (position == -1) {
+//                                        e.getChildren("v", e.getNamespace()).get(0).setText("");
+//                                    } else {
+//                                        e.getChildren("v", e.getNamespace()).get(0).setText(String.valueOf(position));
+//                                    }
+//
+//                                }
+                                cellValFormat(e, rowEntity, val, tempRowList.size() * finalI - 1);
                             }
                         }
 

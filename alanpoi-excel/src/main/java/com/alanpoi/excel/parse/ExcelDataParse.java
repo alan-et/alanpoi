@@ -42,7 +42,7 @@ public class ExcelDataParse extends AbstractParse {
 
     public void exec(List<?> dataList, Class<?> cls, int beginRow) throws IOException, TemplateException, JDOMException {
         ReflectorManager reflectorManager = ReflectorManager.fromCache(cls);
-        ((ExcelZipPackage) zipPackage).loadShared(dataList, reflectorManager, beginRow);
+        ((ExcelZipPackage) zipPackage).writeShared(dataList, reflectorManager, beginRow);
         zipPackage.complete();
     }
 }
