@@ -191,11 +191,11 @@ public class ExportHandle {
                 if (null != index) {
                     cell = headRow.createCell(index);
                     excelParseParam.setIndex(index);
-                    sheet.setColumnWidth(index, excelColumn.width() * 256);
+                    sheet.setColumnWidth(index, excelColumn.width() * 256 + 200);
                 } else {
                     cell = headRow.createCell(cellNum);
                     excelParseParam.setIndex(cellNum);
-                    sheet.setColumnWidth(cellNum, excelColumn.width() * 256);
+                    sheet.setColumnWidth(cellNum, excelColumn.width() * 256 + 200);
                 }
                 cell.setCellValue(excelColumn.name());
                 cell.setCellStyle(headStyle);

@@ -16,8 +16,8 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-//        test1();
-        test2();
+        test1();
+//        test2();
     }
 
     private static void test2() throws IOException {
@@ -52,7 +52,7 @@ public class Main {
         bufferImg = ImageIO.read(new File("/Users/pengzhuoxun/Downloads/image1.png"));
 
         ImageIO.write(bufferImg, "png", byteArrayOut);
-        for (int i = 0; i < 1000000; i++) {
+        for (int i = 0; i < 1000; i++) {
             ExportVO exportVO = new ExportVO();
             if ((i > 100 && i < 103) || (i > 108 && i < 111)) {
                 exportVO.setName("name");

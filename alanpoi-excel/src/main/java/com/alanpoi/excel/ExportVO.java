@@ -21,7 +21,7 @@ public class ExportVO {
     @ExcelColumn(name = "名称", width = 60, autoMerge = true, align = Align.CENTER)
     private String name;
 
-    @ExcelColumn(name = "值")
+    @ExcelColumn(name = "值",width = 10)
     @NumFormat(value = "#0.#")
     private String value;
 
