@@ -61,6 +61,7 @@ public class ExcelHandle {
         int total = sheetDataList.get(0).getData().size();
         final ExcelImportRes excelImportRes = new ExcelImportRes();
         ExcelConsumeInterface consumeInterface = ApplicationUtil.getBean(c);
+        consumeInterface.begin(workbookId);
         consumeInterface.validData(workbookId, sheetDataList, excel.getCustomParam());
         ExcelError excelError = excelWorkbookManage.getExcelError(workbookId);
         int rowStart = sheetDataList.get(0).getRowStart();
@@ -99,11 +100,12 @@ public class ExcelHandle {
             RequestContextHolder.setRequestAttributes(requestAttributes, true);
             try {
 
-                if ("true".equals(excel.getSupportPart())) consumeInterface.end(sheetDataList, excel.getCustomParam());
+                if ("true".equals(excel.getSupportPart()))
+                    consumeInterface.end(workbookId, sheetDataList, excel.getCustomParam());
                 else {
                     if (excelError == null ||
                             CollectionUtils.isEmpty(excelError.getSheetErrors()))
-                        consumeInterface.end(sheetDataList, excel.getCustomParam());
+                        consumeInterface.end(workbookId, sheetDataList, excel.getCustomParam());
                 }
             } catch (Exception e) {
                 log.error("", e);
@@ -130,16 +132,16 @@ public class ExcelHandle {
         CompletableFuture.allOf(completableFuture, completableFuture1).join();
         ErrorFile errorFile = completableFuture1.join();
         try {
+            excelImportRes.setMessage(String.format(ResponseEnum.IMPORT_FILE_DATA_EXP.message(), sheetDataList.get(0).getData().size(), total - sheetDataList.get(0).getData().size()));
             if (errorFile != null) {
-                consumeInterface.error(excelError);
                 excelImportRes.setStatus(ResponseEnum.IMPORT_FILE_DATA_EXP.status());
                 excelImportRes.setDownErrorUrl(downloadPath + workbookId);
                 excelImportRes.setErrorFile(errorFile);
+                consumeInterface.error(workbookId, excelImportRes);
             } else {
                 ByteArrayOutputStream bytes = new ByteArrayOutputStream(3072);
                 excelWorkbookManage.getWorkbook(workbookId).write(bytes);
             }
-            excelImportRes.setMessage(String.format(ResponseEnum.IMPORT_FILE_DATA_EXP.message(), sheetDataList.get(0).getData().size(), total - sheetDataList.get(0).getData().size()));
         } catch (Exception e) {
             log.error("", e);
         }

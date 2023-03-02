@@ -1,5 +1,6 @@
 package com.alanpoi.analysis.excel.imports.handle;
 
+import com.alanpoi.analysis.excel.imports.ExcelImportRes;
 import com.alanpoi.analysis.excel.imports.ExcelSheetData;
 
 import java.io.Serializable;
@@ -13,12 +14,15 @@ import java.util.Map;
  * @since 2020-2-26
  */
 public interface ExcelConsumeInterface {
+
+    void begin(String workbookId);
+
     /**
-     * when error will 调用
+     * when error will call
      *
-     * @param excelError
+     * @param excelImportRes
      */
-    void error(ExcelError excelError);
+    void error(String workbookId, ExcelImportRes excelImportRes);
 
     /**
      * custom valid data
@@ -31,5 +35,5 @@ public interface ExcelConsumeInterface {
     /**
      * @param sheetDataList return success data
      */
-    void end(List<ExcelSheetData> sheetDataList, Map<Serializable, Object> excelParam);
+    void end(String workbookId, List<ExcelSheetData> sheetDataList, Map<Serializable, Object> excelParam);
 }
