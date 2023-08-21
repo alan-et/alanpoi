@@ -90,7 +90,7 @@ consume类继承ExcelConsumeInterface接口，实现方法
 
 #### 一调用
 
-用户调用ExcelExportUtil类的customImportData即可，参数excelId就是excel-conifg.xml中配置的id
+用户调用ExcelImportUtil类的customImportData即可，参数excelId就是excel-conifg.xml中配置的id
 
 ## Export
 
