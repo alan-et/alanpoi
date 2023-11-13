@@ -41,6 +41,8 @@ public class ExcelZipPackage extends ZipPackage {
 
     private DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+    private DateFormat format_date = new SimpleDateFormat("yyyy-MM-dd");
+
     private SAXBuilder saxBuilder;
 
     public ExcelZipPackage(String path) throws IOException {
@@ -143,6 +145,9 @@ public class ExcelZipPackage extends ZipPackage {
                         } else {
                             colEntity.setType("s");
                             if (ObjectUtils.isNotEmpty(value)) {
+                                if (value instanceof java.sql.Date) {
+                                    value = format_date.format(value);
+                                }
                                 if (value instanceof Date) {
                                     value = format.format(value);
                                 }

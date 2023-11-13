@@ -26,13 +26,13 @@ public class TemplateExport {
             contractVO.setCompanyAddress("北京市XXXX");
             contractVO.setCompanyTel("0755XXXXXX");
             contractVO.setContractAmount(new BigDecimal("10000"+i));
-            contractVO.setDiscountAmount(new BigDecimal("500"+i));
+            contractVO.setDiscountAmount(new BigDecimal("500"+i*2));
             contractVO.setPageUrl("https://alanpoi.com");
             list.add(contractVO);
         }
         long begin = System.currentTimeMillis();
-        ZipPackage zipPackage = templateHandle.getExcelStream("/Users/pengzhuoxun/Downloads/合同模版.xlsx", list, ContractVO.class, -1);
+        ZipPackage zipPackage = templateHandle.getExcelStream("/Users/pengzhuoxun/data/alanpoi/合同模版.xlsx", list, ContractVO.class, -1);
         System.out.println("alanpoi 总耗时 " + (System.currentTimeMillis() - begin) + "毫秒");
-        zipPackage.write(new FileOutputStream("/Users/pengzhuoxun/Downloads/合同.xlsx"));
+        zipPackage.write(new FileOutputStream("/Users/pengzhuoxun/data/alanpoi/tmp/合同.xlsx"));
     }
 }

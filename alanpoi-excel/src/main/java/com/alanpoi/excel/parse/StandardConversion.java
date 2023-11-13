@@ -34,6 +34,7 @@ public class StandardConversion extends AbstractConversion {
             Element sheet = root.getChildren("sheetData", root.getNamespace()).get(0);
             RowEntity first = rowEntities.get(0);
             List<Element> rows = sheet.getChildren("row", sheet.getNamespace());
+            super.mergeCell(first.getRowIndex() + 1, 0, rowEntities.size(), 1);
             for (Element row : rows) {
                 String r = row.getAttributeValue("r");
                 if (r.equals(String.valueOf(first.getRowIndex() + 1))) {

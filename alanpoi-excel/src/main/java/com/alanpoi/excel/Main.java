@@ -16,8 +16,8 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        test1();
-//        test2();
+//        test1();
+        test2();
     }
 
     private static void test2() throws IOException {
@@ -38,9 +38,9 @@ public class Main {
             list.add(exportVO);
         }
         long begin = System.currentTimeMillis();
-        ZipPackage zipPackage = templateHandle.getExcelStream("/Users/pengzhuoxun/Downloads/合同模版.xlsx", list, ExportVO.class, -1);
+        ZipPackage zipPackage = templateHandle.getExcelStream("/Users/pengzhuoxun/data/alanpoi/合同模版3.xlsx", list, ExportVO.class, 1);
         System.out.println("alanpoi 总耗时 " + (System.currentTimeMillis() - begin) + "毫秒");
-        zipPackage.write(new FileOutputStream("/Users/pengzhuoxun/Downloads/合同.xlsx"));
+        zipPackage.write(new FileOutputStream("/Users/pengzhuoxun/data/alanpoi/tmp/合同3.xlsx"));
     }
 
     private static void test1() throws IOException {
