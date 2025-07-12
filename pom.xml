@@ -30,7 +30,7 @@
         <java.version>1.8</java.version>
         <springboot.version>2.2.5.RELEASE</springboot.version>
         <fastjson.version>1.2.25</fastjson.version>
-        <commons-lang3.version>3.7</commons-lang3.version>
+        <commons-lang3.version>3.18.0</commons-lang3.version>
         <lombok.version>1.18.12</lombok.version>
         <redis.version>3.1.0</redis.version>
         <apache.poi.version>4.1.2</apache.poi.version>
