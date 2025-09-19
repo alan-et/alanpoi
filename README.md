@@ -19,5 +19,13 @@
 
 4. 中央仓库获取token配置到setting.xml文件
 
+#### 如果上传报错
+
+*执行以下命令*
+```shell
+gpgconf --kill dirmngr
+dirmngr --debug-all --daemon --standard-resolver
+```
+
 
 
