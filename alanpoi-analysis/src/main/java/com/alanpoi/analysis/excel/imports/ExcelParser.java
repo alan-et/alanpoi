@@ -5,6 +5,7 @@ import com.alanpoi.analysis.common.PoiEventManager;
 import com.alanpoi.analysis.excel.imports.handle.ExcelWorkbookManage;
 import com.alanpoi.common.event.Event;
 import com.alanpoi.common.event.EventListener;
+import jakarta.annotation.PostConstruct;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
@@ -16,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.PostConstruct;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.text.DateFormat;
@@ -36,7 +36,6 @@ import java.util.Map;
 public class ExcelParser<T> extends AbstractFileParser<T> implements EventListener {
     private final static Logger log = LoggerFactory.getLogger(ExcelParser.class);
 
-    @Autowired
     public ExcelParser(ExcelInitConfig excelInitConfig,
                        ExcelWorkbookManage excelWorkbookManage,
                        StringRedisTemplate redisTemplate,

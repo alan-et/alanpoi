@@ -1,6 +1,6 @@
 package com.alanpoi.etactivity.transfer;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

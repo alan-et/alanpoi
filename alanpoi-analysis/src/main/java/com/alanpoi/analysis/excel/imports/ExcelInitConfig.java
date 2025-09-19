@@ -12,7 +12,7 @@ import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;

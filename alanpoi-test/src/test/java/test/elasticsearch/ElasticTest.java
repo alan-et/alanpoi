@@ -4,8 +4,8 @@ import com.alanpoi.elasticsearch.ESOpType;
 import com.alanpoi.elasticsearch.client.BatchRequest;
 import com.alanpoi.elasticsearch.client.ESClientApi;
 import com.alanpoi.test.Application;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,8 +20,8 @@ public class ElasticTest {
 
     @Test
     public void bulkTest() throws IOException {
-        BatchRequest request=BatchRequest.build("qzd_cms","POST");
-        request.add("6", ESOpType.index,"{\"name\":\"测试6\"}");
+        BatchRequest request=BatchRequest.build("alan_index","POST");
+        request.add("6", ESOpType.index,"{\"name\":\"alanpoi 高效稳定\"}");
         JSONObject result= esRestClient.bulk(request);
         System.out.println(result);
     }

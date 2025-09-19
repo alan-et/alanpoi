@@ -4,7 +4,7 @@ import com.alanpoi.common.util.ApplicationUtil;
 import com.alanpoi.etactivity.client.EtSocketClient;
 import com.alanpoi.etactivity.protocol.EtActivityEntity;
 import com.alanpoi.etactivity.protocol.EtActivityReq;
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.stereotype.Component;
 

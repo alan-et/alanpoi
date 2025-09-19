@@ -1,6 +1,6 @@
 package com.alanpoi.etactivity.agent;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 
 public class RequestAgent {

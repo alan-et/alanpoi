@@ -3,9 +3,8 @@ package com.alanpoi.common.util;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.net.util.IPAddressUtil;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -175,12 +174,12 @@ public class NetworkUtil {
     /**
      * 判断是否内网ip
      */
-    public static boolean internalIp(String ip) {
+    public static boolean internalIp(String ip) throws UnknownHostException {
         if ("127.0.0.1".equalsIgnoreCase(ip))
             return true;
         if ("0:0:0:0:0:0:0:1".equals(ip))
             return true;
-        byte[] addr = IPAddressUtil.textToNumericFormatV4(ip);
+        byte[] addr = InetAddress.getByName(ip).getAddress();
         return internalIp(addr);
     }
 

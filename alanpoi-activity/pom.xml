@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.alanpoi</groupId>
         <artifactId>alan-poi</artifactId>
-        <version>1.3.5</version>
+        <version>3.0.0</version>
     </parent>
     <groupId>com.alanpoi</groupId>
     <artifactId>et-activity-client</artifactId>
@@ -20,6 +20,10 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
         </dependency>
     </dependencies>
 </project>

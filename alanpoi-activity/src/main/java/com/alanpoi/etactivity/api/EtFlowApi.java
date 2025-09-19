@@ -5,8 +5,8 @@ import com.alanpoi.etactivity.agent.annotation.IService;
 import com.alanpoi.etactivity.api.req.CreateInstanceReq;
 import com.alanpoi.etactivity.api.req.FlowProcessReq;
 import com.alanpoi.etactivity.api.rsp.InstanceInfoRsp;
+import jakarta.validation.constraints.NotNull;
 
-import javax.validation.constraints.NotNull;
 import java.util.Collection;
 
 @IService
