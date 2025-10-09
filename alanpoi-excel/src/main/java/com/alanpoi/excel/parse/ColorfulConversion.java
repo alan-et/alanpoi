@@ -11,6 +11,7 @@ import org.jdom2.output.XMLOutputter;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -37,9 +38,12 @@ public class ColorfulConversion extends AbstractConversion {
             int step = 0;
             List<Element> tempRowList = new ArrayList<>();
             List<Element> delRowList = new ArrayList<>();
+            Map<Integer, List<String>> colIndexMap = new HashMap<>();
             int rIndex = 0;
+            int flag = 0;
             for (Element row : rows) {
                 String value = "";
+                ArrayList<String> colIndexList = new ArrayList<>();
                 for (Element c : row.getChildren("c", row.getNamespace())) {
                     value = c.getValue();
                     boolean bool = NumberUtils.isInteger(value);
@@ -52,18 +56,21 @@ public class ColorfulConversion extends AbstractConversion {
                             break;
                         }
                         if (relVal.trim().startsWith("</#list")) {
-                            step = 9;
+                            step = -1;
                             break;
                         }
                     }
-
+                    if (step == 2) {
+                        colIndexList.add(LetterUtils.getColLetter(c.getAttributeValue("r")));
+                        colIndexMap.put(tempRowList.size(), colIndexList);
+                    }
                 }
                 if (step == 2) {
                     delRowList.add(row);
                     tempRowList.add(row);
                 }
                 //end
-                if (step == 9) {
+                if (step == -1) {
                     delRowList.add(row);
                     break;
                 }
@@ -86,11 +93,12 @@ public class ColorfulConversion extends AbstractConversion {
                     Element row = tempRowList.get(j).clone();
                     row.setAttribute("r", String.valueOf(rIndex));
                     int finalInrIndex = rIndex;
-                    AtomicInteger colIndex = new AtomicInteger();
+                    AtomicInteger cIndex = new AtomicInteger();
                     int finalI = i;
+                    int finalJ = j;
                     row.getChildren("c", row.getNamespace()).forEach(e -> {
                         String type = e.getAttributeValue("t");
-                        e.setAttribute("r", LetterUtils.getColLetter(colIndex.getAndIncrement()) + finalInrIndex);
+                        e.setAttribute("r", colIndexMap.get(finalJ).get(cIndex.getAndIncrement()) + finalInrIndex);
                         String text = e.getValue();
                         if ("s".equals(type) && StringUtils.isNotBlank(text)) {
                             String val = (String) sharedList.get(Integer.valueOf(text));

@@ -17,7 +17,7 @@ public class TemplateExport {
     public static void main(String[] args) throws IOException {
         TemplateHandle templateHandle = new TemplateHandle();
         List<ContractVO> list = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             ContractVO contractVO = new ContractVO();
             contractVO.setCustomerName("XXX科技服务有限公司");
             contractVO.setCustomerAddress("广东省深圳市XXXX科技城B2栋");

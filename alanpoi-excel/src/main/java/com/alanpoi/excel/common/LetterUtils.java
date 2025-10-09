@@ -23,6 +23,11 @@ public class LetterUtils {
         return getColLetter(index, colLetter);
     }
 
+    public static String getColLetter(String r) {
+       String str[]=r.split("(?<=\\D)(?=\\d)");
+       return str[0];
+    }
+
     public static void main(String[] args) {
         for (int i = 0; i < 51; i++) {
             System.out.println(getColLetter(i));

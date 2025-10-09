@@ -16,8 +16,8 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-//        test1();
-        test2();
+        test1();
+//        test2();
     }
 
     private static void test2() throws IOException {
@@ -65,23 +65,23 @@ public class Main {
             exportVO.setDateTime(new java.util.Date());
             list.add(exportVO);
 
-//            Export2VO export2VO = new Export2VO();
-//            export2VO.setName("name" + i);
-//            export2VO.setValue("value" + i);
-//            export2VO.setAmount(new BigDecimal(6666.666 + i * 10));
-//            export2VO.setDate(new Date(132324343 + i * 100));
-//            export2VO.setDateTime(new java.util.Date());
+            Export2VO export2VO = new Export2VO();
+            export2VO.setName("name" + i);
+            export2VO.setValue("value" + i);
+            export2VO.setAmount(new BigDecimal(6666.666 + i * 10));
+            export2VO.setDate(new Date(132324343 + i * 100));
+            export2VO.setDateTime(new java.util.Date());
 //            export2VO.setImage("https://t7.baidu.com/it/u=1569919947,316169633&fm=218&app=92&f=PNG?w=121&h=75&s=6ED4EC1A07384D8A0654DCDE03007031");
-//            export2VO.setImage2(byteArrayOut.toByteArray());
-//            list2.add(export2VO);
+            export2VO.setImage2(byteArrayOut.toByteArray());
+            list2.add(export2VO);
         }
         long begin = System.currentTimeMillis();
-            Workbook workbook = ExcelExportUtil.getWorkbook(list, ExportVO.class);
-        System.out.println("apache poi耗时 " + (System.currentTimeMillis() - begin) + "毫秒");
-//        ExportMultipleSheetParam param = new ExportMultipleSheetParam();
-//        param.put(0, "测试1", ExportVO.class, list);
-//        param.put(1, "测试2", Export2VO.class, list2);
-//        Workbook workbook = ExcelExportUtil.getByMultiSheet(param);
+//            Workbook workbook = ExcelExportUtil.getWorkbook(list, ExportVO.class);
+//        System.out.println("apache poi耗时 " + (System.currentTimeMillis() - begin) + "毫秒");
+        ExportMultipleSheetParam param = new ExportMultipleSheetParam();
+        param.put(0, "测试1", ExportVO.class, list);
+        param.put(1, "测试2", Export2VO.class, list2);
+        Workbook workbook = ExcelExportUtil.getByMultiSheet(param);
         OutputStream outputStream = new FileOutputStream("/Users/pengzhuoxun/Downloads/test.xlsx");
         workbook.write(outputStream);
         workbook.close();
