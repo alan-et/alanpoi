@@ -9,6 +9,7 @@
     </parent>
     <groupId>com.alanpoi</groupId>
     <artifactId>alanpoi-common</artifactId>
+    <version>1.3.9</version>
     <name>alanpoi-common</name>
     <description>Alan POI Common Server</description>
 

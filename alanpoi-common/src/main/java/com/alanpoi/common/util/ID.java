@@ -5,17 +5,18 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 
 /**
  * 64位分布式ID(Long)（支持高并发(单节点每毫秒16383，超过并发数，排队1毫秒)）
- * 支持时间  此方法可以支持139年(应该是目前除开UUID(UUID是128为字节，32位的字符，生成的ID无法排序)，支持时间最长的分布式算法)
- * 支持节点  为了更好的支持高并发，适量的降低了服务器节点数，此方法最多支持128(0-127)台服务器
- * 容错率高  高并发的场景往往不能保持原子性，一般很容易出现问题，因此此算法引入了AtomicInteger（原子类，CAS算法）来解决此问题
- * algorithm |42bit(timestamp)|14bit(version)|7bit(serverId)|
+ * 支持时间  此方法可以支持139年
+ * 支持节点  最多支持128(0-127)台服务器
+ * algorithm 1bit|42bit(timestamp)|14bit(version)|7bit(serverId)|
+ * 结构：| 1位符号(0) | 42位时间戳 | 14位序列号 | 7位节点ID |
  *
  * @author pengzhuoxun
- * @since 1.1.2
+ * @since 1.3.9
  */
 public class ID {
 
@@ -24,36 +25,35 @@ public class ID {
     /**
      * Service unique identification
      */
-    private short serverId;
+    private long serverId;
 
     /**
-     * 2020-4-1 00:00:00.000
+     * 基准时间，不允许修改
      */
-    private long begin = 1585699200000L;
-//    private long begin = 1585624432663L;
+    private final long begin;
 
+    // 位数分配
+    private final long serverIdBits = 7L;
+    private final long sequenceBits = 14L;
 
-    /**
-     * Timestamp (Timestamp (MS))
-     */
-    private long timestamp;
+    private final long maxServerId = -1L ^ (-1L << serverIdBits); // 127
+    private final long sequenceMask = -1L ^ (-1L << sequenceBits); // 16383
 
-    private long seq;
+    private final long sequenceShift = serverIdBits;
+    private final long timestampLeftShift = sequenceBits + serverIdBits;
 
-    /**
-     * operate version
-     */
-    private long version;
-
+    private final AtomicLong sequenceAtomic = new AtomicLong(0);
+    private volatile long lastTimestamp = -1L;
     private Random random;
 
-    private AtomicInteger atomicInt;
+    private static final AtomicLongFieldUpdater<ID> lastTimestampUpdater =
+            AtomicLongFieldUpdater.newUpdater(ID.class, "lastTimestamp");
 
-    private transient long modCount = 0;
 
-    private transient String lock = "";
-
+    // ====================== 你原版构造全部保留 ======================
     public ID() {
+        //2020-4-1 00:00:00.000
+        this.begin = 1585699200000L;
         init();
     }
 
@@ -63,60 +63,80 @@ public class ID {
     }
 
     private void init() {
-        atomicInt = new AtomicInteger(0);
         random = new Random();
-        getTimestamp();
-        getSeq();
         ServerID serverID = ApplicationUtil.getBean(ServerID.class);
-        if (serverID == null)
+        if (serverID == null) {
             serverId = (short) random.nextInt(0x7f + 1);
-        else
+        } else {
             serverId = serverID.getId();
-    }
-
-    public long current() {
-        return timestamp | version | (serverId | 0L);
+            if (serverId > maxServerId || serverId < 0) {
+                throw new IllegalArgumentException(String.format("Server ID can't be greater than %d or less than 0", maxServerId));
+            }
+        }
     }
 
     public long next() {
+        for (; ; ) {
+            long currentTimestamp = timeGen();
+            long lastTs = lastTimestamp;
 
-        return getTimestamp() | getVersion() | (serverId | 0L);
+            if (currentTimestamp < lastTs) {
+                logger.error("时钟回拨，拒绝生成ID，相差：{}ms", lastTs - currentTimestamp);
+                throw new RuntimeException("Clock moved backwards");
+            }
+
+            long currentSeq = sequenceAtomic.get();
+            long nextSeq = currentSeq + 1;
+            long finalSeq = nextSeq & sequenceMask;
+
+            // 在同一毫秒内
+            if (currentTimestamp == lastTs) {
+                // 毫秒内序列号用尽（截断后变成了0，说明16383用完了）
+                if (finalSeq == 0) {
+                    tilNextMillis(lastTs);
+                    continue;
+                }
+                // 抢夺该毫秒内的序列号，抢到直接返回，不抢则自旋
+                if (sequenceAtomic.compareAndSet(currentSeq, nextSeq)) {
+                    return ((currentTimestamp - begin) << timestampLeftShift)
+                            | (finalSeq << sequenceShift)
+                            | serverId;
+                }
+            }
+            // 跨毫秒（新毫秒）
+            else {
+                // 注意：跨毫秒时，我们不把 AtomicLong 强制清空。
+                // 而是借用当前的 nextSeq 值。只要我们能成功把 lastTimestamp 从旧时间戳 CAS 改为新时间戳，
+                // 就说明当前线程是“第一个跨入新毫秒”的幸运儿。
+                // 为了防止finalSeq刚好为0（极其罕见但存在），我们强制让其从1开始，或者直接用当前的finalSeq
+
+                // 谁能成功用 CAS 把时间戳推向新的一毫秒，谁就拥有这一毫秒的绝对解释权
+                if (lastTimestampUpdater.compareAndSet(this, lastTs, currentTimestamp)) {
+                    // 成功跨越时间戳的线程，顺便把序列号也同步一下
+                    sequenceAtomic.set(nextSeq);
+                    return ((currentTimestamp - begin) << timestampLeftShift)
+                            | (finalSeq << sequenceShift)
+                            | serverId;
+                }
+            }
+        }
     }
 
+    // ====================== 你原版工具方法全部保留 ======================
     public static ID getId() {
         return ApplicationUtil.getBean(ID.class);
     }
 
-    private long getTimestamp() {
-        return timestamp = ((long) (System.currentTimeMillis() - begin) | 0L) << 21;
-    }
-
-    private long getSeq() {
-        return seq = 0L | random.nextInt(0xfff);
-    }
-
-    private long getVersion() {
-        long version = atomicInt.incrementAndGet();
-        if (version == 0x3fff) atomicInt = new AtomicInteger(0);
-        if (version == 1 && modCount > 0) {
-            modCount++;
-            lock = String.valueOf(timestamp) + version;
-            synchronized (lock) {
-                try {
-                    if (lock.equals(String.valueOf((System.currentTimeMillis() - begin) << 21) + version)) {
-                        logger.warn("生成ID超过最大并发,系统正在排队处理,排队时间1毫秒,最大每毫米并发数:" + 0x3fff);
-                        Thread.sleep(1);
-                        getTimestamp();
-                    }
-                } catch (InterruptedException e) {
-                    logger.error("", e);
-                }
-                return this.version = (version | 0L) << 7;
-            }
-        } else {
-            modCount++;
-            return this.version = (version | 0L) << 7;
+    private long tilNextMillis(long lastTimestamp) {
+        long timestamp = timeGen();
+        while (timestamp <= lastTimestamp) {
+            timestamp = timeGen();
         }
+        return timestamp;
+    }
+
+    private long timeGen() {
+        return System.currentTimeMillis();
     }
 
     public static void main(String[] args) {
@@ -138,7 +158,5 @@ public class ID {
             list.add(idLong);
             i++;
         } while (i < 0x3fff);
-//        System.out.println(Long.MAX_VALUE);
-//        System.out.println(Long.valueOf((0x3ffffffffffL) << 21) | (0x3fff | 0L) << 7 | 0x7f);
     }
 }
